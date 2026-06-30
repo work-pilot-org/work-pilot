@@ -1,2 +1,2 @@
 hi
-ashif chnage readme as collabrative way
+ashif ek chnage readme as collabrative way 
