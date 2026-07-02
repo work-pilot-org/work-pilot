@@ -1,5 +1,2 @@
-hi
-
-ashika
-ashif
-gfdgfdgf
+hi we fix it
+along with code rabbit
