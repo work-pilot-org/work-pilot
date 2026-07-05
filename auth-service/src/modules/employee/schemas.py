@@ -22,6 +22,8 @@ class EmploymentStatus(str, Enum):
 
 class EmployeeCreate(BaseModel):
     user_id: UUID
+    full_name: str
+    email: str
     role: Role = Role.EMPLOYEE
     department: str | None = None
     job_title: str | None = None
@@ -34,6 +36,10 @@ class EmployeeResponse(BaseModel):
 
     id: UUID
     user_id: UUID
+
+    full_name: str
+    email: str
+
     role: Role
     department: str | None
     job_title: str | None

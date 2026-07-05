@@ -1,0 +1,58 @@
+services:
+
+  postgres:
+    image: postgres:16
+
+    container_name: workpilot_postgres
+
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: workpilot_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+
+    ports:
+      - "5433:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d workpilot_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+
+    container_name: workpilot_auth_service
+
+    restart: unless-stopped
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    env_file:
+      - ./auth-service/.env
+
+    ports:
+      - "8000:8000"
+
+    volumes:
+      - ./auth-service:/app
+
+    working_dir: /app
+
+    command: >
+      uv run uvicorn src.main:app
+      --host 0.0.0.0
+      --port 8000
+      --reload
+
+volumes:
+  postgres_data:

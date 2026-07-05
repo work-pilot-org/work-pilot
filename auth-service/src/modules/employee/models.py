@@ -39,11 +39,23 @@ class Employee(TenantBase):
         default=uuid.uuid4,
     )
 
-
+    # Logical reference to public.users.id
+    # No ForeignKey because this table is inside tenant schema
     user_id: Mapped[uuid.UUID] = mapped_column(
-            UUID(as_uuid=True),
-            nullable=False,
-            unique=True,
+        UUID(as_uuid=True),
+        nullable=False,
+        unique=True,
+    )
+
+    full_name: Mapped[str] = mapped_column(
+        String(255),
+        nullable=False,
+    )
+
+    email: Mapped[str] = mapped_column(
+        String(255),
+        nullable=False,
+        unique=True,
     )
 
     role: Mapped[Role] = mapped_column(
@@ -97,8 +109,6 @@ class Employee(TenantBase):
         onupdate=datetime.utcnow,
         nullable=False,
     )
-
-
 
     manager: Mapped["Employee"] = relationship(
         "Employee",
