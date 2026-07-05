@@ -305,6 +305,8 @@ class AuthService:
 
             employee = Employee(
                 user_id=user.id,
+                full_name=request.full_name,
+                email=request.email,
                 role=Role.ORG_ADMIN,
             )
 
