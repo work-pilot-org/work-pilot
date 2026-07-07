@@ -6,17 +6,24 @@ from src.core.exceptions import (
     CompanyAlreadyExistsException,
     DomainAlreadyExistsException,
     EmailAlreadyExistsException,
+    InvalidCredentialsException,
 )
 
 from src.modules.auth.schemas import (
     RegisterRequest,
     RegisterResponse,
+    LoginRequest,
+    LoginResponse,
 )
 from src.modules.employee.repository import EmployeeRepository
 from src.modules.tenant.repository import TenantRepository
 from src.modules.user.repository import UserRepository
 
-from src.core.security import hash_password
+from src.core.security import (
+    hash_password,
+    verify_password,
+    create_access_token,
+)
 
 from src.modules.tenant.models import (
     Tenant,
@@ -350,4 +357,49 @@ class AuthService:
 
             raise
 
+    def login(
+        self,
+        db: Session,
+        request: LoginRequest,
+    ) -> LoginResponse:
+        """
+        Authenticate user and return a JWT access token.
+        """
         
+        # 1. Find user by email
+        user = self.user_repository.get_user_by_email(db, request.email)
+        if not user:
+            raise InvalidCredentialsException("Invalid email or password.")
+            
+        # 2. Verify password
+        if not verify_password(request.password, user.password):
+            raise InvalidCredentialsException("Invalid email or password.")
+            
+        # 3. Get User Profile to find Tenant ID
+        profile = self.user_repository.get_user_profile(db, user.id)
+        if not profile:
+            raise InvalidCredentialsException("User profile not found.")
+            
+        # 4. Get Tenant to find Schema Name
+        tenant = self.tenant_repository.get_tenant_by_id(db, profile.tenant_id)
+        if not tenant:
+            raise InvalidCredentialsException("Tenant not found.")
+            
+        # 5. Create JWT payload
+        token_data = {
+            "sub": str(user.id),
+            "email": user.email,
+            "tenant_id": tenant.id,
+            "schema_name": tenant.schema_name,
+        }
+        
+        access_token = create_access_token(token_data)
+        
+        return LoginResponse(
+            access_token=access_token,
+            user_id=str(user.id),
+            email=user.email,
+            tenant_id=tenant.id,
+            schema_name=tenant.schema_name,
+            company_name=tenant.company_name,
+        )

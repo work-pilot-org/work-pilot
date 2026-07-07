@@ -7,6 +7,10 @@ app = FastAPI(
     title=settings.APP_NAME,
 )
 
+# Include Middleware
+from src.core.middleware import TenantMiddleware
+app.add_middleware(TenantMiddleware)
+
 # Include Routers
 app.include_router(auth_router)
 

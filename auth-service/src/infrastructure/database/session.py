@@ -15,9 +15,16 @@ SessionLocal = sessionmaker(
 )
 
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+from fastapi import Request
+
+def get_db(request: Request = None):
+    # If middleware already created the session, use it
+    if request and hasattr(request.state, "db"):
+        yield request.state.db
+    else:
+        # Fallback for scripts/tests that bypass middleware
+        db = SessionLocal()
+        try:
+            yield db
+        finally:
+            db.close()
