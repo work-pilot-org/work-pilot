@@ -8,7 +8,7 @@ app = FastAPI(
 )
 
 # Include Middleware
-from src.core.middleware import TenantMiddleware
+from src.infrastructure.middleware.tenant_middleware import TenantMiddleware
 app.add_middleware(TenantMiddleware)
 
 # Include Routers
