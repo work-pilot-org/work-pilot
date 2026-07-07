@@ -45,3 +45,18 @@ class RegisterResponse(BaseModel):
     tenant_id: int
     company_name: str
     domain: str
+
+
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str = Field(..., min_length=1)
+
+
+class LoginResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user_id: str
+    email: str
+    tenant_id: int
+    schema_name: str
+    company_name: str
