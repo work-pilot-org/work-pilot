@@ -8,11 +8,21 @@
     "lint": "next lint"
   },
   "dependencies": {
+<<<<<<< HEAD
+=======
+    "@hookform/resolvers": "^5.4.0",
+    "axios": "^1.18.1",
+>>>>>>> f173151 (feat(auth): implement forgot and reset password flow)
     "lucide-react": "^1.23.0",
     "next": "16.2.1",
     "react": "19.2.0",
     "react-dom": "19.2.0",
+<<<<<<< HEAD
     "zustand": "^5.0.14"
+=======
+    "react-hook-form": "^7.81.0",
+    "zod": "^4.4.3"
+>>>>>>> f173151 (feat(auth): implement forgot and reset password flow)
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

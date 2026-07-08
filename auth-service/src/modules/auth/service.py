@@ -46,6 +46,11 @@ from src.modules.employee.models import (
     Role,
 )
 
+from src.modules.password_reset.service import PasswordResetService
+from src.modules.password_reset.schemas import (
+    ForgotPasswordRequest,
+    ResetPasswordRequest,
+)
 
 
 class AuthService:
@@ -55,7 +60,7 @@ class AuthService:
         self.tenant_repository = TenantRepository()
         self.user_repository = UserRepository()
         self.employee_repository = EmployeeRepository()
-
+        self.password_reset_service = PasswordResetService()
     # --------------------------------------------------
     # Validation Helpers
     # --------------------------------------------------
@@ -404,53 +409,4 @@ class AuthService:
             tenant_id=tenant.id,
             schema_name=tenant.schema_name,
             company_name=tenant.company_name,
-        ), refresh_token
-
-    def refresh_access_token(
-        self,
-        db: Session,
-        refresh_token: str,
-    ) -> LoginResponse:
-        from jose import jwt, JWTError
-        from src.core.config import settings
-        
-        try:
-            payload = jwt.decode(
-                refresh_token,
-                settings.SECRET_KEY,
-                algorithms=[settings.ALGORITHM]
-            )
-            if payload.get("type") != "refresh":
-                raise InvalidCredentialsException("Invalid token type.")
-            
-            user_id = payload.get("sub")
-            if not user_id:
-                raise InvalidCredentialsException("Invalid token payload.")
-                
-            user = self.user_repository.get_user_by_id(db, user_id)
-            if not user:
-                raise InvalidCredentialsException("User not found.")
-                
-            profile = self.user_repository.get_user_profile(db, user.id)
-            tenant = self.tenant_repository.get_tenant_by_id(db, profile.tenant_id)
-            
-            token_data = {
-                "sub": str(user.id),
-                "email": user.email,
-                "tenant_id": tenant.id,
-                "schema_name": tenant.schema_name,
-            }
-            
-            new_access_token = create_access_token(token_data)
-            
-            return LoginResponse(
-                access_token=new_access_token,
-                user_id=str(user.id),
-                email=user.email,
-                tenant_id=tenant.id,
-                schema_name=tenant.schema_name,
-                company_name=tenant.company_name,
-            )
-            
-        except JWTError:
-            raise InvalidCredentialsException("Invalid or expired refresh token.")
+        )
