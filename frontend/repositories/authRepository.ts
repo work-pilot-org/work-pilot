@@ -27,4 +27,64 @@ export const authRepository = {
 
     return result as RegisterResponse;
   },
+
+  async login(data: import("@/types/auth").LoginCredentials): Promise<import("@/types/auth").LoginResponse> {
+    const response = await fetch(`${AUTH_SERVICE_URL}/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        typeof result.detail === "string"
+          ? result.detail
+          : "Failed to login. Please check your credentials."
+      );
+    }
+
+    return {
+      user: {
+        id: result.user_id,
+        email: result.email,
+        name: result.company_name,
+        schemaName: result.schema_name
+      },
+      token: result.access_token
+    };
+  },
+
+  async refreshToken(): Promise<import("@/types/auth").LoginResponse> {
+    const response = await fetch(`${AUTH_SERVICE_URL}/auth/refresh`, {
+      method: "POST",
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to refresh token");
+    }
+    
+    const result = await response.json();
+    return {
+      user: {
+        id: result.user_id,
+        email: result.email,
+        name: result.company_name,
+        schemaName: result.schema_name
+      },
+      token: result.access_token
+    };
+  },
+
+  async logout(): Promise<void> {
+    await fetch(`${AUTH_SERVICE_URL}/auth/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+  }
 };

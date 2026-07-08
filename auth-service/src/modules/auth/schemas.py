@@ -29,6 +29,19 @@ class RegisterRequest(BaseModel):
     confirm_password: str
 
 
+    @field_validator("password")
+    @classmethod
+    def validate_password_complexity(cls, value):
+        if not any(char.isupper() for char in value):
+            raise ValueError("Password must contain at least one uppercase letter.")
+        if not any(char.islower() for char in value):
+            raise ValueError("Password must contain at least one lowercase letter.")
+        if not any(char.isdigit() for char in value):
+            raise ValueError("Password must contain at least one number.")
+        if not any(not char.isalnum() for char in value):
+            raise ValueError("Password must contain at least one special character.")
+        return value
+
     @field_validator("confirm_password")
     @classmethod
     def validate_passwords(cls, value, info):

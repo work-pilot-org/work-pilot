@@ -4,6 +4,7 @@ import { useState } from "react";
 import { User, Mail, Building, Lock, RefreshCw, Info, Loader2 } from "lucide-react";
 import { registerUseCase } from "@/use-cases/auth/register";
 import { RegisterRequest } from "@/types/auth";
+import { useRouter } from "next/navigation";
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState<RegisterRequest>({
@@ -17,6 +18,7 @@ export default function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -33,9 +35,12 @@ export default function RegisterForm() {
 
     if (!result.success) {
       setError(result.error || "An error occurred");
+      setIsLoading(false);
     } else {
-      setSuccessMsg(result.data?.message || "Successfully registered!");
-      // Optionally reset form here
+      setSuccessMsg(result.data?.message || "Successfully registered! Redirecting to login...");
+      setTimeout(() => {
+        router.push("/login");
+      }, 1500);
     }
 
     setIsLoading(false);
