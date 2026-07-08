@@ -46,6 +46,11 @@ from src.modules.employee.models import (
     Role,
 )
 
+from src.modules.password_reset.service import PasswordResetService
+from src.modules.password_reset.schemas import (
+    ForgotPasswordRequest,
+    ResetPasswordRequest,
+)
 
 
 class AuthService:
@@ -55,7 +60,7 @@ class AuthService:
         self.tenant_repository = TenantRepository()
         self.user_repository = UserRepository()
         self.employee_repository = EmployeeRepository()
-
+        self.password_reset_service = PasswordResetService()
     # --------------------------------------------------
     # Validation Helpers
     # --------------------------------------------------
@@ -403,3 +408,44 @@ class AuthService:
             schema_name=tenant.schema_name,
             company_name=tenant.company_name,
         )
+        
+    def forgot_password(
+        self,
+        db: Session,
+        request: ForgotPasswordRequest,
+    ):
+        """
+        Send password reset email.
+        """
+
+        self.password_reset_service.forgot_password(
+            db=db,
+            email=request.email,
+        )
+
+        return {
+            "message": (
+                "If an account exists with this email, "
+                "a password reset link has been sent."
+            )
+        }
+
+
+    def reset_password(
+        self,
+        db: Session,
+        request: ResetPasswordRequest,
+    ):
+        """
+        Reset user password.
+        """
+
+        self.password_reset_service.reset_password(
+            db=db,
+            token=request.token,
+            new_password=request.new_password,
+        )
+
+        return {
+            "message": "Password reset successfully."
+        }

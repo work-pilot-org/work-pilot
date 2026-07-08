@@ -4,6 +4,9 @@ from jose import jwt
 
 from src.core.config import settings
 
+import hashlib
+import secrets
+
 pwd_context = CryptContext(
     schemes=["bcrypt"],
     deprecated="auto"
@@ -47,3 +50,16 @@ def create_access_token(data: dict) -> str:
     )
     
     return encoded_jwt
+
+def generate_reset_token() -> str:
+    """
+    Generate a secure random token for password reset.
+    """
+    return secrets.token_urlsafe(32)
+
+
+def hash_reset_token(token: str) -> str:
+    """
+    Hash the reset token before storing it.
+    """
+    return hashlib.sha256(token.encode()).hexdigest()

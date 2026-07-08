@@ -45,6 +45,7 @@ services:
 
     volumes:
       - ./auth-service:/app
+      - /app/.venv
 
     working_dir: /app
 
