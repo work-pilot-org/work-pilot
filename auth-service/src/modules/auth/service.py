@@ -169,7 +169,7 @@ class AuthService:
             company,
         ).strip("-")
 
-        return f"{company}.workpilot.com"
+        return company
     
     
     def register(
@@ -385,17 +385,22 @@ class AuthService:
         if not tenant:
             raise InvalidCredentialsException("Tenant not found.")
             
-        # 5. Create JWT payload
+        # 5. Extract Primary Domain
+        primary_domain = next((d.domain for d in tenant.domains if d.is_primary), tenant.domains[0].domain if tenant.domains else "localhost")
+        
+        # 6. Create JWT payload
         token_data = {
             "sub": str(user.id),
             "email": user.email,
             "tenant_id": tenant.id,
             "schema_name": tenant.schema_name,
+            "domain": primary_domain,
         }
         
         access_token = create_access_token(token_data)
-        from src.core.security import create_refresh_token
+        from src.core.security import create_refresh_token, create_sso_token
         refresh_token = create_refresh_token(token_data)
+        sso_token = create_sso_token(token_data)
         
         return LoginResponse(
             access_token=access_token,
@@ -404,6 +409,8 @@ class AuthService:
             tenant_id=tenant.id,
             schema_name=tenant.schema_name,
             company_name=tenant.company_name,
+            domain=primary_domain,
+            sso_token=sso_token,
         ), refresh_token
 
     def refresh_access_token(
@@ -434,11 +441,14 @@ class AuthService:
             profile = self.user_repository.get_user_profile(db, user.id)
             tenant = self.tenant_repository.get_tenant_by_id(db, profile.tenant_id)
             
+            primary_domain = next((d.domain for d in tenant.domains if d.is_primary), tenant.domains[0].domain if tenant.domains else "localhost")
+            
             token_data = {
                 "sub": str(user.id),
                 "email": user.email,
                 "tenant_id": tenant.id,
                 "schema_name": tenant.schema_name,
+                "domain": primary_domain,
             }
             
             new_access_token = create_access_token(token_data)
@@ -450,7 +460,53 @@ class AuthService:
                 tenant_id=tenant.id,
                 schema_name=tenant.schema_name,
                 company_name=tenant.company_name,
+                domain=primary_domain,
             )
             
         except JWTError:
             raise InvalidCredentialsException("Invalid or expired refresh token.")
+
+    def exchange_sso_token(
+        self,
+        db: Session,
+        sso_token: str,
+    ) -> str:
+        from jose import jwt, JWTError
+        from src.core.config import settings
+        from src.core.security import create_refresh_token
+        
+        try:
+            payload = jwt.decode(
+                sso_token,
+                settings.SECRET_KEY,
+                algorithms=[settings.ALGORITHM]
+            )
+            if payload.get("type") != "sso":
+                raise InvalidCredentialsException("Invalid token type.")
+            
+            user_id = payload.get("sub")
+            if not user_id:
+                raise InvalidCredentialsException("Invalid token payload.")
+                
+            user = self.user_repository.get_user_by_id(db, user_id)
+            if not user:
+                raise InvalidCredentialsException("User not found.")
+                
+            profile = self.user_repository.get_user_profile(db, user.id)
+            tenant = self.tenant_repository.get_tenant_by_id(db, profile.tenant_id)
+            
+            primary_domain = next((d.domain for d in tenant.domains if d.is_primary), tenant.domains[0].domain if tenant.domains else "localhost")
+            
+            token_data = {
+                "sub": str(user.id),
+                "email": user.email,
+                "tenant_id": tenant.id,
+                "schema_name": tenant.schema_name,
+                "domain": primary_domain,
+            }
+            
+            refresh_token = create_refresh_token(token_data)
+            return refresh_token
+            
+        except JWTError:
+            raise InvalidCredentialsException("Invalid or expired SSO token.")

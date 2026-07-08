@@ -22,6 +22,7 @@ export interface User {
   email: string;
   name?: string;
   schemaName?: string;
+  domain?: string;
 }
 
 export interface LoginCredentials {
@@ -32,4 +33,5 @@ export interface LoginCredentials {
 export interface LoginResponse {
   user: User;
   token: string;
+  ssoToken?: string;
 }

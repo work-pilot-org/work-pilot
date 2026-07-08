@@ -8,6 +8,7 @@ from src.modules.auth.schemas import (
     RegisterResponse,
     LoginRequest,
     LoginResponse,
+    SSOExchangeRequest,
 )
 from src.modules.auth.service import AuthService
 
@@ -62,11 +63,33 @@ def login(
         value=refresh_token,
         httponly=True,
         secure=True, 
-        samesite="lax",
+        samesite="none",
         max_age=7 * 24 * 60 * 60, # 7 days
     )
     
     return login_response
+
+@router.post("/sso-exchange")
+def sso_exchange(
+    request: SSOExchangeRequest,
+    response: Response,
+    db: Session = Depends(get_db),
+) -> dict:
+    """
+    Exchange a short-lived SSO token for an HttpOnly refresh token cookie on the current domain.
+    """
+    refresh_token = auth_service.exchange_sso_token(db=db, sso_token=request.sso_token)
+    
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,
+        secure=True,
+        samesite="none",
+        max_age=7 * 24 * 60 * 60,
+    )
+    
+    return {"message": "SSO exchange successful"}
 
 @router.post("/swagger-login", include_in_schema=False)
 def swagger_login(
@@ -103,7 +126,7 @@ def logout(response: Response):
     """
     Clear the refresh token cookie.
     """
-    response.delete_cookie(key="refresh_token", httponly=True, secure=True, samesite="lax")
+    response.delete_cookie(key="refresh_token", httponly=True, secure=True, samesite="none")
     return {"message": "Logged out successfully"}
 
 from src.core.dependencies import get_current_user_and_set_schema

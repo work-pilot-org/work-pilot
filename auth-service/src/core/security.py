@@ -64,3 +64,19 @@ def create_refresh_token(data: dict) -> str:
     )
     
     return encoded_jwt
+
+def create_sso_token(data: dict) -> str:
+    """
+    Create a very short-lived JWT for SSO token exchange (e.g., 30 seconds).
+    """
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + timedelta(seconds=30)
+    to_encode.update({"exp": expire, "type": "sso"})
+    
+    encoded_jwt = jwt.encode(
+        to_encode,
+        settings.SECRET_KEY,
+        algorithm=settings.ALGORITHM
+    )
+    
+    return encoded_jwt

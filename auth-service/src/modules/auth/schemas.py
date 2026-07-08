@@ -73,3 +73,8 @@ class LoginResponse(BaseModel):
     tenant_id: int
     schema_name: str
     company_name: str
+    domain: str
+    sso_token: str | None = None
+
+class SSOExchangeRequest(BaseModel):
+    sso_token: str
