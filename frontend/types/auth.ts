@@ -16,3 +16,20 @@ export interface RegisterResponse {
 export interface ApiError {
   detail: string | { loc: string[]; msg: string; type: string }[];
 }
+
+export interface User {
+  id: string;
+  email: string;
+  name?: string;
+  schemaName?: string;
+}
+
+export interface LoginCredentials {
+  email: string;
+  password?: string;
+}
+
+export interface LoginResponse {
+  user: User;
+  token: string;
+}

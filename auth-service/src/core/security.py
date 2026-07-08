@@ -47,3 +47,20 @@ def create_access_token(data: dict) -> str:
     )
     
     return encoded_jwt
+
+def create_refresh_token(data: dict) -> str:
+    """
+    Create a JWT refresh token with a longer expiry (e.g., 7 days).
+    """
+    to_encode = data.copy()
+    # Hardcode 7 days for now or use a new setting
+    expire = datetime.now(timezone.utc) + timedelta(days=7)
+    to_encode.update({"exp": expire, "type": "refresh"})
+    
+    encoded_jwt = jwt.encode(
+        to_encode,
+        settings.SECRET_KEY,
+        algorithm=settings.ALGORITHM
+    )
+    
+    return encoded_jwt
