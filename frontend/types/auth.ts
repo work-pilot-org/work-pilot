@@ -33,5 +33,22 @@ export interface LoginCredentials {
 export interface LoginResponse {
   user: User;
   token: string;
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ForgotPasswordResponse {
+  message: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  new_password: string;
+}
+
+export interface ResetPasswordResponse {
+  message: string;
   ssoToken?: string;
 }

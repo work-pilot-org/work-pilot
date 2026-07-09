@@ -4,6 +4,9 @@ from jose import jwt
 
 from src.core.config import settings
 
+import hashlib
+import secrets
+
 pwd_context = CryptContext(
     schemes=["bcrypt"],
     deprecated="auto"
