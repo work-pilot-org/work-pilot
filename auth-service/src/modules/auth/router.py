@@ -11,6 +11,11 @@ from src.modules.auth.schemas import (
 )
 from src.modules.auth.service import AuthService
 
+from src.modules.password_reset.schemas import (
+    ForgotPasswordRequest,
+    ResetPasswordRequest,
+)
+
 router = APIRouter(
     prefix="/auth",
     tags=["Authentication"],
@@ -122,3 +127,37 @@ def get_current_user_info(
         "message": "Successfully authenticated and switched schema!",
         "your_jwt_data": current_user_payload,
     }
+    
+
+
+@router.post(
+    "/forgot-password",
+    status_code=200,
+)
+def forgot_password(
+    request: ForgotPasswordRequest,
+    db: Session = Depends(get_db),
+):
+    """
+    Send password reset email.
+    """
+    return auth_service.forgot_password(
+        db=db,
+        request=request,
+    )
+    
+@router.post(
+    "/reset-password",
+    status_code=200,
+)
+def reset_password(
+    request: ResetPasswordRequest,
+    db: Session = Depends(get_db),
+):
+    """
+    Reset user password.
+    """
+    return auth_service.reset_password(
+        db=db,
+        request=request,
+    )

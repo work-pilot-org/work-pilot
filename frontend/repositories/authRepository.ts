@@ -1,4 +1,14 @@
-import { RegisterRequest, RegisterResponse } from "@/types/auth";
+import { 
+  RegisterRequest, 
+  RegisterResponse, 
+  ForgotPasswordRequest, 
+  ForgotPasswordResponse, 
+  ResetPasswordRequest, 
+  ResetPasswordResponse,
+  ApiError
+} from "@/types/auth";
+import { api } from "@/lib/axios";
+import axios from "axios";
 
 // In a microservices architecture, you might have different URLs for different services,
 // or a single API Gateway URL. Here we assume a dedicated environment variable for the auth service.
@@ -28,6 +38,7 @@ export const authRepository = {
     return result as RegisterResponse;
   },
 
+<<<<<<< HEAD
   async login(data: import("@/types/auth").LoginCredentials): Promise<import("@/types/auth").LoginResponse> {
     const response = await fetch(`${AUTH_SERVICE_URL}/auth/login`, {
       method: "POST",
@@ -86,5 +97,32 @@ export const authRepository = {
       method: "POST",
       credentials: "include",
     });
+=======
+  async forgotPassword(data: ForgotPasswordRequest): Promise<ForgotPasswordResponse> {
+    try {
+      const response = await api.post<ForgotPasswordResponse>("/auth/forgot-password", data);
+      return response.data;
+    } catch (err: any) {
+      if (axios.isAxiosError(err) && err.response?.data) {
+        const detail = (err.response.data as ApiError).detail;
+        throw new Error(typeof detail === "string" ? detail : "Failed to process forgot password request.");
+      }
+      throw new Error(err.message || "An unexpected error occurred.");
+    }
+  },
+
+  async resetPassword(data: ResetPasswordRequest): Promise<ResetPasswordResponse> {
+    try {
+      const response = await api.post<ResetPasswordResponse>("/auth/reset-password", data);
+      return response.data;
+    } catch (err: any) {
+      if (axios.isAxiosError(err) && err.response?.data) {
+        const detail = (err.response.data as ApiError).detail;
+        throw new Error(typeof detail === "string" ? detail : "Failed to reset password.");
+      }
+      throw new Error(err.message || "An unexpected error occurred.");
+    }
+>>>>>>> f173151 (feat(auth): implement forgot and reset password flow)
   }
 };
+
