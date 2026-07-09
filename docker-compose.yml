@@ -52,5 +52,23 @@ services:
     command: >
       sh -c "uv run alembic upgrade head && uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: workpilot_frontend
+    restart: unless-stopped
+    depends_on:
+      - auth-service
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NEXT_PUBLIC_AUTH_SERVICE_URL=http://localhost:8000
+    command: npm run dev
+
 volumes:
   postgres_data:

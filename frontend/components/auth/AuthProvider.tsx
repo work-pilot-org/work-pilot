@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { authRepository } from "@/repositories/authRepository";
+import { getBaseDomainUrl, getTenantDomainUrl, isSubdomain } from "@/lib/auth";
 
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
   const { setInitialized, setUser, isInitialized } = useAuthStore();
@@ -24,9 +25,26 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         // Silently attempt to refresh the token using the HttpOnly cookie
         const response = await authRepository.refreshToken();
         setUser(response.user, response.token);
+        
+        // If authenticated but on public domain, redirect to tenant domain
+        if (!isSubdomain() && response.user?.domain) {
+          let targetUrl = getTenantDomainUrl(response.user.domain);
+          // Append the sso_token that we now get from the refresh call
+          if (response.ssoToken) {
+            targetUrl += `?sso_token=${response.ssoToken}`;
+          }
+          window.location.href = targetUrl;
+          return; // Stop execution
+        }
       } catch (error) {
         // Normal if they don't have a cookie or it's expired
         console.debug("Silent refresh failed or no cookie present.");
+        
+        // If NOT authenticated but on a subdomain, redirect to public login
+        if (isSubdomain()) {
+          window.location.href = getBaseDomainUrl("/login");
+          return; // Stop execution
+        }
       } finally {
         setInitialized(true);
       }

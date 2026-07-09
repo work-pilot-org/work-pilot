@@ -38,7 +38,6 @@ export const authRepository = {
     return result as RegisterResponse;
   },
 
-<<<<<<< HEAD
   async login(data: import("@/types/auth").LoginCredentials): Promise<import("@/types/auth").LoginResponse> {
     const response = await fetch(`${AUTH_SERVICE_URL}/auth/login`, {
       method: "POST",
@@ -108,7 +107,8 @@ export const authRepository = {
         schemaName: result.schema_name,
         domain: result.domain
       },
-      token: result.access_token
+      token: result.access_token,
+      ssoToken: result.sso_token
     };
   },
 
@@ -117,7 +117,9 @@ export const authRepository = {
       method: "POST",
       credentials: "include",
     });
-=======
+  },
+
+    
   async forgotPassword(data: ForgotPasswordRequest): Promise<ForgotPasswordResponse> {
     try {
       const response = await api.post<ForgotPasswordResponse>("/auth/forgot-password", data);
@@ -142,7 +144,6 @@ export const authRepository = {
       }
       throw new Error(err.message || "An unexpected error occurred.");
     }
->>>>>>> f173151 (feat(auth): implement forgot and reset password flow)
   }
 };
 

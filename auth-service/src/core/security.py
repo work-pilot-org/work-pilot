@@ -83,3 +83,15 @@ def create_sso_token(data: dict) -> str:
     )
     
     return encoded_jwt
+
+def generate_reset_token() -> str:
+    """
+    Generate a secure random token for password reset.
+    """
+    return secrets.token_urlsafe(32)
+
+def hash_reset_token(token: str) -> str:
+    """
+    Hash the reset token for secure storage.
+    """
+    return hashlib.sha256(token.encode()).hexdigest()

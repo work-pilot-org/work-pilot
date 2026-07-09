@@ -164,9 +164,11 @@ def forgot_password(
     """
     Send password reset email.
     """
-    return auth_service.forgot_password(
+    from src.modules.password_reset.service import PasswordResetService
+    password_reset_service = PasswordResetService()
+    return password_reset_service.forgot_password(
         db=db,
-        request=request,
+        email=request.email,
     )
     
 @router.post(
@@ -180,7 +182,10 @@ def reset_password(
     """
     Reset user password.
     """
-    return auth_service.reset_password(
+    from src.modules.password_reset.service import PasswordResetService
+    password_reset_service = PasswordResetService()
+    return password_reset_service.reset_password(
         db=db,
-        request=request,
+        token=request.token,
+        new_password=request.new_password,
     )
