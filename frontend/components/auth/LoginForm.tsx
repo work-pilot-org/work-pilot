@@ -5,6 +5,8 @@ import { Mail, Lock, Loader2 } from "lucide-react";
 import { executeLogin } from "@/use-cases/auth/login";
 import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { getTenantDomainUrl } from "@/lib/auth";
 
 export const LoginForm = () => {
   const [email, setEmail] = useState("");
@@ -20,7 +22,7 @@ export const LoginForm = () => {
       
       // Redirect to the tenant-specific subdomain
       if (result.user.domain) {
-        let url = `http://${result.user.domain}.localhost:3000/`;
+        let url = getTenantDomainUrl(result.user.domain, "/");
         if (result.ssoToken) {
           url += `?sso_token=${result.ssoToken}`;
         }
@@ -57,7 +59,12 @@ export const LoginForm = () => {
 
       {/* Password */}
       <div className="space-y-2">
-        <label className="block text-[13px] font-medium text-gray-700">Password</label>
+        <div className="flex items-center justify-between">
+          <label className="block text-[13px] font-medium text-gray-700">Password</label>
+          <Link href="/forgot-password" className="text-[13px] font-medium text-[#36307a] hover:underline">
+            Forgot password?
+          </Link>
+        </div>
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
             <Lock className="h-4 w-4 text-gray-400" />

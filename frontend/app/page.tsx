@@ -5,13 +5,15 @@ import Link from "next/link";
 import { LogOut, Home as HomeIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+import { getBaseDomainUrl } from "@/lib/auth";
+
 export default function Home() {
   const { user, isAuthenticated, logout, isInitialized } = useAuthStore();
   const router = useRouter();
 
-  const handleLogout = () => {
-    logout();
-    router.push("/login");
+  const handleLogout = async () => {
+    await logout();
+    window.location.href = getBaseDomainUrl("/login?logout=true");
   };
 
   if (!isInitialized) {
@@ -61,18 +63,18 @@ export default function Home() {
             </p>
 
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Link 
-                href="/login"
+              <a 
+                href={getBaseDomainUrl("/login")}
                 className="bg-[#36307a] hover:bg-[#2a2468] text-white font-bold text-[14px] py-3 px-8 rounded-xl shadow-sm transition-all text-center"
               >
                 Log In
-              </Link>
-              <Link 
-                href="/register"
+              </a>
+              <a 
+                href={getBaseDomainUrl("/register")}
                 className="bg-white hover:bg-gray-50 text-gray-700 font-bold text-[14px] py-3 px-8 rounded-xl shadow-sm border border-gray-200 transition-all text-center"
               >
                 Create Account
-              </Link>
+              </a>
             </div>
           </>
         )}

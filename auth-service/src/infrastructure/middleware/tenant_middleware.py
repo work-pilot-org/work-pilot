@@ -34,7 +34,21 @@ class TenantMiddleware(BaseHTTPMiddleware):
             response = await call_next(request)
             return response
             
+        except Exception:
+            db.rollback()
+            raise
+            
         finally:
+            # Rollback any uncommitted transaction or failed transaction state
+            # so that we can safely execute the SET search_path command.
+            try:
+                db.rollback()
+            except Exception:
+                pass
+                
             # 6. Critical: Reset the PostgreSQL search_path before returning the connection to the pool
-            set_public_schema(db)
+            try:
+                set_public_schema(db)
+            except Exception:
+                pass
             db.close()
