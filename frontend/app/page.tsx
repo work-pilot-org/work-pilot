@@ -6,13 +6,25 @@ import { LogOut, Home as HomeIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const { user, isAuthenticated, logout, isInitialized } = useAuthStore();
   const router = useRouter();
 
   const handleLogout = () => {
     logout();
     router.push("/login");
   };
+
+  if (!isInitialized) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="animate-pulse bg-white rounded-[20px] shadow-sm border border-gray-100 p-10 w-full max-w-[520px] h-[300px]">
+          <div className="w-16 h-16 bg-gray-200 rounded-2xl mx-auto mb-6"></div>
+          <div className="h-8 bg-gray-200 rounded w-1/2 mx-auto mb-4"></div>
+          <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4 font-sans">

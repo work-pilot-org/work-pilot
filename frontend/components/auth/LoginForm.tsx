@@ -19,8 +19,12 @@ export const LoginForm = () => {
       const result = await executeLogin({ email, password });
       
       // Redirect to the tenant-specific subdomain
-      if (result.user.schemaName) {
-        window.location.href = `http://${result.user.schemaName}.localhost:3000/`;
+      if (result.user.domain) {
+        let url = `http://${result.user.domain}.localhost:3000/`;
+        if (result.ssoToken) {
+          url += `?sso_token=${result.ssoToken}`;
+        }
+        window.location.href = url;
       } else {
         router.push("/");
       }

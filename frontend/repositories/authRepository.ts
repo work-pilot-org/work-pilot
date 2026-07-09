@@ -64,10 +64,29 @@ export const authRepository = {
         id: result.user_id,
         email: result.email,
         name: result.company_name,
-        schemaName: result.schema_name
+        schemaName: result.schema_name,
+        domain: result.domain
       },
-      token: result.access_token
+      token: result.access_token,
+      ssoToken: result.sso_token
     };
+  },
+
+  async exchangeSsoToken(ssoToken: string): Promise<void> {
+    const response = await fetch(`${AUTH_SERVICE_URL}/auth/sso-exchange`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({ sso_token: ssoToken }),
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      console.error("SSO exchange failed with status", response.status, "body:", text);
+      throw new Error("SSO exchange failed");
+    }
   },
 
   async refreshToken(): Promise<import("@/types/auth").LoginResponse> {
@@ -86,7 +105,8 @@ export const authRepository = {
         id: result.user_id,
         email: result.email,
         name: result.company_name,
-        schemaName: result.schema_name
+        schemaName: result.schema_name,
+        domain: result.domain
       },
       token: result.access_token
     };

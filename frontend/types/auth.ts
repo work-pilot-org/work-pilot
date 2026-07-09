@@ -17,12 +17,12 @@ export interface ApiError {
   detail: string | { loc: string[]; msg: string; type: string }[];
 }
 
-<<<<<<< HEAD
 export interface User {
   id: string;
   email: string;
   name?: string;
   schemaName?: string;
+  domain?: string;
 }
 
 export interface LoginCredentials {
@@ -33,7 +33,8 @@ export interface LoginCredentials {
 export interface LoginResponse {
   user: User;
   token: string;
-=======
+}
+
 export interface ForgotPasswordRequest {
   email: string;
 }
@@ -49,5 +50,5 @@ export interface ResetPasswordRequest {
 
 export interface ResetPasswordResponse {
   message: string;
->>>>>>> f173151 (feat(auth): implement forgot and reset password flow)
+  ssoToken?: string;
 }

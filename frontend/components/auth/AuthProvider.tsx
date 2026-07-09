@@ -10,6 +10,17 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   useEffect(() => {
     const initializeAuth = async () => {
       try {
+        const url = new URL(window.location.href);
+        const ssoToken = url.searchParams.get("sso_token");
+        
+        if (ssoToken) {
+          // Exchange the SSO token for a secure HttpOnly cookie on this domain
+          await authRepository.exchangeSsoToken(ssoToken);
+          // Clean the URL
+          url.searchParams.delete("sso_token");
+          window.history.replaceState({}, document.title, url.pathname + url.search);
+        }
+
         // Silently attempt to refresh the token using the HttpOnly cookie
         const response = await authRepository.refreshToken();
         setUser(response.user, response.token);
