@@ -104,10 +104,6 @@ export const LoginForm = () => {
       >
         {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Sign in"}
       </button>
-
-      <p className="text-center text-xs text-gray-400 mt-4">
-        Test: test@example.com / password
-      </p>
     </form>
   );
 };
