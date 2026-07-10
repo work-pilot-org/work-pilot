@@ -134,7 +134,7 @@ export default function RegisterForm() {
             value={formData.company_name}
             onChange={handleChange}
             required
-            placeholder="Tulip Inc."
+            placeholder="Workpilot Inc."
             className="block w-full pl-10 pr-3.5 py-2.5 border border-gray-200 rounded-lg text-[14px] text-black placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#2a2468] focus:border-transparent transition-all bg-white"
           />
         </div>
