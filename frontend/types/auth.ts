@@ -23,6 +23,7 @@ export interface User {
   name?: string;
   schemaName?: string;
   domain?: string;
+  isMfaEnabled?: boolean;
 }
 
 export interface LoginCredentials {
@@ -52,4 +53,29 @@ export interface ResetPasswordRequest {
 export interface ResetPasswordResponse {
   message: string;
   ssoToken?: string;
+}
+
+export interface PreAuthResponse {
+  preauth_token: string;
+  mfa_required: boolean;
+  message: string;
+}
+
+export interface MFASetupResponse {
+  secret: string;
+  provisioning_uri: string;
+}
+
+export interface MFALoginRequest {
+  preauth_token: string;
+  code: string;
+}
+
+export interface MFAEnableRequest {
+  code: string;
+}
+
+export interface MFADisableRequest {
+  password: string;
+  code: string;
 }

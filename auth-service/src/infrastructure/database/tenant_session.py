@@ -20,7 +20,7 @@ def set_tenant_schema(
         raise ValueError("Invalid schema name.")
 
     db.execute(
-        text(f'SET search_path TO "{schema_name}"')
+        text(f'SET search_path TO "{schema_name}", public')
     )
 
 

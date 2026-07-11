@@ -9,7 +9,13 @@ from src.modules.auth.schemas import (
     LoginRequest,
     LoginResponse,
     SSOExchangeRequest,
+    MFASetupResponse,
+    MFAEnableRequest,
+    MFADisableRequest,
+    MFALoginRequest,
+    PreAuthResponse,
 )
+from typing import Union
 from src.modules.auth.service import AuthService
 
 from src.modules.password_reset.schemas import (
@@ -47,7 +53,7 @@ from fastapi import Response, Request, HTTPException
 
 @router.post(
     "/login",
-    response_model=LoginResponse,
+    response_model=Union[LoginResponse, PreAuthResponse],
     status_code=200,
 )
 def login(
@@ -62,6 +68,9 @@ def login(
         db=db,
         request=request,
     )
+    
+    if isinstance(login_response, PreAuthResponse):
+        return login_response
     
     response.set_cookie(
         key="refresh_token",
@@ -189,3 +198,85 @@ def reset_password(
         token=request.token,
         new_password=request.new_password,
     )
+
+@router.post(
+    "/mfa/setup",
+    response_model=MFASetupResponse,
+    status_code=200,
+)
+def setup_mfa(
+    current_user_payload: dict = Depends(get_current_user_and_set_schema),
+    db: Session = Depends(get_db),
+):
+    """
+    Generate an MFA secret and return a provisioning URI for TOTP apps.
+    """
+    user_id = current_user_payload.get("sub")
+    try:
+        return auth_service.setup_mfa(db, user_id)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.post(
+    "/mfa/enable",
+    status_code=200,
+)
+def enable_mfa(
+    request: MFAEnableRequest,
+    current_user_payload: dict = Depends(get_current_user_and_set_schema),
+    db: Session = Depends(get_db),
+):
+    """
+    Verify the TOTP code and enable MFA for the user.
+    """
+    user_id = current_user_payload.get("sub")
+    try:
+        return auth_service.enable_mfa(db, user_id, request)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.post(
+    "/mfa/disable",
+    status_code=200,
+)
+def disable_mfa(
+    request: MFADisableRequest,
+    current_user_payload: dict = Depends(get_current_user_and_set_schema),
+    db: Session = Depends(get_db),
+):
+    """
+    Disable MFA requiring password and current TOTP code.
+    """
+    user_id = current_user_payload.get("sub")
+    try:
+        return auth_service.disable_mfa(db, user_id, request)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.post(
+    "/login/mfa",
+    response_model=LoginResponse,
+    status_code=200,
+)
+def login_mfa(
+    request: MFALoginRequest,
+    response: Response,
+    db: Session = Depends(get_db),
+):
+    """
+    Exchange a preauth token + TOTP code for standard auth tokens.
+    """
+    try:
+        login_response, refresh_token = auth_service.login_mfa(db, request)
+        
+        response.set_cookie(
+            key="refresh_token",
+            value=refresh_token,
+            httponly=True,
+            secure=True, 
+            samesite="none",
+            max_age=7 * 24 * 60 * 60,
+        )
+        return login_response
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))

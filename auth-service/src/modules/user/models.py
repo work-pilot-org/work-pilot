@@ -47,7 +47,6 @@ class User(PublicBase):
         nullable=False,
     )
 
-    # MFA (optional for now)
     is_mfa_enabled: Mapped[bool] = mapped_column(
         Boolean,
         default=False,
@@ -56,6 +55,16 @@ class User(PublicBase):
 
     mfa_secret: Mapped[str | None] = mapped_column(
         String(255),
+        nullable=True,
+    )
+
+    mfa_enabled_at: Mapped[datetime | None] = mapped_column(
+        DateTime,
+        nullable=True,
+    )
+
+    mfa_last_used_at: Mapped[datetime | None] = mapped_column(
+        DateTime,
         nullable=True,
     )
 

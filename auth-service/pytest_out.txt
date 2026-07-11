@@ -1,0 +1,396 @@
+============================= test session starts ==============================
+platform linux -- Python 3.14.6, pytest-9.1.1, pluggy-1.6.0
+rootdir: /app
+configfile: pyproject.toml
+plugins: anyio-4.14.1
+collected 1 item
+
+tests/integration/test_mfa.py F                                          [100%]
+
+=================================== FAILURES ===================================
+________________________________ test_mfa_flow _________________________________
+
+client = <starlette.testclient.TestClient object at 0x7bc903542120>
+db = <sqlalchemy.orm.session.Session object at 0x7bc902104980>
+mock_user_payload = {'company_name': 'Test Company 14cb0f13', 'full_name': 'John Doe', 'email': 'testmfa_14cb0f13@example.com', 'password': 'Password123!', ...}
+
+    def test_mfa_flow(client: TestClient, db: Session, mock_user_payload):
+        # 1. Register User
+        response = client.post("/auth/register", json=mock_user_payload)
+        assert response.status_code == 201
+    
+        # 2. Login to get token
+        login_data = {
+            "email": mock_user_payload["email"],
+            "password": mock_user_payload["password"]
+        }
+        response = client.post("/auth/login", json=login_data)
+        assert response.status_code == 200
+        access_token = response.json()["access_token"]
+        headers = {"Authorization": f"Bearer {access_token}"}
+    
+        # 3. Setup MFA
+        response = client.post("/auth/mfa/setup", headers=headers)
+>       assert response.status_code == 200, f"Setup MFA failed: {response.json()}"
+E       AssertionError: Setup MFA failed: {'detail': '(psycopg.errors.UndefinedTable) relation "users" does not exist\nLINE 2: FROM users \n             ^\n[SQL: SELECT users.id AS users_id, users.email AS users_email, users.password AS users_password, users.is_active AS users_is_active, users.is_superuser AS users_is_superuser, users.is_mfa_enabled AS users_is_mfa_enabled, users.mfa_secret AS users_mfa_secret, users.mfa_enabled_at AS users_mfa_enabled_at, users.mfa_last_used_at AS users_mfa_last_used_at, users.created_at AS users_created_at, users.updated_at AS users_updated_at \nFROM users \nWHERE users.id = %(id_1)s::UUID \n LIMIT %(param_1)s::INTEGER]\n[parameters: {\'id_1\': \'74aa6d87-9ba1-4505-affb-23f8c609f1ce\', \'param_1\': 1}]\n(Background on this error at: https://sqlalche.me/e/20/f405)'}
+E       assert 400 == 200
+E        +  where 400 = <Response [400 Bad Request]>.status_code
+
+tests/integration/test_mfa.py:50: AssertionError
+----------------------------- Captured stdout call -----------------------------
+2026-07-11 11:59:40,690 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2026-07-11 11:59:40,690 INFO sqlalchemy.engine.Engine [raw sql] {}
+2026-07-11 11:59:40,762 INFO sqlalchemy.engine.Engine select current_schema()
+2026-07-11 11:59:40,763 INFO sqlalchemy.engine.Engine [raw sql] {}
+2026-07-11 11:59:40,837 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2026-07-11 11:59:40,837 INFO sqlalchemy.engine.Engine [raw sql] {}
+2026-07-11 11:59:41,054 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-07-11 11:59:41,067 INFO sqlalchemy.engine.Engine SELECT domains.id AS domains_id, domains.domain AS domains_domain, domains.tenant_id AS domains_tenant_id, domains.is_primary AS domains_is_primary, domains.created_at AS domains_created_at 
+FROM domains 
+WHERE domains.domain = %(domain_1)s::VARCHAR 
+ LIMIT %(param_1)s::INTEGER
+2026-07-11 11:59:41,067 INFO sqlalchemy.engine.Engine [generated in 0.00082s] {'domain_1': 'testserver', 'param_1': 1}
+2026-07-11 11:59:41,151 INFO sqlalchemy.engine.Engine SET search_path TO "public"
+2026-07-11 11:59:41,152 INFO sqlalchemy.engine.Engine [generated in 0.00114s] {}
+2026-07-11 11:59:41,396 INFO sqlalchemy.engine.Engine SELECT tenants.id AS tenants_id, tenants.company_name AS tenants_company_name, tenants.schema_name AS tenants_schema_name, tenants.status AS tenants_status, tenants.created_at AS tenants_created_at, tenants.updated_at AS tenants_updated_at 
+FROM tenants 
+WHERE tenants.company_name = %(company_name_1)s::VARCHAR 
+ LIMIT %(param_1)s::INTEGER
+2026-07-11 11:59:41,396 INFO sqlalchemy.engine.Engine [generated in 0.00030s] {'company_name_1': 'Test Company 14cb0f13', 'param_1': 1}
+2026-07-11 11:59:41,436 INFO sqlalchemy.engine.Engine SELECT users.id AS users_id, users.email AS users_email, users.password AS users_password, users.is_active AS users_is_active, users.is_superuser AS users_is_superuser, users.is_mfa_enabled AS users_is_mfa_enabled, users.mfa_secret AS users_mfa_secret, users.mfa_enabled_at AS users_mfa_enabled_at, users.mfa_last_used_at AS users_mfa_last_used_at, users.created_at AS users_created_at, users.updated_at AS users_updated_at 
+FROM users 
+WHERE users.email = %(email_1)s::VARCHAR 
+ LIMIT %(param_1)s::INTEGER
+2026-07-11 11:59:41,436 INFO sqlalchemy.engine.Engine [generated in 0.00028s] {'email_1': 'testmfa_14cb0f13@example.com', 'param_1': 1}
+2026-07-11 11:59:41,476 INFO sqlalchemy.engine.Engine SELECT domains.id AS domains_id, domains.domain AS domains_domain, domains.tenant_id AS domains_tenant_id, domains.is_primary AS domains_is_primary, domains.created_at AS domains_created_at 
+FROM domains 
+WHERE domains.domain = %(domain_1)s::VARCHAR 
+ LIMIT %(param_1)s::INTEGER
+2026-07-11 11:59:41,477 INFO sqlalchemy.engine.Engine [cached since 0.4104s ago] {'domain_1': 'test-company-14cb0f13', 'param_1': 1}
+2026-07-11 11:59:41,896 INFO sqlalchemy.engine.Engine INSERT INTO tenants (company_name, schema_name, status, created_at, updated_at) VALUES (%(company_name)s::VARCHAR, %(schema_name)s::VARCHAR, %(status)s, %(created_at)s::TIMESTAMP WITHOUT TIME ZONE, %(updated_at)s::TIMESTAMP WITHOUT TIME ZONE) RETURNING tenants.id
+2026-07-11 11:59:41,896 INFO sqlalchemy.engine.Engine [generated in 0.00054s] {'company_name': 'Test Company 14cb0f13', 'schema_name': 'tenant_test_company_14cb0f13', 'status': 'ACTIVE', 'created_at': datetime.datetime(2026, 7, 11, 11, 59, 41, 896416), 'updated_at': datetime.datetime(2026, 7, 11, 11, 59, 41, 896427)}
+2026-07-11 11:59:41,943 INFO sqlalchemy.engine.Engine SELECT tenants.id, tenants.company_name, tenants.schema_name, tenants.status, tenants.created_at, tenants.updated_at 
+FROM tenants 
+WHERE tenants.id = %(pk_1)s::INTEGER
+2026-07-11 11:59:41,943 INFO sqlalchemy.engine.Engine [generated in 0.00049s] {'pk_1': 55}
+2026-07-11 11:59:41,987 INFO sqlalchemy.engine.Engine INSERT INTO domains (domain, tenant_id, is_primary, created_at) VALUES (%(domain)s::VARCHAR, %(tenant_id)s::INTEGER, %(is_primary)s, %(created_at)s::TIMESTAMP WITHOUT TIME ZONE) RETURNING domains.id
+2026-07-11 11:59:41,987 INFO sqlalchemy.engine.Engine [generated in 0.00082s] {'domain': 'test-company-14cb0f13', 'tenant_id': 55, 'is_primary': True, 'created_at': datetime.datetime(2026, 7, 11, 11, 59, 41, 986985)}
+2026-07-11 11:59:42,029 INFO sqlalchemy.engine.Engine SELECT domains.id, domains.domain, domains.tenant_id, domains.is_primary, domains.created_at 
+FROM domains 
+WHERE domains.id = %(pk_1)s::INTEGER
+2026-07-11 11:59:42,029 INFO sqlalchemy.engine.Engine [generated in 0.00047s] {'pk_1': 55}
+2026-07-11 11:59:42,070 INFO sqlalchemy.engine.Engine INSERT INTO users (id, email, password, is_active, is_superuser, is_mfa_enabled, mfa_secret, mfa_enabled_at, mfa_last_used_at, created_at, updated_at) VALUES (%(id)s::UUID, %(email)s::VARCHAR, %(password)s::VARCHAR, %(is_active)s, %(is_superuser)s, %(is_mfa_enabled)s, %(mfa_secret)s::VARCHAR, %(mfa_enabled_at)s::TIMESTAMP WITHOUT TIME ZONE, %(mfa_last_used_at)s::TIMESTAMP WITHOUT TIME ZONE, %(created_at)s::TIMESTAMP WITHOUT TIME ZONE, %(updated_at)s::TIMESTAMP WITHOUT TIME ZONE)
+2026-07-11 11:59:42,071 INFO sqlalchemy.engine.Engine [generated in 0.00105s] {'id': UUID('74aa6d87-9ba1-4505-affb-23f8c609f1ce'), 'email': 'testmfa_14cb0f13@example.com', 'password': '$2b$12$QqgopBu6c7jDRS0pNkWXxe3IqrBHvTGOKWuxY7e96OR2ZG4ZhGn6m', 'is_active': True, 'is_superuser': False, 'is_mfa_enabled': False, 'mfa_secret': None, 'mfa_enabled_at': None, 'mfa_last_used_at': None, 'created_at': datetime.datetime(2026, 7, 11, 11, 59, 42, 70624), 'updated_at': datetime.datetime(2026, 7, 11, 11, 59, 42, 70707)}
+2026-07-11 11:59:42,115 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password, users.is_active, users.is_superuser, users.is_mfa_enabled, users.mfa_secret, users.mfa_enabled_at, users.mfa_last_used_at, users.created_at, users.updated_at 
+FROM users 
+WHERE users.id = %(pk_1)s::UUID
+2026-07-11 11:59:42,115 INFO sqlalchemy.engine.Engine [generated in 0.00054s] {'pk_1': UUID('74aa6d87-9ba1-4505-affb-23f8c609f1ce')}
+2026-07-11 11:59:42,155 INFO sqlalchemy.engine.Engine INSERT INTO user_profiles (id, user_id, tenant_id, full_name, created_at, updated_at) VALUES (%(id)s::UUID, %(user_id)s::UUID, %(tenant_id)s::INTEGER, %(full_name)s::VARCHAR, %(created_at)s::TIMESTAMP WITHOUT TIME ZONE, %(updated_at)s::TIMESTAMP WITHOUT TIME ZONE)
+2026-07-11 11:59:42,155 INFO sqlalchemy.engine.Engine [generated in 0.00077s] {'id': UUID('dbabc5d2-1223-4535-80bd-30f03f5ebbec'), 'user_id': UUID('74aa6d87-9ba1-4505-affb-23f8c609f1ce'), 'tenant_id': 55, 'full_name': 'John Doe', 'created_at': datetime.datetime(2026, 7, 11, 11, 59, 42, 154876), 'updated_at': datetime.datetime(2026, 7, 11, 11, 59, 42, 154888)}
+2026-07-11 11:59:42,194 INFO sqlalchemy.engine.Engine SELECT user_profiles.id, user_profiles.user_id, user_profiles.tenant_id, user_profiles.full_name, user_profiles.created_at, user_profiles.updated_at 
+FROM user_profiles 
+WHERE user_profiles.id = %(pk_1)s::UUID
+2026-07-11 11:59:42,194 INFO sqlalchemy.engine.Engine [generated in 0.00037s] {'pk_1': UUID('dbabc5d2-1223-4535-80bd-30f03f5ebbec')}
+2026-07-11 11:59:42,233 INFO sqlalchemy.engine.Engine CREATE SCHEMA "tenant_test_company_14cb0f13"
+2026-07-11 11:59:42,234 INFO sqlalchemy.engine.Engine [generated in 0.00042s] {}
+2026-07-11 11:59:42,274 INFO sqlalchemy.engine.Engine SET search_path TO "tenant_test_company_14cb0f13"
+2026-07-11 11:59:42,274 INFO sqlalchemy.engine.Engine [generated in 0.00056s] {}
+2026-07-11 11:59:42,316 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = %(table_name)s::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[%(param_1)s::VARCHAR, %(param_2)s::VARCHAR, %(param_3)s::VARCHAR, %(param_4)s::VARCHAR, %(param_5)s::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != %(nspname_1)s::VARCHAR
+2026-07-11 11:59:42,316 INFO sqlalchemy.engine.Engine [generated in 0.00039s] {'table_name': 'employees', 'param_1': 'r', 'param_2': 'p', 'param_3': 'f', 'param_4': 'v', 'param_5': 'm', 'nspname_1': 'pg_catalog'}
+2026-07-11 11:59:42,356 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = %(typname_1)s::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != %(nspname_1)s::VARCHAR
+2026-07-11 11:59:42,357 INFO sqlalchemy.engine.Engine [generated in 0.00052s] {'typname_1': 'role', 'nspname_1': 'pg_catalog'}
+2026-07-11 11:59:42,393 INFO sqlalchemy.engine.Engine CREATE TYPE role AS ENUM ('ORG_ADMIN', 'HR_ADMIN', 'IT_ADMIN', 'MANAGER', 'EMPLOYEE')
+2026-07-11 11:59:42,394 INFO sqlalchemy.engine.Engine [no key 0.00046s] {}
+2026-07-11 11:59:42,432 INFO sqlalchemy.engine.Engine SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = %(typname_1)s::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != %(nspname_1)s::VARCHAR
+2026-07-11 11:59:42,432 INFO sqlalchemy.engine.Engine [cached since 0.07562s ago] {'typname_1': 'employmentstatus', 'nspname_1': 'pg_catalog'}
+2026-07-11 11:59:42,474 INFO sqlalchemy.engine.Engine CREATE TYPE employmentstatus AS ENUM ('ACTIVE', 'INACTIVE', 'ON_LEAVE', 'TERMINATED')
+2026-07-11 11:59:42,474 INFO sqlalchemy.engine.Engine [no key 0.00042s] {}
+2026-07-11 11:59:42,512 INFO sqlalchemy.engine.Engine 
+CREATE TABLE employees (
+	id UUID NOT NULL, 
+	user_id UUID NOT NULL, 
+	full_name VARCHAR(255) NOT NULL, 
+	email VARCHAR(255) NOT NULL, 
+	role role NOT NULL, 
+	department VARCHAR(100), 
+	job_title VARCHAR(100), 
+	phone_number VARCHAR(20), 
+	manager_id UUID, 
+	employment_status employmentstatus NOT NULL, 
+	is_active BOOLEAN NOT NULL, 
+	created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL, 
+	updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (user_id), 
+	UNIQUE (email), 
+	FOREIGN KEY(manager_id) REFERENCES employees (id) ON DELETE SET NULL
+)
+
+
+2026-07-11 11:59:42,513 INFO sqlalchemy.engine.Engine [no key 0.00040s] {}
+2026-07-11 11:59:42,561 INFO sqlalchemy.engine.Engine INSERT INTO employees (id, user_id, full_name, email, role, department, job_title, phone_number, manager_id, employment_status, is_active, created_at, updated_at) VALUES (%(id)s::UUID, %(user_id)s::UUID, %(full_name)s::VARCHAR, %(email)s::VARCHAR, %(role)s, %(department)s::VARCHAR, %(job_title)s::VARCHAR, %(phone_number)s::VARCHAR, %(manager_id)s::UUID, %(employment_status)s, %(is_active)s, %(created_at)s::TIMESTAMP WITHOUT TIME ZONE, %(updated_at)s::TIMESTAMP WITHOUT TIME ZONE)
+2026-07-11 11:59:42,562 INFO sqlalchemy.engine.Engine [generated in 0.00122s] {'id': UUID('b113a0ff-5ad8-462f-948f-61bedb792427'), 'user_id': UUID('74aa6d87-9ba1-4505-affb-23f8c609f1ce'), 'full_name': 'John Doe', 'email': 'testmfa_14cb0f13@example.com', 'role': 'ORG_ADMIN', 'department': None, 'job_title': None, 'phone_number': None, 'manager_id': None, 'employment_status': 'ACTIVE', 'is_active': True, 'created_at': datetime.datetime(2026, 7, 11, 11, 59, 42, 561545), 'updated_at': datetime.datetime(2026, 7, 11, 11, 59, 42, 561552)}
+2026-07-11 11:59:42,602 INFO sqlalchemy.engine.Engine SELECT employees.id, employees.user_id, employees.full_name, employees.email, employees.role, employees.department, employees.job_title, employees.phone_number, employees.manager_id, employees.employment_status, employees.is_active, employees.created_at, employees.updated_at 
+FROM employees 
+WHERE employees.id = %(pk_1)s::UUID
+2026-07-11 11:59:42,602 INFO sqlalchemy.engine.Engine [generated in 0.00037s] {'pk_1': UUID('b113a0ff-5ad8-462f-948f-61bedb792427')}
+2026-07-11 11:59:42,643 INFO sqlalchemy.engine.Engine SET search_path TO "public"
+2026-07-11 11:59:42,643 INFO sqlalchemy.engine.Engine [cached since 1.492s ago] {}
+2026-07-11 11:59:42,679 INFO sqlalchemy.engine.Engine COMMIT
+2026-07-11 11:59:42,717 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-07-11 11:59:42,720 INFO sqlalchemy.engine.Engine SELECT tenants.id AS tenants_id, tenants.company_name AS tenants_company_name, tenants.schema_name AS tenants_schema_name, tenants.status AS tenants_status, tenants.created_at AS tenants_created_at, tenants.updated_at AS tenants_updated_at 
+FROM tenants 
+WHERE tenants.id = %(pk_1)s::INTEGER
+2026-07-11 11:59:42,720 INFO sqlalchemy.engine.Engine [generated in 0.00069s] {'pk_1': 55}
+2026-07-11 11:59:42,795 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-07-11 11:59:42,832 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-07-11 11:59:42,832 INFO sqlalchemy.engine.Engine SET search_path TO "public"
+2026-07-11 11:59:42,833 INFO sqlalchemy.engine.Engine [cached since 1.682s ago] {}
+2026-07-11 11:59:42,908 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-07-11 11:59:42,959 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-07-11 11:59:42,960 INFO sqlalchemy.engine.Engine SELECT domains.id AS domains_id, domains.domain AS domains_domain, domains.tenant_id AS domains_tenant_id, domains.is_primary AS domains_is_primary, domains.created_at AS domains_created_at 
+FROM domains 
+WHERE domains.domain = %(domain_1)s::VARCHAR 
+ LIMIT %(param_1)s::INTEGER
+2026-07-11 11:59:42,960 INFO sqlalchemy.engine.Engine [cached since 1.894s ago] {'domain_1': 'testserver', 'param_1': 1}
+2026-07-11 11:59:43,035 INFO sqlalchemy.engine.Engine SET search_path TO "public"
+2026-07-11 11:59:43,035 INFO sqlalchemy.engine.Engine [cached since 1.884s ago] {}
+2026-07-11 11:59:43,086 INFO sqlalchemy.engine.Engine SELECT users.id AS users_id, users.email AS users_email, users.password AS users_password, users.is_active AS users_is_active, users.is_superuser AS users_is_superuser, users.is_mfa_enabled AS users_is_mfa_enabled, users.mfa_secret AS users_mfa_secret, users.mfa_enabled_at AS users_mfa_enabled_at, users.mfa_last_used_at AS users_mfa_last_used_at, users.created_at AS users_created_at, users.updated_at AS users_updated_at 
+FROM users 
+WHERE users.email = %(email_1)s::VARCHAR 
+ LIMIT %(param_1)s::INTEGER
+2026-07-11 11:59:43,087 INFO sqlalchemy.engine.Engine [cached since 1.654s ago] {'email_1': 'testmfa_14cb0f13@example.com', 'param_1': 1}
+2026-07-11 11:59:44,321 INFO sqlalchemy.engine.Engine SELECT user_profiles.id AS user_profiles_id, user_profiles.user_id AS user_profiles_user_id, user_profiles.tenant_id AS user_profiles_tenant_id, user_profiles.full_name AS user_profiles_full_name, user_profiles.created_at AS user_profiles_created_at, user_profiles.updated_at AS user_profiles_updated_at 
+FROM user_profiles 
+WHERE user_profiles.user_id = %(user_id_1)s::UUID 
+ LIMIT %(param_1)s::INTEGER
+2026-07-11 11:59:44,323 INFO sqlalchemy.engine.Engine [generated in 0.00665s] {'user_id_1': UUID('74aa6d87-9ba1-4505-affb-23f8c609f1ce'), 'param_1': 1}
+2026-07-11 11:59:44,366 INFO sqlalchemy.engine.Engine SELECT tenants.id AS tenants_id, tenants.company_name AS tenants_company_name, tenants.schema_name AS tenants_schema_name, tenants.status AS tenants_status, tenants.created_at AS tenants_created_at, tenants.updated_at AS tenants_updated_at 
+FROM tenants 
+WHERE tenants.id = %(id_1)s::INTEGER 
+ LIMIT %(param_1)s::INTEGER
+2026-07-11 11:59:44,366 INFO sqlalchemy.engine.Engine [generated in 0.00067s] {'id_1': 55, 'param_1': 1}
+2026-07-11 11:59:44,416 INFO sqlalchemy.engine.Engine SELECT domains.id AS domains_id, domains.domain AS domains_domain, domains.tenant_id AS domains_tenant_id, domains.is_primary AS domains_is_primary, domains.created_at AS domains_created_at 
+FROM domains 
+WHERE %(param_1)s::INTEGER = domains.tenant_id
+2026-07-11 11:59:44,417 INFO sqlalchemy.engine.Engine [generated in 0.00054s] {'param_1': 55}
+2026-07-11 11:59:44,509 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-07-11 11:59:44,547 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-07-11 11:59:44,548 INFO sqlalchemy.engine.Engine SET search_path TO "public"
+2026-07-11 11:59:44,548 INFO sqlalchemy.engine.Engine [cached since 3.4s ago] {}
+2026-07-11 11:59:44,626 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-07-11 11:59:44,673 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-07-11 11:59:44,676 INFO sqlalchemy.engine.Engine SELECT domains.id AS domains_id, domains.domain AS domains_domain, domains.tenant_id AS domains_tenant_id, domains.is_primary AS domains_is_primary, domains.created_at AS domains_created_at 
+FROM domains 
+WHERE domains.domain = %(domain_1)s::VARCHAR 
+ LIMIT %(param_1)s::INTEGER
+2026-07-11 11:59:44,677 INFO sqlalchemy.engine.Engine [cached since 3.614s ago] {'domain_1': 'testserver', 'param_1': 1}
+2026-07-11 11:59:44,759 INFO sqlalchemy.engine.Engine SET search_path TO "public"
+2026-07-11 11:59:44,759 INFO sqlalchemy.engine.Engine [cached since 3.611s ago] {}
+2026-07-11 11:59:44,828 INFO sqlalchemy.engine.Engine SET search_path TO "tenant_test_company_14cb0f13"
+2026-07-11 11:59:44,828 INFO sqlalchemy.engine.Engine [cached since 2.558s ago] {}
+2026-07-11 11:59:44,870 INFO sqlalchemy.engine.Engine SELECT users.id AS users_id, users.email AS users_email, users.password AS users_password, users.is_active AS users_is_active, users.is_superuser AS users_is_superuser, users.is_mfa_enabled AS users_is_mfa_enabled, users.mfa_secret AS users_mfa_secret, users.mfa_enabled_at AS users_mfa_enabled_at, users.mfa_last_used_at AS users_mfa_last_used_at, users.created_at AS users_created_at, users.updated_at AS users_updated_at 
+FROM users 
+WHERE users.id = %(id_1)s::UUID 
+ LIMIT %(param_1)s::INTEGER
+2026-07-11 11:59:44,870 INFO sqlalchemy.engine.Engine [generated in 0.00085s] {'id_1': '74aa6d87-9ba1-4505-affb-23f8c609f1ce', 'param_1': 1}
+2026-07-11 11:59:44,916 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-07-11 11:59:44,957 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-07-11 11:59:44,958 INFO sqlalchemy.engine.Engine SET search_path TO "public"
+2026-07-11 11:59:44,958 INFO sqlalchemy.engine.Engine [cached since 3.811s ago] {}
+2026-07-11 11:59:45,032 INFO sqlalchemy.engine.Engine ROLLBACK
+------------------------------ Captured log call -------------------------------
+INFO     sqlalchemy.engine.Engine:base.py:1848 select pg_catalog.version()
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] {}
+INFO     sqlalchemy.engine.Engine:base.py:1848 select current_schema()
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] {}
+INFO     sqlalchemy.engine.Engine:base.py:1848 show standard_conforming_strings
+INFO     sqlalchemy.engine.Engine:base.py:1848 [raw sql] {}
+INFO     sqlalchemy.engine.Engine:base.py:2712 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT domains.id AS domains_id, domains.domain AS domains_domain, domains.tenant_id AS domains_tenant_id, domains.is_primary AS domains_is_primary, domains.created_at AS domains_created_at 
+FROM domains 
+WHERE domains.domain = %(domain_1)s::VARCHAR 
+ LIMIT %(param_1)s::INTEGER
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00082s] {'domain_1': 'testserver', 'param_1': 1}
+INFO     sqlalchemy.engine.Engine:base.py:1848 SET search_path TO "public"
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00114s] {}
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT tenants.id AS tenants_id, tenants.company_name AS tenants_company_name, tenants.schema_name AS tenants_schema_name, tenants.status AS tenants_status, tenants.created_at AS tenants_created_at, tenants.updated_at AS tenants_updated_at 
+FROM tenants 
+WHERE tenants.company_name = %(company_name_1)s::VARCHAR 
+ LIMIT %(param_1)s::INTEGER
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00030s] {'company_name_1': 'Test Company 14cb0f13', 'param_1': 1}
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT users.id AS users_id, users.email AS users_email, users.password AS users_password, users.is_active AS users_is_active, users.is_superuser AS users_is_superuser, users.is_mfa_enabled AS users_is_mfa_enabled, users.mfa_secret AS users_mfa_secret, users.mfa_enabled_at AS users_mfa_enabled_at, users.mfa_last_used_at AS users_mfa_last_used_at, users.created_at AS users_created_at, users.updated_at AS users_updated_at 
+FROM users 
+WHERE users.email = %(email_1)s::VARCHAR 
+ LIMIT %(param_1)s::INTEGER
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00028s] {'email_1': 'testmfa_14cb0f13@example.com', 'param_1': 1}
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT domains.id AS domains_id, domains.domain AS domains_domain, domains.tenant_id AS domains_tenant_id, domains.is_primary AS domains_is_primary, domains.created_at AS domains_created_at 
+FROM domains 
+WHERE domains.domain = %(domain_1)s::VARCHAR 
+ LIMIT %(param_1)s::INTEGER
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 0.4104s ago] {'domain_1': 'test-company-14cb0f13', 'param_1': 1}
+INFO     sqlalchemy.engine.Engine:base.py:1848 INSERT INTO tenants (company_name, schema_name, status, created_at, updated_at) VALUES (%(company_name)s::VARCHAR, %(schema_name)s::VARCHAR, %(status)s, %(created_at)s::TIMESTAMP WITHOUT TIME ZONE, %(updated_at)s::TIMESTAMP WITHOUT TIME ZONE) RETURNING tenants.id
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00054s] {'company_name': 'Test Company 14cb0f13', 'schema_name': 'tenant_test_company_14cb0f13', 'status': 'ACTIVE', 'created_at': datetime.datetime(2026, 7, 11, 11, 59, 41, 896416), 'updated_at': datetime.datetime(2026, 7, 11, 11, 59, 41, 896427)}
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT tenants.id, tenants.company_name, tenants.schema_name, tenants.status, tenants.created_at, tenants.updated_at 
+FROM tenants 
+WHERE tenants.id = %(pk_1)s::INTEGER
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00049s] {'pk_1': 55}
+INFO     sqlalchemy.engine.Engine:base.py:1848 INSERT INTO domains (domain, tenant_id, is_primary, created_at) VALUES (%(domain)s::VARCHAR, %(tenant_id)s::INTEGER, %(is_primary)s, %(created_at)s::TIMESTAMP WITHOUT TIME ZONE) RETURNING domains.id
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00082s] {'domain': 'test-company-14cb0f13', 'tenant_id': 55, 'is_primary': True, 'created_at': datetime.datetime(2026, 7, 11, 11, 59, 41, 986985)}
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT domains.id, domains.domain, domains.tenant_id, domains.is_primary, domains.created_at 
+FROM domains 
+WHERE domains.id = %(pk_1)s::INTEGER
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00047s] {'pk_1': 55}
+INFO     sqlalchemy.engine.Engine:base.py:1848 INSERT INTO users (id, email, password, is_active, is_superuser, is_mfa_enabled, mfa_secret, mfa_enabled_at, mfa_last_used_at, created_at, updated_at) VALUES (%(id)s::UUID, %(email)s::VARCHAR, %(password)s::VARCHAR, %(is_active)s, %(is_superuser)s, %(is_mfa_enabled)s, %(mfa_secret)s::VARCHAR, %(mfa_enabled_at)s::TIMESTAMP WITHOUT TIME ZONE, %(mfa_last_used_at)s::TIMESTAMP WITHOUT TIME ZONE, %(created_at)s::TIMESTAMP WITHOUT TIME ZONE, %(updated_at)s::TIMESTAMP WITHOUT TIME ZONE)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00105s] {'id': UUID('74aa6d87-9ba1-4505-affb-23f8c609f1ce'), 'email': 'testmfa_14cb0f13@example.com', 'password': '$2b$12$QqgopBu6c7jDRS0pNkWXxe3IqrBHvTGOKWuxY7e96OR2ZG4ZhGn6m', 'is_active': True, 'is_superuser': False, 'is_mfa_enabled': False, 'mfa_secret': None, 'mfa_enabled_at': None, 'mfa_last_used_at': None, 'created_at': datetime.datetime(2026, 7, 11, 11, 59, 42, 70624), 'updated_at': datetime.datetime(2026, 7, 11, 11, 59, 42, 70707)}
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT users.id, users.email, users.password, users.is_active, users.is_superuser, users.is_mfa_enabled, users.mfa_secret, users.mfa_enabled_at, users.mfa_last_used_at, users.created_at, users.updated_at 
+FROM users 
+WHERE users.id = %(pk_1)s::UUID
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00054s] {'pk_1': UUID('74aa6d87-9ba1-4505-affb-23f8c609f1ce')}
+INFO     sqlalchemy.engine.Engine:base.py:1848 INSERT INTO user_profiles (id, user_id, tenant_id, full_name, created_at, updated_at) VALUES (%(id)s::UUID, %(user_id)s::UUID, %(tenant_id)s::INTEGER, %(full_name)s::VARCHAR, %(created_at)s::TIMESTAMP WITHOUT TIME ZONE, %(updated_at)s::TIMESTAMP WITHOUT TIME ZONE)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00077s] {'id': UUID('dbabc5d2-1223-4535-80bd-30f03f5ebbec'), 'user_id': UUID('74aa6d87-9ba1-4505-affb-23f8c609f1ce'), 'tenant_id': 55, 'full_name': 'John Doe', 'created_at': datetime.datetime(2026, 7, 11, 11, 59, 42, 154876), 'updated_at': datetime.datetime(2026, 7, 11, 11, 59, 42, 154888)}
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT user_profiles.id, user_profiles.user_id, user_profiles.tenant_id, user_profiles.full_name, user_profiles.created_at, user_profiles.updated_at 
+FROM user_profiles 
+WHERE user_profiles.id = %(pk_1)s::UUID
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00037s] {'pk_1': UUID('dbabc5d2-1223-4535-80bd-30f03f5ebbec')}
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE SCHEMA "tenant_test_company_14cb0f13"
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00042s] {}
+INFO     sqlalchemy.engine.Engine:base.py:1848 SET search_path TO "tenant_test_company_14cb0f13"
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00056s] {}
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT pg_catalog.pg_class.relname 
+FROM pg_catalog.pg_class JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_class.relnamespace 
+WHERE pg_catalog.pg_class.relname = %(table_name)s::VARCHAR AND pg_catalog.pg_class.relkind = ANY (ARRAY[%(param_1)s::VARCHAR, %(param_2)s::VARCHAR, %(param_3)s::VARCHAR, %(param_4)s::VARCHAR, %(param_5)s::VARCHAR]) AND pg_catalog.pg_table_is_visible(pg_catalog.pg_class.oid) AND pg_catalog.pg_namespace.nspname != %(nspname_1)s::VARCHAR
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00039s] {'table_name': 'employees', 'param_1': 'r', 'param_2': 'p', 'param_3': 'f', 'param_4': 'v', 'param_5': 'm', 'nspname_1': 'pg_catalog'}
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = %(typname_1)s::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != %(nspname_1)s::VARCHAR
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00052s] {'typname_1': 'role', 'nspname_1': 'pg_catalog'}
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE TYPE role AS ENUM ('ORG_ADMIN', 'HR_ADMIN', 'IT_ADMIN', 'MANAGER', 'EMPLOYEE')
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00046s] {}
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT pg_catalog.pg_type.typname 
+FROM pg_catalog.pg_type JOIN pg_catalog.pg_namespace ON pg_catalog.pg_namespace.oid = pg_catalog.pg_type.typnamespace 
+WHERE pg_catalog.pg_type.typname = %(typname_1)s::VARCHAR AND pg_catalog.pg_type_is_visible(pg_catalog.pg_type.oid) AND pg_catalog.pg_namespace.nspname != %(nspname_1)s::VARCHAR
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 0.07562s ago] {'typname_1': 'employmentstatus', 'nspname_1': 'pg_catalog'}
+INFO     sqlalchemy.engine.Engine:base.py:1848 CREATE TYPE employmentstatus AS ENUM ('ACTIVE', 'INACTIVE', 'ON_LEAVE', 'TERMINATED')
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00042s] {}
+INFO     sqlalchemy.engine.Engine:base.py:1848 
+CREATE TABLE employees (
+	id UUID NOT NULL, 
+	user_id UUID NOT NULL, 
+	full_name VARCHAR(255) NOT NULL, 
+	email VARCHAR(255) NOT NULL, 
+	role role NOT NULL, 
+	department VARCHAR(100), 
+	job_title VARCHAR(100), 
+	phone_number VARCHAR(20), 
+	manager_id UUID, 
+	employment_status employmentstatus NOT NULL, 
+	is_active BOOLEAN NOT NULL, 
+	created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL, 
+	updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL, 
+	PRIMARY KEY (id), 
+	UNIQUE (user_id), 
+	UNIQUE (email), 
+	FOREIGN KEY(manager_id) REFERENCES employees (id) ON DELETE SET NULL
+)
+
+
+INFO     sqlalchemy.engine.Engine:base.py:1848 [no key 0.00040s] {}
+INFO     sqlalchemy.engine.Engine:base.py:1848 INSERT INTO employees (id, user_id, full_name, email, role, department, job_title, phone_number, manager_id, employment_status, is_active, created_at, updated_at) VALUES (%(id)s::UUID, %(user_id)s::UUID, %(full_name)s::VARCHAR, %(email)s::VARCHAR, %(role)s, %(department)s::VARCHAR, %(job_title)s::VARCHAR, %(phone_number)s::VARCHAR, %(manager_id)s::UUID, %(employment_status)s, %(is_active)s, %(created_at)s::TIMESTAMP WITHOUT TIME ZONE, %(updated_at)s::TIMESTAMP WITHOUT TIME ZONE)
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00122s] {'id': UUID('b113a0ff-5ad8-462f-948f-61bedb792427'), 'user_id': UUID('74aa6d87-9ba1-4505-affb-23f8c609f1ce'), 'full_name': 'John Doe', 'email': 'testmfa_14cb0f13@example.com', 'role': 'ORG_ADMIN', 'department': None, 'job_title': None, 'phone_number': None, 'manager_id': None, 'employment_status': 'ACTIVE', 'is_active': True, 'created_at': datetime.datetime(2026, 7, 11, 11, 59, 42, 561545), 'updated_at': datetime.datetime(2026, 7, 11, 11, 59, 42, 561552)}
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT employees.id, employees.user_id, employees.full_name, employees.email, employees.role, employees.department, employees.job_title, employees.phone_number, employees.manager_id, employees.employment_status, employees.is_active, employees.created_at, employees.updated_at 
+FROM employees 
+WHERE employees.id = %(pk_1)s::UUID
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00037s] {'pk_1': UUID('b113a0ff-5ad8-462f-948f-61bedb792427')}
+INFO     sqlalchemy.engine.Engine:base.py:1848 SET search_path TO "public"
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 1.492s ago] {}
+INFO     sqlalchemy.engine.Engine:base.py:2718 COMMIT
+INFO     sqlalchemy.engine.Engine:base.py:2712 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT tenants.id AS tenants_id, tenants.company_name AS tenants_company_name, tenants.schema_name AS tenants_schema_name, tenants.status AS tenants_status, tenants.created_at AS tenants_created_at, tenants.updated_at AS tenants_updated_at 
+FROM tenants 
+WHERE tenants.id = %(pk_1)s::INTEGER
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00069s] {'pk_1': 55}
+INFO     sqlalchemy.engine.Engine:base.py:2715 ROLLBACK
+INFO     sqlalchemy.engine.Engine:base.py:2712 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1848 SET search_path TO "public"
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 1.682s ago] {}
+INFO     sqlalchemy.engine.Engine:base.py:2715 ROLLBACK
+INFO     sqlalchemy.engine.Engine:base.py:2712 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT domains.id AS domains_id, domains.domain AS domains_domain, domains.tenant_id AS domains_tenant_id, domains.is_primary AS domains_is_primary, domains.created_at AS domains_created_at 
+FROM domains 
+WHERE domains.domain = %(domain_1)s::VARCHAR 
+ LIMIT %(param_1)s::INTEGER
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 1.894s ago] {'domain_1': 'testserver', 'param_1': 1}
+INFO     sqlalchemy.engine.Engine:base.py:1848 SET search_path TO "public"
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 1.884s ago] {}
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT users.id AS users_id, users.email AS users_email, users.password AS users_password, users.is_active AS users_is_active, users.is_superuser AS users_is_superuser, users.is_mfa_enabled AS users_is_mfa_enabled, users.mfa_secret AS users_mfa_secret, users.mfa_enabled_at AS users_mfa_enabled_at, users.mfa_last_used_at AS users_mfa_last_used_at, users.created_at AS users_created_at, users.updated_at AS users_updated_at 
+FROM users 
+WHERE users.email = %(email_1)s::VARCHAR 
+ LIMIT %(param_1)s::INTEGER
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 1.654s ago] {'email_1': 'testmfa_14cb0f13@example.com', 'param_1': 1}
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT user_profiles.id AS user_profiles_id, user_profiles.user_id AS user_profiles_user_id, user_profiles.tenant_id AS user_profiles_tenant_id, user_profiles.full_name AS user_profiles_full_name, user_profiles.created_at AS user_profiles_created_at, user_profiles.updated_at AS user_profiles_updated_at 
+FROM user_profiles 
+WHERE user_profiles.user_id = %(user_id_1)s::UUID 
+ LIMIT %(param_1)s::INTEGER
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00665s] {'user_id_1': UUID('74aa6d87-9ba1-4505-affb-23f8c609f1ce'), 'param_1': 1}
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT tenants.id AS tenants_id, tenants.company_name AS tenants_company_name, tenants.schema_name AS tenants_schema_name, tenants.status AS tenants_status, tenants.created_at AS tenants_created_at, tenants.updated_at AS tenants_updated_at 
+FROM tenants 
+WHERE tenants.id = %(id_1)s::INTEGER 
+ LIMIT %(param_1)s::INTEGER
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00067s] {'id_1': 55, 'param_1': 1}
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT domains.id AS domains_id, domains.domain AS domains_domain, domains.tenant_id AS domains_tenant_id, domains.is_primary AS domains_is_primary, domains.created_at AS domains_created_at 
+FROM domains 
+WHERE %(param_1)s::INTEGER = domains.tenant_id
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00054s] {'param_1': 55}
+INFO     sqlalchemy.engine.Engine:base.py:2715 ROLLBACK
+INFO     sqlalchemy.engine.Engine:base.py:2712 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1848 SET search_path TO "public"
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 3.4s ago] {}
+INFO     sqlalchemy.engine.Engine:base.py:2715 ROLLBACK
+INFO     sqlalchemy.engine.Engine:base.py:2712 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT domains.id AS domains_id, domains.domain AS domains_domain, domains.tenant_id AS domains_tenant_id, domains.is_primary AS domains_is_primary, domains.created_at AS domains_created_at 
+FROM domains 
+WHERE domains.domain = %(domain_1)s::VARCHAR 
+ LIMIT %(param_1)s::INTEGER
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 3.614s ago] {'domain_1': 'testserver', 'param_1': 1}
+INFO     sqlalchemy.engine.Engine:base.py:1848 SET search_path TO "public"
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 3.611s ago] {}
+INFO     sqlalchemy.engine.Engine:base.py:1848 SET search_path TO "tenant_test_company_14cb0f13"
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 2.558s ago] {}
+INFO     sqlalchemy.engine.Engine:base.py:1848 SELECT users.id AS users_id, users.email AS users_email, users.password AS users_password, users.is_active AS users_is_active, users.is_superuser AS users_is_superuser, users.is_mfa_enabled AS users_is_mfa_enabled, users.mfa_secret AS users_mfa_secret, users.mfa_enabled_at AS users_mfa_enabled_at, users.mfa_last_used_at AS users_mfa_last_used_at, users.created_at AS users_created_at, users.updated_at AS users_updated_at 
+FROM users 
+WHERE users.id = %(id_1)s::UUID 
+ LIMIT %(param_1)s::INTEGER
+INFO     sqlalchemy.engine.Engine:base.py:1848 [generated in 0.00085s] {'id_1': '74aa6d87-9ba1-4505-affb-23f8c609f1ce', 'param_1': 1}
+INFO     sqlalchemy.engine.Engine:base.py:2715 ROLLBACK
+INFO     sqlalchemy.engine.Engine:base.py:2712 BEGIN (implicit)
+INFO     sqlalchemy.engine.Engine:base.py:1848 SET search_path TO "public"
+INFO     sqlalchemy.engine.Engine:base.py:1848 [cached since 3.811s ago] {}
+INFO     sqlalchemy.engine.Engine:base.py:2715 ROLLBACK
+=============================== warnings summary ===============================
+.venv/lib/python3.14/site-packages/fastapi/testclient.py:1
+  /app/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+tests/integration/test_mfa.py::test_mfa_flow
+tests/integration/test_mfa.py::test_mfa_flow
+tests/integration/test_mfa.py::test_mfa_flow
+tests/integration/test_mfa.py::test_mfa_flow
+tests/integration/test_mfa.py::test_mfa_flow
+tests/integration/test_mfa.py::test_mfa_flow
+tests/integration/test_mfa.py::test_mfa_flow
+tests/integration/test_mfa.py::test_mfa_flow
+tests/integration/test_mfa.py::test_mfa_flow
+  /app/.venv/lib/python3.14/site-packages/sqlalchemy/sql/schema.py:3623: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return util.wrap_callable(lambda ctx: fn(), fn)  # type: ignore
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/integration/test_mfa.py::test_mfa_flow - AssertionError: Setup M...
+======================= 1 failed, 10 warnings in 16.41s ========================
