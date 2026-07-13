@@ -12,8 +12,10 @@ export const executeLogin = async (credentials: LoginCredentials) => {
     // Call the data layer
     const response = await authRepository.login(credentials);
     
-    // Update global state
-    setUser(response.user, response.token);
+    // Update global state if MFA is not required
+    if (!response.mfaRequired && response.user && response.token) {
+      setUser(response.user, response.token);
+    }
     
     // Optionally return response if the caller needs it
     return response;

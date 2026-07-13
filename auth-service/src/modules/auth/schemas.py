@@ -78,3 +78,9 @@ class LoginResponse(BaseModel):
 
 class SSOExchangeRequest(BaseModel):
     sso_token: str
+
+class MFAPendingResponse(BaseModel):
+    mfa_required: bool = True
+    mfa_token: str
+    user_id: str
+    email: str

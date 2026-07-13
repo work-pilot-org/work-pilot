@@ -31,10 +31,18 @@ export interface LoginCredentials {
 }
 
 export interface LoginResponse {
-  user: User;
-  token: string;
+  user?: User;
+  token?: string;
   ssoToken?: string;
+  mfaRequired?: boolean;
+  mfaToken?: string;
 }
+
+export interface MFASetupResponse {
+  otpauth_url: string;
+  qr_code: string;
+}
+
 
 export interface ForgotPasswordRequest {
   email: string;

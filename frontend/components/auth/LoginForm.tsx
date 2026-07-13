@@ -21,8 +21,13 @@ export const LoginForm = () => {
     try {
       const result = await executeLogin({ email, password });
       
+      if (result.mfaRequired && result.mfaToken) {
+        router.push(`/mfa/verify?token=${result.mfaToken}`);
+        return;
+      }
+      
       // Redirect to the tenant-specific subdomain
-      if (result.user.domain) {
+      if (result.user && result.user.domain) {
         let url = getTenantDomainUrl(result.user.domain, "/");
         if (result.ssoToken) {
           url += `?sso_token=${result.ssoToken}`;

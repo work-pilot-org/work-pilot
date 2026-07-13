@@ -9,6 +9,7 @@ from src.modules.auth.schemas import (
     LoginRequest,
     LoginResponse,
     SSOExchangeRequest,
+    MFAPendingResponse,
 )
 from src.modules.auth.service import AuthService
 
@@ -21,6 +22,10 @@ router = APIRouter(
     prefix="/auth",
     tags=["Authentication"],
 )
+
+from src.modules.mfa.router import router as mfa_router
+router.include_router(mfa_router)
+
 
 auth_service = AuthService()
 
@@ -47,32 +52,34 @@ from fastapi import Response, Request, HTTPException
 
 @router.post(
     "/login",
-    response_model=LoginResponse,
+    response_model=LoginResponse | MFAPendingResponse,
     status_code=200,
 )
 def login(
     request: LoginRequest,
     response: Response,
     db: Session = Depends(get_db),
-) -> LoginResponse:
+) -> LoginResponse | MFAPendingResponse:
     """
-    Authenticate a user and return a JWT access token. Sets refresh token as HttpOnly cookie.
+    Authenticate a user and return a JWT access token. Sets refresh token as HttpOnly cookie if MFA is not enabled.
     """
     login_response, refresh_token = auth_service.login(
         db=db,
         request=request,
     )
     
-    response.set_cookie(
-        key="refresh_token",
-        value=refresh_token,
-        httponly=True,
-        secure=True, 
-        samesite="none",
-        max_age=7 * 24 * 60 * 60, # 7 days
-    )
+    if refresh_token:
+        response.set_cookie(
+            key="refresh_token",
+            value=refresh_token,
+            httponly=True,
+            secure=True, 
+            samesite="none",
+            max_age=7 * 24 * 60 * 60, # 7 days
+        )
     
     return login_response
+
 
 @router.post("/sso-exchange")
 def sso_exchange(

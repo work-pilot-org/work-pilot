@@ -15,6 +15,7 @@ from src.infrastructure.database.base import PublicBase
 
 class PasswordResetToken(PublicBase):
     __tablename__ = "password_reset_tokens"
+    __table_args__ = {"schema": "public"}
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
@@ -24,7 +25,7 @@ class PasswordResetToken(PublicBase):
 
     user_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
-        ForeignKey("users.id", ondelete="CASCADE"),
+        ForeignKey("public.users.id", ondelete="CASCADE"),
         nullable=False,
     )
 

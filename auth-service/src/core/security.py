@@ -95,3 +95,20 @@ def hash_reset_token(token: str) -> str:
     Hash the reset token for secure storage.
     """
     return hashlib.sha256(token.encode()).hexdigest()
+
+def create_mfa_token(data: dict) -> str:
+    """
+    Create a very short-lived JWT for MFA pending state.
+    """
+    to_encode = data.copy()
+    from datetime import datetime, timedelta, timezone
+    expire = datetime.now(timezone.utc) + timedelta(minutes=5)
+    to_encode.update({"exp": expire, "type": "mfa_pending"})
+    
+    encoded_jwt = jwt.encode(
+        to_encode,
+        settings.SECRET_KEY,
+        algorithm=settings.ALGORITHM
+    )
+    
+    return encoded_jwt

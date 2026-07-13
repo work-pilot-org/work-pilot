@@ -22,13 +22,14 @@ class TenantStatus(str, Enum):
 
 class Tenant(PublicBase):
     __tablename__ = "tenants"
+    __table_args__ = {"schema": "public"}
 
     id: Mapped[int] = mapped_column(
         Integer,
         primary_key=True,
         index=True,
     )
-
+# company name
     company_name: Mapped[str] = mapped_column(
         String(255),
         nullable=False,
@@ -71,6 +72,7 @@ class Tenant(PublicBase):
 
 class Domain(PublicBase):
     __tablename__ = "domains"
+    __table_args__ = {"schema": "public"}
 
     id: Mapped[int] = mapped_column(
         Integer,
@@ -86,7 +88,7 @@ class Domain(PublicBase):
     )
 
     tenant_id: Mapped[int] = mapped_column(
-        ForeignKey("tenants.id", ondelete="CASCADE"),
+        ForeignKey("public.tenants.id", ondelete="CASCADE"),
         nullable=False,
     )
 

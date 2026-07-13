@@ -58,6 +58,13 @@ export const authRepository = {
       );
     }
 
+    if (result.mfa_required) {
+      return {
+        mfaRequired: true,
+        mfaToken: result.mfa_token
+      };
+    }
+
     return {
       user: {
         id: result.user_id,
@@ -141,6 +148,110 @@ export const authRepository = {
       if (axios.isAxiosError(err) && err.response?.data) {
         const detail = (err.response.data as ApiError).detail;
         throw new Error(typeof detail === "string" ? detail : "Failed to reset password.");
+      }
+      throw new Error(err.message || "An unexpected error occurred.");
+    }
+  },
+
+  async mfaSetup(): Promise<import("@/types/auth").MFASetupResponse> {
+    const { useAuthStore } = await import("@/store/authStore");
+    const token = useAuthStore.getState().token;
+    try {
+      const response = await api.post<import("@/types/auth").MFASetupResponse>(
+        "/auth/mfa/setup",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (err: any) {
+      if (axios.isAxiosError(err) && err.response?.data) {
+        const detail = (err.response.data as ApiError).detail;
+        throw new Error(typeof detail === "string" ? detail : "Failed to setup MFA.");
+      }
+      throw new Error(err.message || "An unexpected error occurred.");
+    }
+  },
+
+  async mfaVerify(code: string, mfaToken?: string): Promise<import("@/types/auth").LoginResponse> {
+    const { useAuthStore } = await import("@/store/authStore");
+    const token = useAuthStore.getState().token;
+    try {
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+      const response = await api.post(
+        "/auth/mfa/verify",
+        { code, mfa_token: mfaToken },
+        { headers }
+      );
+      const result = response.data;
+      if (result.access_token) {
+        return {
+          user: {
+            id: result.user_id,
+            email: result.email,
+            name: result.company_name,
+            schemaName: result.schema_name,
+            domain: result.domain
+          },
+          token: result.access_token,
+          ssoToken: result.sso_token
+        };
+      }
+      return result;
+    } catch (err: any) {
+      if (axios.isAxiosError(err) && err.response?.data) {
+        const detail = (err.response.data as ApiError).detail;
+        throw new Error(typeof detail === "string" ? detail : "Failed to verify code.");
+      }
+      throw new Error(err.message || "An unexpected error occurred.");
+    }
+  },
+
+  async mfaDisable(code: string): Promise<void> {
+    const { useAuthStore } = await import("@/store/authStore");
+    const token = useAuthStore.getState().token;
+    try {
+      await api.post(
+        "/auth/mfa/disable",
+        { code },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    } catch (err: any) {
+      if (axios.isAxiosError(err) && err.response?.data) {
+        const detail = (err.response.data as ApiError).detail;
+        throw new Error(typeof detail === "string" ? detail : "Failed to disable MFA.");
+      }
+      throw new Error(err.message || "An unexpected error occurred.");
+    }
+  },
+
+  async mfaStatus(): Promise<{ enabled: boolean }> {
+    const { useAuthStore } = await import("@/store/authStore");
+    const token = useAuthStore.getState().token;
+    try {
+      const response = await api.get<{ enabled: boolean }>(
+        "/auth/mfa/status",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (err: any) {
+      if (axios.isAxiosError(err) && err.response?.data) {
+        const detail = (err.response.data as ApiError).detail;
+        throw new Error(typeof detail === "string" ? detail : "Failed to fetch MFA status.");
       }
       throw new Error(err.message || "An unexpected error occurred.");
     }

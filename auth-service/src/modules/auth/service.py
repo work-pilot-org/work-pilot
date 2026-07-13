@@ -390,6 +390,19 @@ class AuthService:
         if not tenant:
             raise InvalidCredentialsException("Tenant not found.")
             
+        # Check if MFA is enabled
+        if user.is_mfa_enabled:
+            from src.core.security import create_mfa_token
+            from src.modules.auth.schemas import MFAPendingResponse
+            mfa_token = create_mfa_token({"sub": str(user.id)})
+            return MFAPendingResponse(
+                mfa_required=True,
+                mfa_token=mfa_token,
+                user_id=str(user.id),
+                email=user.email
+            ), None
+
+            
         # 5. Extract Primary Domain
         primary_domain = next((d.domain for d in tenant.domains if d.is_primary), tenant.domains[0].domain if tenant.domains else "localhost")
         

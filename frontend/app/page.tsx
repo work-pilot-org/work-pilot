@@ -82,10 +82,13 @@ export default function Home() {
                 <p className="text-[15px] text-gray-500 max-w-lg">
                   You are currently logged into the {user?.domain} workspace. Navigate to your dashboard to manage your workflows and settings.
                 </p>
-                <div className="pt-4">
+                <div className="pt-4 flex flex-wrap gap-4">
                   <a href={getTenantDomainUrl(user?.domain || "", "/")} className="inline-flex items-center gap-2 bg-[#36307a] hover:bg-[#2a2468] text-white text-[14px] font-medium px-6 py-3 rounded-xl shadow-sm transition-colors">
                     Go to Dashboard <ArrowRight className="w-4 h-4" />
                   </a>
+                  <Link href="/mfa/setup" className="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 text-[14px] font-medium px-6 py-3 rounded-xl shadow-sm border border-gray-200 transition-colors">
+                    <Shield className="w-4 h-4 text-[#36307a]" /> Configure MFA
+                  </Link>
                 </div>
               </div>
               <div className="w-full md:w-1/3 aspect-square bg-gray-50 rounded-xl border border-gray-100 flex items-center justify-center flex-col gap-4 text-gray-400">
