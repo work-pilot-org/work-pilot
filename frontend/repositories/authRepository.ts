@@ -3,8 +3,12 @@ import {
   RegisterResponse, 
   ForgotPasswordRequest, 
   ForgotPasswordResponse, 
-  ResetPasswordRequest, 
   ResetPasswordResponse,
+  PreAuthResponse,
+  MFASetupResponse,
+  MFALoginRequest,
+  MFAEnableRequest,
+  MFADisableRequest,
   ApiError
 } from "@/types/auth";
 import { api } from "@/lib/axios";
@@ -38,7 +42,7 @@ export const authRepository = {
     return result as RegisterResponse;
   },
 
-  async login(data: import("@/types/auth").LoginCredentials): Promise<import("@/types/auth").LoginResponse> {
+  async login(data: import("@/types/auth").LoginCredentials): Promise<import("@/types/auth").LoginResponse | PreAuthResponse> {
     const response = await fetch(`${AUTH_SERVICE_URL}/auth/login`, {
       method: "POST",
       headers: {
@@ -58,13 +62,52 @@ export const authRepository = {
       );
     }
 
+    if (result.mfa_required) {
+      return result as PreAuthResponse;
+    }
+
     return {
       user: {
         id: result.user_id,
         email: result.email,
         name: result.company_name,
         schemaName: result.schema_name,
-        domain: result.domain
+        domain: result.domain,
+        isMfaEnabled: result.is_mfa_enabled
+      },
+      token: result.access_token,
+      ssoToken: result.sso_token
+    };
+  },
+
+  async loginMfa(data: MFALoginRequest): Promise<import("@/types/auth").LoginResponse> {
+    const response = await fetch(`${AUTH_SERVICE_URL}/auth/login/mfa`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        typeof result.detail === "string"
+          ? result.detail
+          : "Invalid MFA code."
+      );
+    }
+
+    return {
+      user: {
+        id: result.user_id,
+        email: result.email,
+        name: result.company_name,
+        schemaName: result.schema_name,
+        domain: result.domain,
+        isMfaEnabled: result.is_mfa_enabled
       },
       token: result.access_token,
       ssoToken: result.sso_token
@@ -105,7 +148,8 @@ export const authRepository = {
         email: result.email,
         name: result.company_name,
         schemaName: result.schema_name,
-        domain: result.domain
+        domain: result.domain,
+        isMfaEnabled: result.is_mfa_enabled
       },
       token: result.access_token,
       ssoToken: result.sso_token
@@ -144,6 +188,19 @@ export const authRepository = {
       }
       throw new Error(err.message || "An unexpected error occurred.");
     }
+  },
+
+  async setupMfa(): Promise<MFASetupResponse> {
+    const response = await api.post<MFASetupResponse>("/auth/mfa/setup");
+    return response.data;
+  },
+
+  async enableMfa(data: MFAEnableRequest): Promise<void> {
+    await api.post("/auth/mfa/enable", data);
+  },
+
+  async disableMfa(data: MFADisableRequest): Promise<void> {
+    await api.post("/auth/mfa/disable", data);
   }
 };
 

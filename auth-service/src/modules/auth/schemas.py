@@ -74,7 +74,28 @@ class LoginResponse(BaseModel):
     schema_name: str
     company_name: str
     domain: str
+    is_mfa_enabled: bool = False
     sso_token: str | None = None
 
 class SSOExchangeRequest(BaseModel):
     sso_token: str
+
+class MFASetupResponse(BaseModel):
+    secret: str
+    provisioning_uri: str
+
+class MFAEnableRequest(BaseModel):
+    code: str = Field(..., min_length=6, max_length=6)
+
+class MFADisableRequest(BaseModel):
+    password: str = Field(..., min_length=1)
+    code: str = Field(..., min_length=6, max_length=6)
+
+class PreAuthResponse(BaseModel):
+    preauth_token: str
+    mfa_required: bool = True
+    message: str = "MFA is required. Please verify TOTP."
+
+class MFALoginRequest(BaseModel):
+    preauth_token: str
+    code: str = Field(..., min_length=6, max_length=6)

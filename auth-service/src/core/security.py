@@ -84,6 +84,38 @@ def create_sso_token(data: dict) -> str:
     
     return encoded_jwt
 
+def create_preauth_token(data: dict) -> str:
+    """
+    Create a very short-lived JWT for MFA pre-authentication (e.g. 120 seconds).
+    """
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + timedelta(seconds=120)
+    to_encode.update({"exp": expire, "type": "preauth"})
+    
+    encoded_jwt = jwt.encode(
+        to_encode,
+        settings.SECRET_KEY,
+        algorithm=settings.ALGORITHM
+    )
+    
+    return encoded_jwt
+
+def verify_preauth_token(token: str) -> dict:
+    """
+    Verify a pre-authentication token and return the payload.
+    """
+    try:
+        payload = jwt.decode(
+            token,
+            settings.SECRET_KEY,
+            algorithms=[settings.ALGORITHM]
+        )
+        if payload.get("type") != "preauth":
+            raise ValueError("Invalid token type.")
+        return payload
+    except Exception as e:
+        raise ValueError(f"Invalid or expired preauth token: {e}")
+
 def generate_reset_token() -> str:
     """
     Generate a secure random token for password reset.
