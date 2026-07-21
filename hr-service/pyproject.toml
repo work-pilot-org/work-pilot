@@ -1,0 +1,10 @@
+[project]
+name = "hr-service"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "alembic>=1.18.5",
+    "email-validator>=2.3.0",
+]
