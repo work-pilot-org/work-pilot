@@ -307,12 +307,21 @@ class AttendanceService:
         month: int,
         year: int,
     ) -> dict[str, str]:
+        if month < 1 or month > 12:
+            raise ValueError("month must be between 1 and 12")
+        if year < 1900 or year > 2100:
+            raise ValueError("year must be between 1900 and 2100")
+
         records = self.repository.get_monthly(month, year)
 
-        export_dir = Path("exports")
+        export_dir = Path("exports").resolve()
         export_dir.mkdir(exist_ok=True)
 
-        file_path = export_dir / f"attendance_{year}_{month}.csv"
+        file_path = (export_dir / f"attendance_{year}_{month}.csv").resolve()
+        try:
+            file_path.relative_to(export_dir)
+        except ValueError as exc:
+            raise ValueError("Invalid export path.") from exc
 
         with open(
             file_path,
