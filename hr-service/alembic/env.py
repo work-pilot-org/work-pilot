@@ -12,6 +12,7 @@ from src.infrastructure.database.base import TenantBase
 from src.modules.employee.models import *
 from src.modules.attendance.models import *
 from src.modules.leave.models import *
+from src.modules.policies.models import *
 
 config = context.config
 

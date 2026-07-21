@@ -17,6 +17,13 @@ from src.modules.leave.router import (
     leave_calendar_router,
     holiday_router,
 )
+from src.modules.policies.router import (
+    leave_policy_router,
+    attendance_policy_router,
+    shift_policy_router,
+    holiday_policy_router,
+    probation_policy_router,
+)
 
 
 
@@ -76,6 +83,11 @@ app.include_router(leave_balance_router)
 app.include_router(leave_report_router)
 app.include_router(leave_calendar_router)
 app.include_router(holiday_router)
+app.include_router(leave_policy_router)
+app.include_router(attendance_policy_router)
+app.include_router(shift_policy_router)
+app.include_router(holiday_policy_router)
+app.include_router(probation_policy_router)
 
 # =====================================================
 # Root Endpoint
