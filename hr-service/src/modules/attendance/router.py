@@ -252,8 +252,8 @@ def get_monthly_report(
     response_model=AttendanceExportResponse,
 )
 def export_attendance(
-    month: int,
-    year: int,
+    month: int = Query(..., ge=1, le=12),
+    year: int = Query(..., ge=1900, le=2100),
     service: AttendanceService = Depends(get_service),
 ):
     return service.export_attendance(month, year)
