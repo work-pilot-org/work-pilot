@@ -18,7 +18,7 @@ class WorkflowRepository:
     def create_workflow(self, workflow: Workflow):
 
         self.db.add(workflow)
-        self.db.commit()
+        self.db.flush()
         self.db.refresh(workflow)
 
         return workflow
@@ -40,7 +40,7 @@ class WorkflowRepository:
 
     def update_workflow(self, workflow):
 
-        self.db.commit()
+        self.db.flush()
         self.db.refresh(workflow)
 
         return workflow
@@ -48,14 +48,14 @@ class WorkflowRepository:
     def delete_workflow(self, workflow):
 
         self.db.delete(workflow)
-        self.db.commit()
+        self.db.flush()
 
     # ---------------- Workflow Step ----------------
 
     def create_step(self, step: WorkflowStep):
 
         self.db.add(step)
-        self.db.commit()
+        self.db.flush()
         self.db.refresh(step)
 
         return step
@@ -81,7 +81,7 @@ class WorkflowRepository:
     ):
 
         self.db.add(execution)
-        self.db.commit()
+        self.db.flush()
         self.db.refresh(execution)
 
         return execution
@@ -104,7 +104,7 @@ class WorkflowRepository:
         execution,
     ):
 
-        self.db.commit()
+        self.db.flush()
         self.db.refresh(execution)
 
         return execution
@@ -117,7 +117,7 @@ class WorkflowRepository:
     ):
 
         self.db.add(approval)
-        self.db.commit()
+        self.db.flush()
         self.db.refresh(approval)
 
         return approval
@@ -140,7 +140,7 @@ class WorkflowRepository:
         approval,
     ):
 
-        self.db.commit()
+        self.db.flush()
         self.db.refresh(approval)
 
         return approval

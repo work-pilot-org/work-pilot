@@ -3,7 +3,8 @@ from fastapi import FastAPI
 from src.core.config import settings
 from src.core.logging import logger
 from src.infrastructure.database.session import engine
-from src.infrastructure.database.base import Base
+from src.infrastructure.database.session import engine
+from src.modules.workflow.router import router as workflow_router
 
 
 app = FastAPI(
@@ -11,14 +12,13 @@ app = FastAPI(
     debug=settings.DEBUG,
 )
 
-
+app.include_router(workflow_router, prefix="/api/v1")
 @app.on_event("startup")
 async def startup():
 
     logger.info("Workflow Service Started")
 
-    Base.metadata.create_all(bind=engine)
-
+    pass
 
 @app.get("/")
 async def root():
