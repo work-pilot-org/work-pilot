@@ -4,7 +4,8 @@ from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
 from src.infrastructure.database.session import get_db
-from src.core.dependencies import get_current_user
+from src.core.dependencies import get_current_user, security
+from fastapi.security import HTTPAuthorizationCredentials
 
 from .schemas import (
     WorkflowCreate,
@@ -37,7 +38,7 @@ def create_workflow(
     current_user: dict = Depends(get_current_user),
 ):
     service = WorkflowService(db)
-    return service.create_workflow(data, user_id=current_user.get("user_id"))
+    return service.create_workflow(data, user_id=current_user.get("sub"))
 
 
 @router.get(
@@ -107,11 +108,10 @@ async def start_workflow_execution(
     data: WorkflowExecutionCreate,
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
+    credentials: HTTPAuthorizationCredentials = Depends(security),
 ):
     service = WorkflowService(db)
-    # Forward the token implicitly by using a dependency or header, 
-    # but for now we pass None and let internal client handle auth if needed
-    return await service.start_workflow_execution(data)
+    return await service.start_workflow_execution(data, token=credentials.credentials)
 
 
 @router.get(
@@ -136,13 +136,15 @@ async def approve_task(
     data: ApprovalDecision,
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
+    credentials: HTTPAuthorizationCredentials = Depends(security),
 ):
     service = WorkflowService(db)
     return await service.approve_step(
         task_id=task_id,
-        user_id=current_user.get("user_id"),
+        user_id=current_user.get("sub"),
         user_role=current_user.get("role", "EMPLOYEE"),
         decision_data=data,
+        token=credentials.credentials,
     )
 
 
@@ -158,7 +160,7 @@ async def cancel_workflow(
     service = WorkflowService(db)
     return await service.cancel_workflow(
         execution_id=execution_id,
-        user_id=current_user.get("user_id"),
+        user_id=current_user.get("sub"),
     )
 
 
@@ -170,11 +172,13 @@ async def restart_workflow(
     execution_id: str,
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
+    credentials: HTTPAuthorizationCredentials = Depends(security),
 ):
     service = WorkflowService(db)
     return await service.restart_workflow(
         execution_id=execution_id,
-        user_id=current_user.get("user_id"),
+        user_id=current_user.get("sub"),
+        token=credentials.credentials,
     )
 
 @router.get(
