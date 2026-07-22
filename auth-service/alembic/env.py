@@ -44,6 +44,7 @@ def run_migrations_offline() -> None:
             "paramstyle": "named",
         },
         include_schemas=True,
+        version_table="alembic_version_auth",
     )
 
     with context.begin_transaction():
@@ -71,6 +72,7 @@ def run_migrations_online() -> None:
             target_metadata=target_metadata,
             include_schemas=True,
             compare_type=True,
+            version_table="alembic_version_auth",
         )
 
         with context.begin_transaction():
