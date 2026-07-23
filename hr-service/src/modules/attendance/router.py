@@ -1,7 +1,7 @@
 from datetime import date
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, status, HTTPException
 from sqlalchemy.orm import Session
 
 from src.infrastructure.database.session import get_db
@@ -41,7 +41,10 @@ def check_in(
     request: AttendanceCheckIn,
     service: AttendanceService = Depends(get_service),
 ):
-    return service.check_in(request)
+    try:
+        return service.check_in(request)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
 # ----------------------------------------------------
@@ -57,7 +60,10 @@ def check_out(
     request: AttendanceCheckOut,
     service: AttendanceService = Depends(get_service),
 ):
-    return service.check_out(request)
+    try:
+        return service.check_out(request)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
 
 # ----------------------------------------------------

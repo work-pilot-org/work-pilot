@@ -1,5 +1,5 @@
 import csv
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from uuid import UUID
 
@@ -174,7 +174,13 @@ class AttendanceService:
         )
 
         if not attendance:
-            raise ValueError("Employee has not checked in today.")
+            yesterday = today - timedelta(days=1)
+            attendance = self.repository.get_by_employee_and_date(
+                checkout_data.employee_id,
+                yesterday,
+            )
+            if not attendance or attendance.check_out:
+                raise ValueError("Employee has not checked in.")
 
         if attendance.check_out:
             raise ValueError("Employee already checked out.")
@@ -182,8 +188,11 @@ class AttendanceService:
         attendance.check_out = datetime.now().time()
 
         if attendance.check_in:
-            checkin = datetime.combine(today, attendance.check_in)
+            checkin = datetime.combine(attendance.attendance_date, attendance.check_in)
             checkout = datetime.combine(today, attendance.check_out)
+
+            if checkout < checkin:
+                checkout += timedelta(days=1)
 
             total_minutes = int((checkout - checkin).total_seconds() / 60)
 

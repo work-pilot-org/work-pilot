@@ -280,6 +280,32 @@ class LeaveRequestRepository:
         status: LeaveStatus,
     ) -> LeaveRequest:
 
+        if status == LeaveStatus.APPROVED and leave_request.status != LeaveStatus.APPROVED:
+            balance = (
+                self.db.query(LeaveBalance)
+                .filter(
+                    LeaveBalance.employee_id == leave_request.employee_id,
+                    LeaveBalance.leave_type == leave_request.leave_type,
+                    LeaveBalance.year == leave_request.start_date.year,
+                )
+                .first()
+            )
+            if balance:
+                balance.used_days += Decimal(str(leave_request.total_days))
+                
+        elif leave_request.status == LeaveStatus.APPROVED and status != LeaveStatus.APPROVED:
+            balance = (
+                self.db.query(LeaveBalance)
+                .filter(
+                    LeaveBalance.employee_id == leave_request.employee_id,
+                    LeaveBalance.leave_type == leave_request.leave_type,
+                    LeaveBalance.year == leave_request.start_date.year,
+                )
+                .first()
+            )
+            if balance:
+                balance.used_days -= Decimal(str(leave_request.total_days))
+
         leave_request.status = status
 
         self.db.flush()

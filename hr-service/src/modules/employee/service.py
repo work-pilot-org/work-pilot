@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
 from src.modules.employee.exceptions import (
     EmployeeAlreadyExistsException,
@@ -67,9 +68,13 @@ class EmployeeService:
             profile_photo=employee_data.profile_photo,
         )
 
-        employee = self.repository.create_employee(employee)
-        self.db.commit()
-        return employee
+        try:
+            employee = self.repository.create_employee(employee)
+            self.db.commit()
+            return employee
+        except IntegrityError:
+            self.db.rollback()
+            raise EmployeeAlreadyExistsException()
 
     # =====================================================
     # Get Employee By Id

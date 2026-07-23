@@ -188,6 +188,7 @@ class LeaveRequestService:
     def __init__(self, db: Session):
         self.db = db
         self.repository = LeaveRequestRepository(db)
+        self.balance_repository = LeaveBalanceRepository(db)
         # self.workflow_client = WorkflowClient()
 
     # ---------------------------------------------------------
@@ -211,6 +212,19 @@ class LeaveRequestService:
                 leave_data.end_date,
                 leave_data.is_half_day,
             )
+
+            balances = self.balance_repository.get_by_employee(leave_data.employee_id)
+            balance = next(
+                (b for b in balances if b.leave_type == leave_data.leave_type and b.year == leave_data.start_date.year),
+                None,
+            )
+            
+            if not balance:
+                raise BadRequestException(message="No leave balance found for the specified type and year.")
+                
+            remaining_days = _compute_remaining(balance)
+            if Decimal(str(total_days)) > remaining_days:
+                raise BadRequestException(message="Insufficient leave balance.")
 
             leave_request = LeaveRequest(
                 employee_id=leave_data.employee_id,
