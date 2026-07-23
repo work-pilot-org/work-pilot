@@ -1,0 +1,847 @@
+{
+  "auth-service": {
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/",
+        "module": "Core",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\auth-service\\src\\main.py"
+      },
+      {
+        "method": "POST",
+        "path": "/register",
+        "module": "auth",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\auth-service\\src\\modules\\auth\\router.py"
+      },
+      {
+        "method": "POST",
+        "path": "/login",
+        "module": "auth",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\auth-service\\src\\modules\\auth\\router.py"
+      },
+      {
+        "method": "POST",
+        "path": "/sso-exchange",
+        "module": "auth",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\auth-service\\src\\modules\\auth\\router.py"
+      },
+      {
+        "method": "POST",
+        "path": "/swagger-login",
+        "module": "auth",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\auth-service\\src\\modules\\auth\\router.py"
+      },
+      {
+        "method": "POST",
+        "path": "/refresh",
+        "module": "auth",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\auth-service\\src\\modules\\auth\\router.py"
+      },
+      {
+        "method": "POST",
+        "path": "/logout",
+        "module": "auth",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\auth-service\\src\\modules\\auth\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/me",
+        "module": "auth",
+        "is_public": false,
+        "file": "d:\\work-pilot-clone\\auth-service\\src\\modules\\auth\\router.py"
+      },
+      {
+        "method": "POST",
+        "path": "/forgot-password",
+        "module": "auth",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\auth-service\\src\\modules\\auth\\router.py"
+      },
+      {
+        "method": "POST",
+        "path": "/reset-password",
+        "module": "auth",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\auth-service\\src\\modules\\auth\\router.py"
+      },
+      {
+        "method": "POST",
+        "path": "/mfa/setup",
+        "module": "auth",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\auth-service\\src\\modules\\auth\\router.py"
+      },
+      {
+        "method": "POST",
+        "path": "/mfa/enable",
+        "module": "auth",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\auth-service\\src\\modules\\auth\\router.py"
+      },
+      {
+        "method": "POST",
+        "path": "/mfa/disable",
+        "module": "auth",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\auth-service\\src\\modules\\auth\\router.py"
+      },
+      {
+        "method": "POST",
+        "path": "/login/mfa",
+        "module": "auth",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\auth-service\\src\\modules\\auth\\router.py"
+      }
+    ],
+    "internal_calls": []
+  },
+  "hr-service": {
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/",
+        "module": "Core",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\main.py"
+      },
+      {
+        "method": "GET",
+        "path": "/health",
+        "module": "Core",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\main.py"
+      },
+      {
+        "method": "POST",
+        "path": "/check-in",
+        "module": "attendance",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\attendance\\router.py"
+      },
+      {
+        "method": "POST",
+        "path": "/check-out",
+        "module": "attendance",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\attendance\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/{attendance_id}",
+        "module": "attendance",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\attendance\\router.py"
+      },
+      {
+        "method": "PUT",
+        "path": "/{attendance_id}",
+        "module": "attendance",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\attendance\\router.py"
+      },
+      {
+        "method": "DELETE",
+        "path": "/{attendance_id}",
+        "module": "attendance",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\attendance\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/employee/{employee_id}",
+        "module": "attendance",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\attendance\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/employee/{employee_id}/summary",
+        "module": "attendance",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\attendance\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/date/{attendance_date}",
+        "module": "attendance",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\attendance\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/today",
+        "module": "attendance",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\attendance\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/active",
+        "module": "attendance",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\attendance\\router.py"
+      },
+      {
+        "method": "PATCH",
+        "path": "/{attendance_id}/status",
+        "module": "attendance",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\attendance\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/report/monthly",
+        "module": "attendance",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\attendance\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/export",
+        "module": "attendance",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\attendance\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/{employee_id}",
+        "module": "employee",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\employee\\router.py"
+      },
+      {
+        "method": "PUT",
+        "path": "/{employee_id}",
+        "module": "employee",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\employee\\router.py"
+      },
+      {
+        "method": "DELETE",
+        "path": "/{employee_id}",
+        "module": "employee",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\employee\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/search/",
+        "module": "employee",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\employee\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/{employee_id}/profile",
+        "module": "employee",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\employee\\router.py"
+      },
+      {
+        "method": "PUT",
+        "path": "/{employee_id}/profile",
+        "module": "employee",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\employee\\router.py"
+      },
+      {
+        "method": "POST",
+        "path": "/{employee_id}/documents",
+        "module": "employee",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\employee\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/{employee_id}/documents",
+        "module": "employee",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\employee\\router.py"
+      },
+      {
+        "method": "DELETE",
+        "path": "/{employee_id}/documents/{document_id}",
+        "module": "employee",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\employee\\router.py"
+      },
+      {
+        "method": "POST",
+        "path": "/departments",
+        "module": "organization",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/departments",
+        "module": "organization",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+      },
+      {
+        "method": "PUT",
+        "path": "/departments/{department_id}",
+        "module": "organization",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+      },
+      {
+        "method": "DELETE",
+        "path": "/departments/{department_id}",
+        "module": "organization",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+      },
+      {
+        "method": "POST",
+        "path": "/designations",
+        "module": "organization",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/designations",
+        "module": "organization",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+      },
+      {
+        "method": "PUT",
+        "path": "/designations/{designation_id}",
+        "module": "organization",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+      },
+      {
+        "method": "DELETE",
+        "path": "/designations/{designation_id}",
+        "module": "organization",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+      },
+      {
+        "method": "POST",
+        "path": "/branches",
+        "module": "organization",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/branches",
+        "module": "organization",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+      },
+      {
+        "method": "PUT",
+        "path": "/branches/{branch_id}",
+        "module": "organization",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+      },
+      {
+        "method": "DELETE",
+        "path": "/branches/{branch_id}",
+        "module": "organization",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+      },
+      {
+        "method": "POST",
+        "path": "/shifts",
+        "module": "organization",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/shifts",
+        "module": "organization",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+      },
+      {
+        "method": "PUT",
+        "path": "/shifts/{shift_id}",
+        "module": "organization",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+      },
+      {
+        "method": "DELETE",
+        "path": "/shifts/{shift_id}",
+        "module": "organization",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+      }
+    ],
+    "internal_calls": []
+  },
+  "it-service": {
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/",
+        "module": "Core",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\main.py"
+      },
+      {
+        "method": "GET",
+        "path": "/health",
+        "module": "Core",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\main.py"
+      },
+      {
+        "method": "GET",
+        "path": "/{request_id}",
+        "module": "access",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\access\\router.py"
+      },
+      {
+        "method": "PUT",
+        "path": "/{request_id}",
+        "module": "access",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\access\\router.py"
+      },
+      {
+        "method": "DELETE",
+        "path": "/{request_id}",
+        "module": "access",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\access\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/{asset_id}",
+        "module": "assets",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\assets\\router.py"
+      },
+      {
+        "method": "PUT",
+        "path": "/{asset_id}",
+        "module": "assets",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\assets\\router.py"
+      },
+      {
+        "method": "POST",
+        "path": "/{asset_id}/assign",
+        "module": "assets",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\assets\\router.py"
+      },
+      {
+        "method": "POST",
+        "path": "/{asset_id}/return",
+        "module": "assets",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\assets\\router.py"
+      },
+      {
+        "method": "DELETE",
+        "path": "/{asset_id}",
+        "module": "assets",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\assets\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/{device_id}",
+        "module": "devices",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\devices\\router.py"
+      },
+      {
+        "method": "PUT",
+        "path": "/{device_id}",
+        "module": "devices",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\devices\\router.py"
+      },
+      {
+        "method": "POST",
+        "path": "/{device_id}/assign",
+        "module": "devices",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\devices\\router.py"
+      },
+      {
+        "method": "POST",
+        "path": "/{device_id}/return",
+        "module": "devices",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\devices\\router.py"
+      },
+      {
+        "method": "DELETE",
+        "path": "/{device_id}",
+        "module": "devices",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\devices\\router.py"
+      },
+      {
+        "method": "POST",
+        "path": "/{device_id}/maintenance",
+        "module": "devices",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\devices\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/{device_id}/maintenance",
+        "module": "devices",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\devices\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/{ticket_id}",
+        "module": "helpdesk",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\helpdesk\\router.py"
+      },
+      {
+        "method": "PATCH",
+        "path": "/{ticket_id}",
+        "module": "helpdesk",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\helpdesk\\router.py"
+      },
+      {
+        "method": "PATCH",
+        "path": "/{ticket_id}/status",
+        "module": "helpdesk",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\helpdesk\\router.py"
+      },
+      {
+        "method": "PATCH",
+        "path": "/{ticket_id}/assign",
+        "module": "helpdesk",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\helpdesk\\router.py"
+      },
+      {
+        "method": "DELETE",
+        "path": "/{ticket_id}",
+        "module": "helpdesk",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\helpdesk\\router.py"
+      },
+      {
+        "method": "POST",
+        "path": "/{ticket_id}/comments",
+        "module": "helpdesk",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\helpdesk\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/{ticket_id}/comments",
+        "module": "helpdesk",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\helpdesk\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/comments/{comment_id}",
+        "module": "helpdesk",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\helpdesk\\router.py"
+      },
+      {
+        "method": "PATCH",
+        "path": "/comments/{comment_id}",
+        "module": "helpdesk",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\helpdesk\\router.py"
+      },
+      {
+        "method": "DELETE",
+        "path": "/comments/{comment_id}",
+        "module": "helpdesk",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\helpdesk\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/{license_id}",
+        "module": "licenses",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\licenses\\router.py"
+      },
+      {
+        "method": "PUT",
+        "path": "/{license_id}",
+        "module": "licenses",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\licenses\\router.py"
+      },
+      {
+        "method": "DELETE",
+        "path": "/{license_id}",
+        "module": "licenses",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\licenses\\router.py"
+      },
+      {
+        "method": "POST",
+        "path": "/{license_id}/assign",
+        "module": "licenses",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\licenses\\router.py"
+      },
+      {
+        "method": "DELETE",
+        "path": "/assignments/{assignment_id}",
+        "module": "licenses",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\licenses\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/assignments/user/{user_id}",
+        "module": "licenses",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\licenses\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/{record_id}",
+        "module": "maintenance",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\maintenance\\router.py"
+      },
+      {
+        "method": "PUT",
+        "path": "/{record_id}",
+        "module": "maintenance",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\maintenance\\router.py"
+      },
+      {
+        "method": "POST",
+        "path": "/{record_id}/start",
+        "module": "maintenance",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\maintenance\\router.py"
+      },
+      {
+        "method": "POST",
+        "path": "/{record_id}/complete",
+        "module": "maintenance",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\maintenance\\router.py"
+      },
+      {
+        "method": "POST",
+        "path": "/{record_id}/cancel",
+        "module": "maintenance",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\maintenance\\router.py"
+      },
+      {
+        "method": "DELETE",
+        "path": "/{record_id}",
+        "module": "maintenance",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\maintenance\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/{software_id}",
+        "module": "software",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\software\\router.py"
+      },
+      {
+        "method": "PUT",
+        "path": "/{software_id}",
+        "module": "software",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\software\\router.py"
+      },
+      {
+        "method": "DELETE",
+        "path": "/{software_id}",
+        "module": "software",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\software\\router.py"
+      },
+      {
+        "method": "POST",
+        "path": "/{software_id}/install",
+        "module": "software",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\software\\router.py"
+      },
+      {
+        "method": "DELETE",
+        "path": "/installations/{install_id}",
+        "module": "software",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\software\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/installations/device/{device_id}",
+        "module": "software",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\software\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/installations/user/{user_id}",
+        "module": "software",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\software\\router.py"
+      },
+      {
+        "method": "POST",
+        "path": "/requests",
+        "module": "software",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\software\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/requests",
+        "module": "software",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\software\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/requests/{request_id}",
+        "module": "software",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\software\\router.py"
+      }
+    ],
+    "internal_calls": []
+  },
+  "workflow-service": {
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/",
+        "module": "Core",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\workflow-service\\src\\main.py"
+      },
+      {
+        "method": "GET",
+        "path": "/health",
+        "module": "Core",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\workflow-service\\src\\main.py"
+      },
+      {
+        "method": "POST",
+        "path": "/workflows",
+        "module": "workflow",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\workflow-service\\src\\modules\\workflow\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/workflows",
+        "module": "workflow",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\workflow-service\\src\\modules\\workflow\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/workflows/{workflow_id}",
+        "module": "workflow",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\workflow-service\\src\\modules\\workflow\\router.py"
+      },
+      {
+        "method": "PUT",
+        "path": "/workflows/{workflow_id}",
+        "module": "workflow",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\workflow-service\\src\\modules\\workflow\\router.py"
+      },
+      {
+        "method": "DELETE",
+        "path": "/workflows/{workflow_id}",
+        "module": "workflow",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\workflow-service\\src\\modules\\workflow\\router.py"
+      },
+      {
+        "method": "POST",
+        "path": "/workflow-executions",
+        "module": "workflow",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\workflow-service\\src\\modules\\workflow\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/workflow-executions/{execution_id}",
+        "module": "workflow",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\workflow-service\\src\\modules\\workflow\\router.py"
+      },
+      {
+        "method": "PATCH",
+        "path": "/tasks/{task_id}/approve",
+        "module": "workflow",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\workflow-service\\src\\modules\\workflow\\router.py"
+      },
+      {
+        "method": "PATCH",
+        "path": "/workflow-executions/{execution_id}/cancel",
+        "module": "workflow",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\workflow-service\\src\\modules\\workflow\\router.py"
+      },
+      {
+        "method": "PATCH",
+        "path": "/workflow-executions/{execution_id}/restart",
+        "module": "workflow",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\workflow-service\\src\\modules\\workflow\\router.py"
+      },
+      {
+        "method": "GET",
+        "path": "/workflow-executions/{execution_id}/history",
+        "module": "workflow",
+        "is_public": true,
+        "file": "d:\\work-pilot-clone\\workflow-service\\src\\modules\\workflow\\router.py"
+      }
+    ],
+    "internal_calls": [
+      {
+        "client": "hr_client",
+        "method": "POST",
+        "path": "/api/v1/leaves/{execution.entity_id}/approve",
+        "from_file": "d:\\work-pilot-clone\\workflow-service\\src\\modules\\workflow\\service.py"
+      },
+      {
+        "client": "it_client",
+        "method": "POST",
+        "path": "/api/v1/equipment/requests/{execution.entity_id}/approve",
+        "from_file": "d:\\work-pilot-clone\\workflow-service\\src\\modules\\workflow\\service.py"
+      }
+    ]
+  }
+}

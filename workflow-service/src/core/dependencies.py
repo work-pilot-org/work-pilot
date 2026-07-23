@@ -1,5 +1,5 @@
 from fastapi import Depends
-from fastapi import Header
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from sqlalchemy.orm import Session
 
@@ -8,16 +8,14 @@ from src.core.security import verify_access_token
 from src.infrastructure.database.session import get_db
 from src.infrastructure.database.schema import set_schema
 
+security = HTTPBearer()
 
 def get_current_user(
-    authorization: str = Header(...),
+    credentials: HTTPAuthorizationCredentials = Depends(security),
     db: Session = Depends(get_db),
 ):
 
-    if not authorization.startswith("Bearer "):
-        raise UnauthorizedException()
-
-    token = authorization.replace("Bearer ", "")
+    token = credentials.credentials
 
     payload = verify_access_token(token)
 

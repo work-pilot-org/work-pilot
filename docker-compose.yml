@@ -1,28 +1,6 @@
 services:
 
-  postgres:
-    image: postgres:16
 
-    container_name: workpilot_postgres
-
-    restart: unless-stopped
-
-    environment:
-      POSTGRES_DB: workpilot_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres123
-
-    ports:
-      - "5433:5432"
-
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d workpilot_db"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   auth-service:
     build:
@@ -33,15 +11,13 @@ services:
 
     restart: unless-stopped
 
-    depends_on:
-      postgres:
-        condition: service_healthy
+
 
     env_file:
       - ./auth-service/.env
 
     ports:
-      - "8000:8000"
+      - "8001:8000"
 
     volumes:
       - ./auth-service:/app
@@ -51,6 +27,60 @@ services:
 
     command: >
       sh -c "uv run alembic upgrade head && uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  hr-service:
+    build:
+      context: ./hr-service
+      dockerfile: Dockerfile
+    container_name: workpilot_hr_service
+    restart: unless-stopped
+
+    env_file:
+      - ./hr-service/.env
+    ports:
+      - "8002:8000"
+    volumes:
+      - ./hr-service:/app
+      - /app/.venv
+    working_dir: /app
+    command: >
+      sh -c "uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  it-service:
+    build:
+      context: ./it-service
+      dockerfile: Dockerfile
+    container_name: workpilot_it_service
+    restart: unless-stopped
+
+    env_file:
+      - ./it-service/.env
+    ports:
+      - "8004:8000"
+    volumes:
+      - ./it-service:/app
+      - /app/.venv
+    working_dir: /app
+    command: >
+      sh -c "uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  workflow-service:
+    build:
+      context: ./workflow-service
+      dockerfile: Dockerfile
+    container_name: workpilot_workflow_service
+    restart: unless-stopped
+
+    env_file:
+      - ./workflow-service/.env
+    ports:
+      - "8005:8000"
+    volumes:
+      - ./workflow-service:/app
+      - /app/.venv
+    working_dir: /app
+    command: >
+      sh -c "uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"
 
   frontend:
     build:
@@ -67,10 +97,7 @@ services:
       - /app/node_modules
       - /app/.next
     environment:
-      - NEXT_PUBLIC_AUTH_SERVICE_URL=http://localhost:8000
+      - NEXT_PUBLIC_AUTH_SERVICE_URL=http://localhost:8001
       - WATCHPACK_POLLING=true
       - CHOKIDAR_USEPOLLING=true
     command: npm run dev
-
-volumes:
-  postgres_data:
