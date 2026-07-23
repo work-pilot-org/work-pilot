@@ -303,10 +303,10 @@ class WorkflowService:
         try:
             if execution.entity_type.lower() == "leave_request":
                 # Changed to target the correct HR service endpoint for leave requests
-                await hr_client.patch(f"/api/v1/leave-requests/{execution.entity_id}/status", json={"status": "APPROVED"}, token=token)
+                await hr_client.patch(f"/leave-requests/{execution.entity_id}/status", json={"status": "APPROVED"}, token=token)
             elif execution.entity_type.lower() == "asset_request" or execution.entity_type.lower() == "access_request":
                 # Changed to target the correct IT service endpoint for access requests
-                await it_client.patch(f"/api/v1/access/{execution.entity_id}/status", json={"status": "APPROVED"}, token=token)
+                await it_client.patch(f"/access/{execution.entity_id}/status", json={"status": "APPROVED"}, token=token)
         except Exception as e:
             # Log failure to notify downstream, but workflow remains completed
             # In a production system, this might use a message queue

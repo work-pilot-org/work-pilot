@@ -44,3 +44,7 @@ class BaseClient:
 
     async def delete(self, endpoint: str, token: Optional[str] = None, **kwargs) -> Any:
         return await self._request("DELETE", endpoint, token, **kwargs)
+
+    async def patch(self, endpoint: str, token: Optional[str] = None, **kwargs) -> Any:
+        return await self._request("PATCH", endpoint, token, **kwargs)
+

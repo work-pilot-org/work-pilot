@@ -23,7 +23,7 @@ class WorkflowClient:
         
         with httpx.Client(base_url=self.base_url) as client:
             try:
-                response = client.post("/api/v1/workflow-executions", json=payload, headers=headers, timeout=10.0)
+                response = client.post("/workflow-executions", json=payload, headers=headers, timeout=10.0)
                 response.raise_for_status()
                 return response.json()
             except httpx.HTTPError as e:

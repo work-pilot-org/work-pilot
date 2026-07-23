@@ -12,7 +12,7 @@ app = FastAPI(
     debug=settings.DEBUG,
 )
 
-app.include_router(workflow_router, prefix="/api/v1")
+app.include_router(workflow_router)
 @app.on_event("startup")
 async def startup():
 
