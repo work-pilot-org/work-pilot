@@ -12,11 +12,7 @@ class NotificationClient(BaseClient):
         """
         Send a notification to a user.
         """
-        payload = {
-            "user_id": user_id,
-            "message": message,
-            "type": "WORKFLOW_APPROVAL"
-        }
-        return await self.post("/api/v1/notifications", json=payload, token=token)
+        print(f"[STUB] Notification to {user_id}: {message}")
+        return {"status": "success", "stubbed": True}
 
 notification_client = NotificationClient()
