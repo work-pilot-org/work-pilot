@@ -10,6 +10,7 @@ from it_service.modules.access.schemas import (
     CreateAccessRequest,
     UpdateAccessRequest,
 )
+from it_service.infrastructure.clients.workflow_client import workflow_client
 
 
 class AccessService:
@@ -33,7 +34,17 @@ class AccessService:
             reason=payload.reason,
             status=AccessRequestStatus.PENDING,
         )
-        return self.repository.create(db, request)
+        saved_request = self.repository.create(db, request)
+        
+        # Trigger Workflow execution
+        workflow_client.start_workflow(
+            entity_id=saved_request.id,
+            entity_type="access_request",
+            workflow_name="access_approval",
+            requested_by=str(payload.requested_by)
+        )
+        
+        return saved_request
 
     def get_request(self, db: Session, request_id: uuid.UUID) -> AccessRequest:
         return self._get_request(db, request_id)
@@ -55,6 +66,13 @@ class AccessService:
         for field, value in updates.items():
             setattr(request, field, value)
             
+        return self.repository.save(db, request)
+
+    def update_request_status(
+        self, db: Session, request_id: uuid.UUID, status: AccessRequestStatus
+    ) -> AccessRequest:
+        request = self._get_request(db, request_id)
+        request.status = status
         return self.repository.save(db, request)
 
 

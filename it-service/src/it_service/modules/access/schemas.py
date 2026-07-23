@@ -10,7 +10,11 @@ class CreateAccessRequest(BaseModel):
     request_type: AccessRequestType
     target_resource: str = Field(..., min_length=2, max_length=255)
     requested_by: uuid.UUID
-    reason: str | None = None
+    reason: str | None = Field(None, max_length=1000)
+
+
+class AccessRequestStatusUpdate(BaseModel):
+    status: AccessRequestStatus
 
 
 class UpdateAccessRequest(BaseModel):

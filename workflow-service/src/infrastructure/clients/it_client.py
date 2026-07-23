@@ -12,6 +12,6 @@ class ITClient(BaseClient):
         """
         Fetch equipment assigned to a specific user from the IT Service.
         """
-        return await self.get(f"/api/v1/equipment/user/{user_id}", token=token)
+        return await self.get(f"/equipment/user/{user_id}", token=token)
 
 it_client = ITClient()

@@ -12,6 +12,6 @@ class HRClient(BaseClient):
         """
         Fetch details for a specific employee from the HR Service.
         """
-        return await self.get(f"/api/v1/employees/{employee_id}", token=token)
+        return await self.get(f"/employees/{employee_id}", token=token)
 
 hr_client = HRClient()

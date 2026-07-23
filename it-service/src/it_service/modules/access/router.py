@@ -10,6 +10,7 @@ from it_service.modules.access.schemas import (
     AccessRequestResponse,
     CreateAccessRequest,
     UpdateAccessRequest,
+    AccessRequestStatusUpdate,
 )
 from it_service.modules.access.service import AccessService
 
@@ -69,6 +70,16 @@ def update_request(
     service: AccessService = Depends(get_access_service),
 ):
     return service.update_request(db, request_id, payload)
+
+
+@router.patch("/{request_id}/status", response_model=AccessRequestResponse)
+def update_request_status(
+    request_id: uuid.UUID,
+    payload: AccessRequestStatusUpdate,
+    db: Session = Depends(get_db),
+    service: AccessService = Depends(get_access_service),
+):
+    return service.update_request_status(db, request_id, payload.status)
 
 
 @router.delete("/{request_id}", status_code=status.HTTP_204_NO_CONTENT)
