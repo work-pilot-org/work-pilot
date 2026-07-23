@@ -106,6 +106,9 @@ class LeaveRequestUpdate(BaseModel):
     attachment_url: Optional[str] = None
     emergency_contact: Optional[str] = Field(None, max_length=100)
 
+class LeaveRequestStatusUpdate(BaseModel):
+    status: LeaveStatus
+
 
 # ------------------------------------------------------------------
 # Response

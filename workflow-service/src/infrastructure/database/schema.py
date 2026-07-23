@@ -10,9 +10,12 @@ def set_schema(
     Switch PostgreSQL search_path
     """
 
+    import re
+    if not re.fullmatch(r"[a-z][a-z0-9_]*", schema_name):
+        raise ValueError("Invalid schema name.")
+
     db.execute(
-        text("SET search_path TO :schema"),
-        {"schema": schema_name},
+        text(f'SET search_path TO "{schema_name}", public')
     )
 
 

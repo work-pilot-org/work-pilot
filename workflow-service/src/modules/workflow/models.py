@@ -12,10 +12,10 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
-from src.infrastructure.database.base import Base
+from src.infrastructure.database.base import TenantBase
 
 
-class Workflow(Base):
+class Workflow(TenantBase):
     __tablename__ = "workflows"
 
     id: Mapped[str] = mapped_column(
@@ -62,7 +62,7 @@ class Workflow(Base):
     )
 
 
-class WorkflowStep(Base):
+class WorkflowStep(TenantBase):
     __tablename__ = "workflow_steps"
 
     id: Mapped[str] = mapped_column(
@@ -96,7 +96,7 @@ class WorkflowStep(Base):
     )
 
 
-class WorkflowExecution(Base):
+class WorkflowExecution(TenantBase):
     __tablename__ = "workflow_executions"
 
     id: Mapped[str] = mapped_column(
@@ -137,7 +137,7 @@ class WorkflowExecution(Base):
     )
 
 
-class Approval(Base):
+class Approval(TenantBase):
     __tablename__ = "approvals"
 
     id: Mapped[str] = mapped_column(

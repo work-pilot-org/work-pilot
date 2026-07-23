@@ -42,6 +42,7 @@ from src.modules.leave.exceptions import (
 
 from uuid import UUID
 from datetime import date
+from src.infrastructure.clients.workflow_client import workflow_client
 
 
 # ==================================================================
@@ -188,7 +189,7 @@ class LeaveRequestService:
     def __init__(self, db: Session):
         self.db = db
         self.repository = LeaveRequestRepository(db)
-        # self.workflow_client = WorkflowClient()
+        self.workflow_client = workflow_client
 
     # ---------------------------------------------------------
     # Create Leave Request
@@ -230,6 +231,14 @@ class LeaveRequestService:
             )
 
             self.db.commit()
+            
+            # Start workflow
+            self.workflow_client.start_workflow(
+                entity_id=leave_request.id,
+                entity_type="leave_request",
+                workflow_name="leave_approval",
+                requested_by=leave_data.employee_id
+            )
 
             return LeaveRequestResponse.model_validate(
                 leave_request
@@ -325,6 +334,25 @@ class LeaveRequestService:
             self.db.rollback()
             raise
 
+    # ---------------------------------------------------------
+    # Update Leave Request Status
+    # ---------------------------------------------------------
+    def update_leave_request_status(
+        self,
+        leave_request_id: UUID,
+        status: LeaveStatus,
+    ) -> LeaveRequestResponse:
+        try:
+            leave_request = self.repository.get_by_id(leave_request_id)
+            if not leave_request:
+                raise ResourceNotFoundException(message="Leave request not found.")
+            
+            leave_request.status = status
+            self.db.commit()
+            return LeaveRequestResponse.model_validate(leave_request)
+        except Exception:
+            self.db.rollback()
+            raise
     # ---------------------------------------------------------
     # Cancel Leave Request
     # ---------------------------------------------------------

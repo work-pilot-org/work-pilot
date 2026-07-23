@@ -18,6 +18,7 @@ class Settings(BaseSettings):
 
     AUTH_SERVICE_URL: str
     HR_SERVICE_URL: str
+    IT_SERVICE_URL: str
     NOTIFICATION_SERVICE_URL: str
     AI_SERVICE_URL: str
 

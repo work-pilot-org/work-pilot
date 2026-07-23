@@ -8,6 +8,7 @@ from src.modules.leave.schemas import (
     LeaveTypeUpdate,
     LeaveRequestCreate,
     LeaveRequestUpdate,
+    LeaveRequestStatusUpdate,
     LeaveRequestResponse,
     LeaveRequestListResponse,
     LeaveBalanceCreate,
@@ -206,6 +207,25 @@ def update_leave_request(
         leave_request,
     )
 
+# -------------------------------------------------------------------
+# Update Leave Request Status
+# ---------------------------------------------------------
+
+@leave_request_router.patch(
+    "/{leave_request_id}/status",
+    response_model=LeaveRequestResponse,
+)
+def update_leave_request_status(
+    leave_request_id: UUID,
+    status_update: LeaveRequestStatusUpdate,
+    db: Session = Depends(get_db),
+):
+    """Update a leave request status (approve/reject/etc)."""
+    service = LeaveRequestService(db)
+    return service.update_leave_request_status(
+        leave_request_id,
+        status_update.status,
+    )
 
 # -------------------------------------------------------------------
 # Cancel Leave Request
