@@ -4,9 +4,12 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Lock, RefreshCw, Loader2 } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { resetPasswordUseCase } from "@/use-cases/auth/resetPassword";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Label } from "@/components/ui/Label";
 
 const resetPasswordSchema = z
   .object({
@@ -29,6 +32,8 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -36,10 +41,7 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
     formState: { errors },
   } = useForm<ResetPasswordFormData>({
     resolver: zodResolver(resetPasswordSchema),
-    defaultValues: {
-      new_password: "",
-      confirm_password: "",
-    },
+    defaultValues: { new_password: "", confirm_password: "" },
   });
 
   const onSubmit = async (data: ResetPasswordFormData) => {
@@ -71,7 +73,7 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 
   if (!token) {
     return (
-      <div className="bg-red-50 text-red-700 p-4 rounded-xl text-sm font-medium text-center">
+      <div className="bg-destructive/10 text-destructive p-4 rounded-xl text-sm font-medium text-center">
         Reset token is missing or invalid. Please check your password recovery link.
       </div>
     );
@@ -79,67 +81,60 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 
   return (
     <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
-      {/* New Password */}
       <div className="space-y-2">
-        <label htmlFor="new_password" className="block text-[13px] font-medium text-gray-700">New Password</label>
+        <Label htmlFor="new_password">New Password</Label>
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-            <Lock className="h-4 w-4 text-gray-400" />
-          </div>
-          <input
-            type="password"
+          <Input
             id="new_password"
+            type={showPassword ? "text" : "password"}
             placeholder="••••••••"
             {...register("new_password")}
-            className="block w-full pl-10 pr-3.5 py-2.5 border border-gray-200 rounded-lg text-[14px] text-black placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#2a2468] focus:border-transparent transition-all bg-white tracking-widest"
+            error={!!errors.new_password}
+            className="pr-10 tracking-widest"
           />
+          <button 
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground"
+          >
+            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+          </button>
         </div>
         {errors.new_password && (
-          <p className="text-red-500 text-xs font-medium mt-1">{errors.new_password.message}</p>
+          <p className="text-destructive text-xs font-medium mt-1">{errors.new_password.message}</p>
         )}
       </div>
 
-      {/* Confirm Password */}
       <div className="space-y-2">
-        <label htmlFor="confirm_password" className="block text-[13px] font-medium text-gray-700">Confirm Password</label>
+        <Label htmlFor="confirm_password">Confirm Password</Label>
         <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-            <RefreshCw className="h-4 w-4 text-gray-400" />
-          </div>
-          <input
-            type="password"
+          <Input
             id="confirm_password"
+            type={showConfirmPassword ? "text" : "password"}
             placeholder="••••••••"
             {...register("confirm_password")}
-            className="block w-full pl-10 pr-3.5 py-2.5 border border-gray-200 rounded-lg text-[14px] text-black placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#2a2468] focus:border-transparent transition-all bg-white tracking-widest"
+            error={!!errors.confirm_password}
+            className="pr-10 tracking-widest"
           />
+          <button 
+            type="button"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground"
+          >
+            {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+          </button>
         </div>
         {errors.confirm_password && (
-          <p className="text-red-500 text-xs font-medium mt-1">{errors.confirm_password.message}</p>
+          <p className="text-destructive text-xs font-medium mt-1">{errors.confirm_password.message}</p>
         )}
       </div>
 
-      {/* Feedback messages */}
-      {error && (
-        <div className="text-red-500 text-sm font-medium mt-2">
-          {error}
-        </div>
-      )}
-      
-      {successMsg && (
-        <div className="text-green-600 text-sm font-medium mt-2">
-          {successMsg}
-        </div>
-      )}
+      {error && <div className="text-destructive text-sm font-medium mt-2">{error}</div>}
+      {successMsg && <div className="text-green-600 text-sm font-medium mt-2">{successMsg}</div>}
 
-      {/* Submit Button */}
-      <button
-        type="submit"
-        disabled={isLoading}
-        className="w-full bg-[#36307a] hover:bg-[#2a2468] text-white text-[14px] font-bold py-3.5 rounded-xl shadow-sm transition-all mt-4 disabled:opacity-70 flex items-center justify-center cursor-pointer"
-      >
-        {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Reset Password"}
-      </button>
+      <Button type="submit" className="w-full mt-4" isLoading={isLoading}>
+        Reset Password
+      </Button>
     </form>
   );
 }

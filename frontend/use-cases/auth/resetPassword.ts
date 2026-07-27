@@ -19,7 +19,7 @@ export const resetPasswordUseCase = async (
   try {
     const result = await authRepository.resetPassword(data);
     return { success: true, data: result };
-  } catch (err: any) {
-    return { success: false, error: err.message || "An unexpected error occurred." };
+  } catch (err: unknown) {
+    return { success: false, error: err instanceof Error ? err.message : "An unexpected error occurred." };
   }
 };

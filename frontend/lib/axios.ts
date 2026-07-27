@@ -1,7 +1,8 @@
 import axios from "axios";
 import { useAuthStore } from "@/store/authStore";
 
-const AUTH_SERVICE_URL = process.env.NEXT_PUBLIC_AUTH_SERVICE_URL || "http://localhost:8000";
+const AUTH_SERVICE_URL = process.env.NEXT_PUBLIC_AUTH_SERVICE_URL || "http://localhost:8001";
+const HR_SERVICE_URL = process.env.NEXT_PUBLIC_HR_SERVICE_URL || "http://localhost:8002";
 
 export const api = axios.create({
   baseURL: AUTH_SERVICE_URL,
@@ -12,6 +13,22 @@ export const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
+  const token = useAuthStore.getState().token;
+  if (token && config.headers) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export const hrApi = axios.create({
+  baseURL: HR_SERVICE_URL,
+  withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+hrApi.interceptors.request.use((config) => {
   const token = useAuthStore.getState().token;
   if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;

@@ -21,8 +21,9 @@ export const executeLogin = async (credentials: LoginCredentials): Promise<Login
     
     // Optionally return response if the caller needs it
     return response as LoginResponse;
-  } catch (error: any) {
-    setError(error.message || "Failed to login");
+  } catch (error: unknown) {
+    const errorMsg = error instanceof Error ? error.message : "Failed to login";
+    setError(errorMsg);
     throw error;
   } finally {
     setLoading(false);

@@ -3,6 +3,7 @@ import {
   RegisterResponse, 
   ForgotPasswordRequest, 
   ForgotPasswordResponse, 
+  ResetPasswordRequest,
   ResetPasswordResponse,
   PreAuthResponse,
   MFASetupResponse,
@@ -168,12 +169,12 @@ export const authRepository = {
     try {
       const response = await api.post<ForgotPasswordResponse>("/auth/forgot-password", data);
       return response.data;
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (axios.isAxiosError(err) && err.response?.data) {
         const detail = (err.response.data as ApiError).detail;
         throw new Error(typeof detail === "string" ? detail : "Failed to process forgot password request.");
       }
-      throw new Error(err.message || "An unexpected error occurred.");
+      throw new Error(err instanceof Error ? err.message : "An unexpected error occurred.");
     }
   },
 
@@ -181,12 +182,12 @@ export const authRepository = {
     try {
       const response = await api.post<ResetPasswordResponse>("/auth/reset-password", data);
       return response.data;
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (axios.isAxiosError(err) && err.response?.data) {
         const detail = (err.response.data as ApiError).detail;
         throw new Error(typeof detail === "string" ? detail : "Failed to reset password.");
       }
-      throw new Error(err.message || "An unexpected error occurred.");
+      throw new Error(err instanceof Error ? err.message : "An unexpected error occurred.");
     }
   },
 

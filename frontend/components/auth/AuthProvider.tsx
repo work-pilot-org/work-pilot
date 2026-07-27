@@ -6,7 +6,7 @@ import { authRepository } from "@/repositories/authRepository";
 import { getBaseDomainUrl, getTenantDomainUrl, isSubdomain } from "@/lib/auth";
 
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
-  const { setInitialized, setUser, isInitialized } = useAuthStore();
+  const { setInitialized, setUser } = useAuthStore();
 
   useEffect(() => {
     const initializeAuth = async () => {
