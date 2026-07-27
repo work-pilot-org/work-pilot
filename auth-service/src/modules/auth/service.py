@@ -59,6 +59,9 @@ from src.modules.password_reset.schemas import (
     ResetPasswordRequest,
 )
 
+from src.core.rbac import Role as RBACRole, ROLE_PERMISSIONS
+from src.modules.rbac.models import Role as DBRole, UserRole
+
 
 class AuthService:
 
@@ -319,6 +322,24 @@ class AuthService:
             )
 
             # ------------------------------------------
+            # Seed Roles
+            # ------------------------------------------
+            
+            db_roles = []
+            for rbac_role in RBACRole:
+                db_role = DBRole(name=rbac_role.value)
+                db.add(db_role)
+                db_roles.append(db_role)
+            db.flush()
+
+            # ------------------------------------------
+            # Assign TENANT_ADMIN Role to User
+            # ------------------------------------------
+            tenant_admin_role = next(r for r in db_roles if r.name == RBACRole.TENANT_ADMIN.value)
+            user_role = UserRole(user_id=user.id, role_id=tenant_admin_role.id)
+            db.add(user_role)
+            
+            # ------------------------------------------
             # Create Organization Admin Employee
             # ------------------------------------------
 
@@ -401,6 +422,10 @@ class AuthService:
         # 5. Extract Primary Domain
         primary_domain = next((d.domain for d in tenant.domains if d.is_primary), tenant.domains[0].domain if tenant.domains else "localhost")
         
+        # 5.5 Extract User Roles
+        user_roles_db = db.query(UserRole).filter(UserRole.user_id == user.id).all()
+        roles_list = [r.role.name for r in user_roles_db] if user_roles_db else []
+        
         # 6. Create JWT payload
         token_data = {
             "sub": str(user.id),
@@ -408,6 +433,7 @@ class AuthService:
             "tenant_id": tenant.id,
             "schema_name": tenant.schema_name,
             "domain": primary_domain,
+            "roles": roles_list,
         }
 
         # 7. Check if MFA is enabled
@@ -430,6 +456,7 @@ class AuthService:
             domain=primary_domain,
             is_mfa_enabled=False,
             sso_token=sso_token,
+            roles=roles_list,
         ), refresh_token
 
     def exchange_sso_token(
@@ -462,12 +489,16 @@ class AuthService:
             tenant = self.tenant_repository.get_tenant_by_id(db, profile.tenant_id)
             primary_domain = next((d.domain for d in tenant.domains if d.is_primary), tenant.domains[0].domain if tenant.domains else "localhost")
             
+            user_roles_db = db.query(UserRole).filter(UserRole.user_id == user.id).all()
+            roles_list = [r.role.name for r in user_roles_db] if user_roles_db else []
+            
             token_data = {
                 "sub": str(user.id),
                 "email": user.email,
                 "tenant_id": tenant.id,
                 "schema_name": tenant.schema_name,
                 "domain": primary_domain,
+                "roles": roles_list,
             }
             
             return create_refresh_token(token_data)
@@ -505,12 +536,16 @@ class AuthService:
             
             primary_domain = next((d.domain for d in tenant.domains if d.is_primary), tenant.domains[0].domain if tenant.domains else "localhost")
             
+            user_roles_db = db.query(UserRole).filter(UserRole.user_id == user.id).all()
+            roles_list = [r.role.name for r in user_roles_db] if user_roles_db else []
+            
             token_data = {
                 "sub": str(user.id),
                 "email": user.email,
                 "tenant_id": tenant.id,
                 "schema_name": tenant.schema_name,
                 "domain": primary_domain,
+                "roles": roles_list,
             }
             
             new_access_token = create_access_token(token_data)
@@ -527,6 +562,7 @@ class AuthService:
                 domain=primary_domain,
                 is_mfa_enabled=user.is_mfa_enabled,
                 sso_token=sso_token,
+                roles=roles_list,
             )
             
         except JWTError:
@@ -641,12 +677,16 @@ class AuthService:
         db.add(user)
         db.commit()
         
+        user_roles_db = db.query(UserRole).filter(UserRole.user_id == user.id).all()
+        roles_list = [r.role.name for r in user_roles_db] if user_roles_db else []
+        
         token_data = {
             "sub": str(user.id),
             "email": user.email,
             "tenant_id": payload.get("tenant_id"),
             "schema_name": payload.get("schema_name"),
             "domain": payload.get("domain"),
+            "roles": roles_list,
         }
         
         access_token = create_access_token(token_data)
@@ -665,6 +705,7 @@ class AuthService:
             domain=payload.get("domain"),
             is_mfa_enabled=True,
             sso_token=sso_token,
+            roles=roles_list,
         )
         
         return login_response, refresh_token

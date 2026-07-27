@@ -17,9 +17,13 @@ from src.modules.employee.schemas import (
 
 from src.modules.employee.service import EmployeeService
 
+from src.core.rbac import Permission
+from src.core.dependencies import require_permissions, get_current_user_and_set_schema, verify_employee_ownership
+
 router = APIRouter(
     prefix="/employees",
     tags=["Employees"],
+    dependencies=[Depends(get_current_user_and_set_schema)],
 )
 
 
@@ -31,6 +35,7 @@ router = APIRouter(
     "",
     response_model=EmployeeResponse,
     status_code=201,
+    dependencies=[Depends(require_permissions([Permission.EMPLOYEE_MANAGE]))],
 )
 def create_employee(
     employee: EmployeeCreate,
@@ -43,6 +48,7 @@ def create_employee(
 @router.get(
     "",
     response_model=list[EmployeeResponse],
+    dependencies=[Depends(require_permissions([Permission.EMPLOYEE_MANAGE]))],
 )
 def get_all_employees(
     db: Session = Depends(get_db),
@@ -57,8 +63,10 @@ def get_all_employees(
 )
 def get_employee_by_id(
     employee_id: UUID,
+    current_user: dict = Depends(get_current_user_and_set_schema),
     db: Session = Depends(get_db),
 ):
+    verify_employee_ownership(employee_id, current_user, db, bypass_permissions=[Permission.EMPLOYEE_MANAGE])
     service = EmployeeService(db)
     return service.get_employee_by_id(employee_id)
 
@@ -66,6 +74,7 @@ def get_employee_by_id(
 @router.put(
     "/{employee_id}",
     response_model=EmployeeResponse,
+    dependencies=[Depends(require_permissions([Permission.EMPLOYEE_MANAGE]))],
 )
 def update_employee(
     employee_id: UUID,
@@ -82,6 +91,7 @@ def update_employee(
 @router.delete(
     "/{employee_id}",
     response_model=EmployeeResponse,
+    dependencies=[Depends(require_permissions([Permission.EMPLOYEE_MANAGE]))],
 )
 def delete_employee(
     employee_id: UUID,
@@ -94,6 +104,7 @@ def delete_employee(
 @router.get(
     "/search/",
     response_model=list[EmployeeResponse],
+    dependencies=[Depends(require_permissions([Permission.EMPLOYEE_MANAGE]))],
 )
 def search_employees(
     keyword: str = Query(..., min_length=1, max_length=100),
@@ -115,8 +126,10 @@ def search_employees(
 )
 def get_employee_profile(
     employee_id: UUID,
+    current_user: dict = Depends(get_current_user_and_set_schema),
     db: Session = Depends(get_db),
 ):
+    verify_employee_ownership(employee_id, current_user, db, bypass_permissions=[Permission.EMPLOYEE_MANAGE])
     service = EmployeeService(db)
     return service.get_employee_profile(employee_id)
 
@@ -128,8 +141,10 @@ def get_employee_profile(
 def update_employee_profile(
     employee_id: UUID,
     profile: EmployeeProfileUpdate,
+    current_user: dict = Depends(get_current_user_and_set_schema),
     db: Session = Depends(get_db),
 ):
+    verify_employee_ownership(employee_id, current_user, db, bypass_permissions=[Permission.EMPLOYEE_MANAGE])
     service = EmployeeService(db)
     return service.update_employee_profile(
         employee_id,
@@ -149,8 +164,10 @@ def update_employee_profile(
 def upload_document(
     employee_id: UUID,
     document: EmployeeDocumentCreate,
+    current_user: dict = Depends(get_current_user_and_set_schema),
     db: Session = Depends(get_db),
 ):
+    verify_employee_ownership(employee_id, current_user, db, bypass_permissions=[Permission.EMPLOYEE_MANAGE])
     service = EmployeeService(db)
     return service.upload_document(
         employee_id,
@@ -164,8 +181,10 @@ def upload_document(
 )
 def get_documents(
     employee_id: UUID,
+    current_user: dict = Depends(get_current_user_and_set_schema),
     db: Session = Depends(get_db),
 ):
+    verify_employee_ownership(employee_id, current_user, db, bypass_permissions=[Permission.EMPLOYEE_MANAGE])
     service = EmployeeService(db)
     return service.get_documents(employee_id)
 
@@ -176,8 +195,10 @@ def get_documents(
 def delete_document(
     employee_id: UUID,
     document_id: UUID,
+    current_user: dict = Depends(get_current_user_and_set_schema),
     db: Session = Depends(get_db),
 ):
+    verify_employee_ownership(employee_id, current_user, db, bypass_permissions=[Permission.EMPLOYEE_MANAGE])
     service = EmployeeService(db)
     service.delete_document(
         employee_id,

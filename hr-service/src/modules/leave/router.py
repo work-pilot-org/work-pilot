@@ -1,3 +1,5 @@
+from src.core.rbac import Permission
+from src.core.dependencies import require_permissions
 from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.orm import Session
 
@@ -40,7 +42,7 @@ from typing import Optional
 # Leave Types Router
 # ==================================================================
 
-leave_type_router = APIRouter(
+leave_type_router = APIRouter(dependencies=[Depends(require_permissions([Permission.HR_MANAGE]))], 
     prefix="/leave-types",
     tags=["Leave Types"],
 )
@@ -130,7 +132,7 @@ def delete_leave_type(
 # Leave Requests Router
 # ==================================================================
 
-leave_request_router = APIRouter(
+leave_request_router = APIRouter(dependencies=[Depends(require_permissions([Permission.HR_MANAGE]))], 
     prefix="/leave-requests",
     tags=["Leave Requests"],
 )
@@ -249,7 +251,7 @@ def cancel_leave_request(
 # Employee Leave Router  (/employees/{employee_id}/...)
 # ==================================================================
 
-employee_leave_router = APIRouter(
+employee_leave_router = APIRouter(dependencies=[Depends(require_permissions([Permission.HR_MANAGE]))], 
     prefix="/employees",
     tags=["Employee Leave"],
 )
@@ -313,7 +315,7 @@ def get_employee_leave_summary(
 # Leave Balance Router  (/leave-balances)
 # ==================================================================
 
-leave_balance_router = APIRouter(
+leave_balance_router = APIRouter(dependencies=[Depends(require_permissions([Permission.HR_MANAGE]))], 
     prefix="/leave-balances",
     tags=["Leave Balance Management"],
 )
@@ -425,7 +427,7 @@ router = leave_request_router
 # Leave Reports Router (/leave/reports)
 # ==================================================================
 
-leave_report_router = APIRouter(
+leave_report_router = APIRouter(dependencies=[Depends(require_permissions([Permission.HR_MANAGE]))], 
     prefix="/leave/reports",
     tags=["Leave Reports"],
 )
@@ -478,7 +480,7 @@ def get_department_leave_report(
 # Leave Calendar Router (/leave/calendar)
 # ==================================================================
 
-leave_calendar_router = APIRouter(
+leave_calendar_router = APIRouter(dependencies=[Depends(require_permissions([Permission.HR_MANAGE]))], 
     prefix="/leave/calendar",
     tags=["Leave Calendar"],
 )
@@ -502,7 +504,7 @@ def get_leave_calendar(
 # Holiday Router (/holidays)
 # ==================================================================
 
-holiday_router = APIRouter(
+holiday_router = APIRouter(dependencies=[Depends(require_permissions([Permission.HR_MANAGE]))], 
     prefix="/holidays",
     tags=["Holidays"],
 )
@@ -545,4 +547,4 @@ def delete_holiday(
     """Remove a holiday."""
     service = HolidayService(db)
     service.delete_holiday(holiday_id)
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

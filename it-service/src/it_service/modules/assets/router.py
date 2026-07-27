@@ -1,3 +1,5 @@
+from it_service.core.rbac import Permission
+from it_service.core.dependencies import require_permissions
 import uuid
 
 from fastapi import APIRouter, Depends, Query, status
@@ -14,7 +16,7 @@ from it_service.modules.assets.schemas import (
 )
 from it_service.modules.assets.service import AssetService
 
-router = APIRouter(
+router = APIRouter(dependencies=[Depends(require_permissions([Permission.ASSETS_MANAGE]))], 
     prefix="/assets",
     tags=["Assets"],
 )

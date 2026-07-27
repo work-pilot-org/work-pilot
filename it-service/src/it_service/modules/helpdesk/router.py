@@ -1,3 +1,5 @@
+from it_service.core.rbac import Permission
+from it_service.core.dependencies import require_permissions, get_current_user_and_set_schema, verify_ticket_ownership
 import uuid
 from typing import Annotated
 
@@ -39,7 +41,7 @@ from it_service.modules.helpdesk.service import (
     TicketService,
 )
 
-router = APIRouter(
+router = APIRouter(dependencies=[Depends(get_current_user_and_set_schema)], 
     prefix="/tickets",
     tags=["Help Desk"],
 )
@@ -111,14 +113,12 @@ def create_ticket(
     request: Request,
     db: DatabaseDependency,
     service: TicketServiceDependency,
+    current_user: dict = Depends(get_current_user_and_set_schema),
 ):
     """
     Create ticket.
     """
-
-    # TODO:
-    # Replace with authenticated user
-    requester_id = uuid.uuid4()
+    requester_id = uuid.UUID(current_user.get("sub"))
 
     return service.create_ticket(
         db=db,
@@ -130,6 +130,7 @@ def create_ticket(
 @router.get(
     "",
     response_model=list[TicketResponse],
+    dependencies=[Depends(require_permissions([Permission.TICKETS_MANAGE]))],
 )
 def list_tickets(
     db: DatabaseDependency,
@@ -164,10 +165,12 @@ def get_ticket(
     ticket_id: uuid.UUID,
     db: DatabaseDependency,
     service: TicketServiceDependency,
+    current_user: dict = Depends(get_current_user_and_set_schema),
 ):
     """
     Get ticket.
     """
+    verify_ticket_ownership(ticket_id, current_user, db, bypass_permissions=[Permission.TICKETS_MANAGE])
 
     return service.get_ticket(
         db=db,
@@ -184,10 +187,12 @@ def update_ticket(
     payload: UpdateTicketRequest,
     db: DatabaseDependency,
     service: TicketServiceDependency,
+    current_user: dict = Depends(get_current_user_and_set_schema),
 ):
     """
     Update ticket.
     """
+    verify_ticket_ownership(ticket_id, current_user, db, bypass_permissions=[Permission.TICKETS_MANAGE])
 
     return service.update_ticket(
         db=db,
@@ -199,6 +204,7 @@ def update_ticket(
 @router.patch(
     "/{ticket_id}/status",
     response_model=TicketResponse,
+    dependencies=[Depends(require_permissions([Permission.TICKETS_MANAGE]))],
 )
 def change_status(
     ticket_id: uuid.UUID,
@@ -220,6 +226,7 @@ def change_status(
 @router.patch(
     "/{ticket_id}/assign",
     response_model=TicketResponse,
+    dependencies=[Depends(require_permissions([Permission.TICKETS_MANAGE]))],
 )
 def assign_ticket(
     ticket_id: uuid.UUID,
@@ -241,6 +248,7 @@ def assign_ticket(
 @router.delete(
     "/{ticket_id}",
     response_model=MessageResponse,
+    dependencies=[Depends(require_permissions([Permission.TICKETS_MANAGE]))],
 )
 def delete_ticket(
     ticket_id: uuid.UUID,
@@ -275,14 +283,14 @@ def create_comment(
     payload: CreateCommentRequest,
     db: DatabaseDependency,
     service: CommentServiceDependency,
+    current_user: dict = Depends(get_current_user_and_set_schema),
 ):
     """
     Create a comment for a ticket.
     """
-
-    # TODO:
-    # Replace with authenticated user ID
-    author_id = uuid.uuid4()
+    verify_ticket_ownership(ticket_id, current_user, db, bypass_permissions=[Permission.TICKETS_MANAGE])
+    
+    author_id = uuid.UUID(current_user.get("sub"))
 
     return service.create_comment(
         db=db,
@@ -300,10 +308,12 @@ def list_comments(
     ticket_id: uuid.UUID,
     db: DatabaseDependency,
     service: CommentServiceDependency,
+    current_user: dict = Depends(get_current_user_and_set_schema),
 ):
     """
     List all comments for a ticket.
     """
+    verify_ticket_ownership(ticket_id, current_user, db, bypass_permissions=[Permission.TICKETS_MANAGE])
 
     return service.list_comments(
         db=db,
@@ -314,6 +324,7 @@ def list_comments(
 @router.get(
     "/comments/{comment_id}",
     response_model=CommentResponse,
+    dependencies=[Depends(require_permissions([Permission.TICKETS_MANAGE]))],
 )
 def get_comment(
     comment_id: uuid.UUID,
@@ -333,6 +344,7 @@ def get_comment(
 @router.patch(
     "/comments/{comment_id}",
     response_model=CommentResponse,
+    dependencies=[Depends(require_permissions([Permission.TICKETS_MANAGE]))],
 )
 def update_comment(
     comment_id: uuid.UUID,
@@ -354,6 +366,7 @@ def update_comment(
 @router.delete(
     "/comments/{comment_id}",
     response_model=MessageResponse,
+    dependencies=[Depends(require_permissions([Permission.TICKETS_MANAGE]))],
 )
 def delete_comment(
     comment_id: uuid.UUID,
@@ -372,6 +385,3 @@ def delete_comment(
     return MessageResponse(
         message="Comment deleted successfully.",
     )
-    
-    
-    

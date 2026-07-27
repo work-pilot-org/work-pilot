@@ -14,6 +14,7 @@ import {
   Building2,
 } from "lucide-react";
 import { useState } from "react";
+import { RequirePermission } from "@/components/RequirePermission";
 
 export type Permission = string; // Future: define specific permission strings
 
@@ -37,12 +38,12 @@ const navConfig: NavItem[] = [
     name: "HR", 
     href: "/dashboard/hr", 
     icon: Users,
-    requiredPermissions: ["hr:view"], // Dummy permission for future implementation
+    requiredPermissions: ["hr:manage"],
     children: [
-      { name: "Employees", href: "/dashboard/hr", icon: Users, requiredPermissions: ["hr:employee:view"] },
-      { name: "Attendance", href: "/dashboard/hr/attendance", icon: UserCheck, requiredPermissions: ["hr:attendance:view"] },
-      { name: "Leave", href: "/dashboard/hr/leave", icon: Calendar, requiredPermissions: ["hr:leave:view"] },
-      { name: "Organization", href: "/dashboard/hr/organization", icon: Building2, requiredPermissions: ["hr:org:view"] },
+      { name: "Employees", href: "/dashboard/hr", icon: Users, requiredPermissions: ["employee:manage"] },
+      { name: "Attendance", href: "/dashboard/hr/attendance", icon: UserCheck, requiredPermissions: ["attendance:read"] },
+      { name: "Leave", href: "/dashboard/hr/leave", icon: Calendar, requiredPermissions: ["hr:manage"] },
+      { name: "Organization", href: "/dashboard/hr/organization", icon: Building2, requiredPermissions: ["organization:manage"] },
     ]
   },
 ];
@@ -88,7 +89,7 @@ export default function Sidebar() {
             const Icon = item.icon;
             const hasChildren = item.children && item.children.length > 0;
             
-            return (
+            const navItemContent = (
               <li key={item.name} className="flex flex-col">
                 <div className="flex items-center">
                   <Link
@@ -119,7 +120,7 @@ export default function Sidebar() {
                   <ul className="mt-1 mb-2 ml-6 space-y-1 border-l border-border pl-2">
                     {item.children!.map((child) => {
                       const isChildLinkActive = pathname === child.href;
-                      return (
+                      const childNode = (
                         <li key={child.name}>
                           <Link
                             href={child.href}
@@ -129,16 +130,33 @@ export default function Sidebar() {
                                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
                             }`}
                           >
-                            {/* <ChildIcon className="w-3.5 h-3.5 opacity-70" /> */}
                             {child.name}
                           </Link>
                         </li>
                       );
+                      
+                      if (child.requiredPermissions && child.requiredPermissions.length > 0) {
+                        return (
+                          <RequirePermission key={child.name} requiredPermissions={child.requiredPermissions}>
+                            {childNode}
+                          </RequirePermission>
+                        );
+                      }
+                      return childNode;
                     })}
                   </ul>
                 )}
               </li>
             );
+
+            if (item.requiredPermissions && item.requiredPermissions.length > 0) {
+              return (
+                <RequirePermission key={item.name} requiredPermissions={item.requiredPermissions}>
+                  {navItemContent}
+                </RequirePermission>
+              );
+            }
+            return navItemContent;
           })}
         </ul>
       </nav>

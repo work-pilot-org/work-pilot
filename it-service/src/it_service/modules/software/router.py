@@ -1,3 +1,5 @@
+from it_service.core.rbac import Permission
+from it_service.core.dependencies import require_permissions
 import uuid
 
 from fastapi import APIRouter, Depends, Query, status
@@ -22,7 +24,7 @@ from it_service.modules.software.schemas import (
 )
 from it_service.modules.software.service import SoftwareService
 
-router = APIRouter(
+router = APIRouter(dependencies=[Depends(require_permissions([Permission.IT_MANAGE]))], 
     prefix="/software",
     tags=["Software"],
 )
