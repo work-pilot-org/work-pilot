@@ -43,6 +43,32 @@ export const hrRepository = {
     }
   },
 
+  async checkIn(): Promise<import("@/types/hr").AttendanceResponse> {
+    try {
+      const response = await hrApi.post<import("@/types/hr").AttendanceResponse>("/attendance/check-in");
+      return response.data;
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err) && err.response?.data) {
+        const detail = (err.response.data as ApiError).detail;
+        throw new Error(typeof detail === "string" ? detail : "Failed to check in.");
+      }
+      throw new Error(err instanceof Error ? err.message : "An unexpected error occurred.");
+    }
+  },
+
+  async checkOut(): Promise<import("@/types/hr").AttendanceResponse> {
+    try {
+      const response = await hrApi.post<import("@/types/hr").AttendanceResponse>("/attendance/check-out");
+      return response.data;
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err) && err.response?.data) {
+        const detail = (err.response.data as ApiError).detail;
+        throw new Error(typeof detail === "string" ? detail : "Failed to check out.");
+      }
+      throw new Error(err instanceof Error ? err.message : "An unexpected error occurred.");
+    }
+  },
+
   async getLeaveRequests(): Promise<import("@/types/hr").LeaveRequestResponse[]> {
     try {
       const response = await hrApi.get<import("@/types/hr").LeaveRequestResponse[]>("/leave-requests");

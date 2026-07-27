@@ -16,6 +16,7 @@ import { LoadingState } from "@/components/common/LoadingState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { EmptyState } from "@/components/common/EmptyState";
 import { UserCheck } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 
 export default function AttendancePage() {
   const [attendance, setAttendance] = useState<AttendanceResponse[]>([]);
@@ -46,6 +47,34 @@ export default function AttendancePage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold tracking-tight text-foreground">Today's Attendance</h1>
+        <div className="flex gap-2">
+          <Button 
+            variant="primary" 
+            onClick={async () => {
+              try {
+                await hrRepository.checkIn();
+                fetchAttendance();
+              } catch (err: unknown) {
+                alert(err instanceof Error ? err.message : "Check-in failed");
+              }
+            }}
+          >
+            Check In
+          </Button>
+          <Button 
+            variant="outline"
+            onClick={async () => {
+              try {
+                await hrRepository.checkOut();
+                fetchAttendance();
+              } catch (err: unknown) {
+                alert(err instanceof Error ? err.message : "Check-out failed");
+              }
+            }}
+          >
+            Check Out
+          </Button>
+        </div>
       </div>
 
       {attendance.length === 0 ? (
