@@ -101,3 +101,29 @@ services:
       - WATCHPACK_POLLING=true
       - CHOKIDAR_USEPOLLING=true
     command: npm run dev
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+
+    container_name: workpilot_ai_service
+
+    restart: unless-stopped
+
+    env_file:
+      - ./ai-service/.env
+
+    ports:
+      - "8003:8000"
+
+    volumes:
+      - ./ai-service:/app
+      - /app/.venv
+
+    working_dir: /app
+
+    environment:
+      - PYTHONPATH=/app/src
+
+    command: >
+      sh -c "uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"

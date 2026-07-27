@@ -21,7 +21,17 @@ class Settings(BaseSettings):
     log_level: str = Field(default="INFO", alias="LOG_LEVEL")
 
     # AI Provider
+    llm_provider: str = Field(
+        default="gemini",
+        alias="LLM_PROVIDER",
+    )
+
     gemini_api_key: str = Field(alias="GEMINI_API_KEY")
+
+    gemini_model: str = Field(
+    default="gemini-2.0-flash-lite",
+    alias="GEMINI_MODEL",
+)
 
     # Database
     database_url: str = Field(alias="DATABASE_URL")
