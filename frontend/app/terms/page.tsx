@@ -25,17 +25,17 @@ export default function TermsPage() {
             
             <section>
               <h2 className="text-[18px] font-bold text-gray-900 mb-3">2. Use License</h2>
-              <p>Permission is granted to temporarily access the materials on WorkPilot AI's platform for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title.</p>
+              <p>Permission is granted to temporarily access the materials on WorkPilot AI&apos;s platform for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title.</p>
             </section>
 
             <section>
               <h2 className="text-[18px] font-bold text-gray-900 mb-3">3. Disclaimer</h2>
-              <p>The materials on WorkPilot AI's platform are provided on an 'as is' basis. We make no warranties, expressed or implied, and hereby disclaim and negate all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.</p>
+              <p>The materials on WorkPilot AI&apos;s platform are provided on an &apos;as is&apos; basis. We make no warranties, expressed or implied, and hereby disclaim and negate all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.</p>
             </section>
 
             <section>
               <h2 className="text-[18px] font-bold text-gray-900 mb-3">4. Limitations</h2>
-              <p>In no event shall WorkPilot AI or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on WorkPilot AI's platform.</p>
+              <p>In no event shall WorkPilot AI or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on WorkPilot AI&apos;s platform.</p>
             </section>
           </div>
         </div>

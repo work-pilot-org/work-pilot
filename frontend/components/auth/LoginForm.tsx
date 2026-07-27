@@ -1,37 +1,53 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, Lock, Loader2, Eye, EyeOff, ShieldCheck, ArrowLeft } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { executeLogin } from "@/use-cases/auth/login";
 import { executeMfaLogin } from "@/use-cases/auth/mfa";
 import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getTenantDomainUrl } from "@/lib/auth";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Label } from "@/components/ui/Label";
+
+const loginSchema = z.object({
+  email: z.string().email("Invalid email address").optional().or(z.literal("")),
+  password: z.string().optional().or(z.literal("")),
+  totpCode: z.string().optional().or(z.literal("")),
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
 
 export const LoginForm = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  
-  // MFA states
   const [preAuthToken, setPreAuthToken] = useState<string | null>(null);
-  const [totpCode, setTotpCode] = useState("");
-  
   const router = useRouter();
-  
   const { isLoading, error } = useAuthStore();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: "", password: "", totpCode: "" },
+  });
+
+  const onSubmit = async (data: LoginFormData) => {
     try {
       if (preAuthToken) {
-        // Step 2: MFA Login
-        const result = await executeMfaLogin({ preauth_token: preAuthToken, code: totpCode });
+        if (!data.totpCode) return;
+        const result = await executeMfaLogin({ preauth_token: preAuthToken, code: data.totpCode });
         handleLoginSuccess(result);
       } else {
-        // Step 1: Password Login
-        const result = await executeLogin({ email, password });
+        if (!data.email || !data.password) return;
+        const result = await executeLogin({ email: data.email, password: data.password });
         
         if ("mfa_required" in result && result.mfa_required) {
           setPreAuthToken(result.preauth_token);
@@ -45,67 +61,56 @@ export const LoginForm = () => {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleLoginSuccess = (result: any) => {
-    // Redirect to the tenant-specific subdomain
     if (result.user.domain) {
-      let url = getTenantDomainUrl(result.user.domain, "/");
+      let url = getTenantDomainUrl(result.user.domain, "/dashboard");
       if (result.ssoToken) {
         url += `?sso_token=${result.ssoToken}`;
       }
-      window.location.href = url;
+      window.location.assign(url);
     } else {
-      router.push("/");
+      router.push("/dashboard");
     }
   };
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit}>
-      
-      {/* Step 1: Work Email & Password */}
+    <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
       {!preAuthToken ? (
         <>
           <div className="space-y-2">
-            <label className="block text-[13px] font-medium text-gray-700">Work Email</label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                <Mail className="h-4 w-4 text-gray-400" />
-              </div>
-              <input
-                type="email"
-                name="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                placeholder="name@company.com"
-                className="block w-full pl-10 pr-3.5 py-2.5 border border-gray-200 rounded-lg text-[14px] text-black placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#2a2468] focus:border-transparent transition-all bg-white"
-              />
-            </div>
+            <Label htmlFor="email">Work Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="name@company.com"
+              {...register("email")}
+              error={!!errors.email}
+              required
+            />
+            {errors.email && <p className="text-destructive text-xs">{errors.email.message}</p>}
           </div>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="block text-[13px] font-medium text-gray-700">Password</label>
-              <Link href="/forgot-password" className="text-[13px] font-medium text-[#36307a] hover:underline">
+              <Label htmlFor="password">Password</Label>
+              <Link href="/forgot-password" className="text-sm font-medium text-primary hover:underline">
                 Forgot password?
               </Link>
             </div>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                <Lock className="h-4 w-4 text-gray-400" />
-              </div>
-              <input
+              <Input
+                id="password"
                 type={showPassword ? "text" : "password"}
-                name="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                {...register("password")}
+                error={!!errors.password}
+                className="pr-10"
                 required
-                placeholder="••••••••"
-                className="block w-full pl-10 pr-10 py-2.5 border border-gray-200 rounded-lg text-[14px] text-black placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#2a2468] focus:border-transparent transition-all bg-white"
               />
               <button 
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-gray-400 hover:text-gray-600"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -113,53 +118,45 @@ export const LoginForm = () => {
           </div>
         </>
       ) : (
-        /* Step 2: MFA Code */
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-2">
             <button
               type="button"
               onClick={() => setPreAuthToken(null)}
-              className="text-gray-500 hover:text-gray-800 transition-colors p-1 -ml-1 rounded-md"
+              className="text-muted-foreground hover:text-foreground p-1 -ml-1 rounded"
               title="Go back"
             >
               <ArrowLeft className="w-4 h-4" />
             </button>
-            <p className="text-[14px] font-medium text-gray-700">Enter your authenticator code</p>
+            <p className="text-sm font-medium">Enter your authenticator code</p>
           </div>
           
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-              <ShieldCheck className="h-4 w-4 text-gray-400" />
-            </div>
-            <input
+          <div className="space-y-2">
+            <Input
               type="text"
-              name="totpCode"
-              value={totpCode}
-              onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, ''))}
+              {...register("totpCode", {
+                onChange: (e) => {
+                  setValue("totpCode", e.target.value.replace(/\D/g, ''));
+                }
+              })}
               required
               maxLength={6}
               placeholder="000000"
-              className="block w-full pl-10 pr-3.5 py-2.5 border border-gray-200 rounded-lg text-[16px] tracking-[0.2em] font-mono text-center text-black placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#2a2468] focus:border-transparent transition-all bg-white"
+              className="text-center tracking-[0.2em] font-mono text-lg"
             />
           </div>
         </div>
       )}
 
-      {/* Feedback messages */}
       {error && (
-        <div className="text-red-500 text-sm font-medium mt-2">
+        <div className="text-destructive text-sm font-medium mt-2 bg-destructive/10 p-3 rounded-md border border-destructive/20">
           {error}
         </div>
       )}
       
-      {/* Submit Button */}
-      <button
-        type="submit"
-        disabled={isLoading}
-        className="w-full bg-[#36307a] hover:bg-[#2a2468] text-white text-[14px] font-bold py-3.5 rounded-xl shadow-sm transition-all mt-4 disabled:opacity-70 flex items-center justify-center"
-      >
-        {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Sign in"}
-      </button>
+      <Button type="submit" className="w-full mt-4" isLoading={isLoading}>
+        Sign in
+      </Button>
     </form>
   );
 };

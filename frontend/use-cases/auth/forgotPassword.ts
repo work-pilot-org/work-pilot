@@ -11,7 +11,7 @@ export const forgotPasswordUseCase = async (
   try {
     const result = await authRepository.forgotPassword(data);
     return { success: true, data: result };
-  } catch (err: any) {
-    return { success: false, error: err.message || "An unexpected error occurred." };
+  } catch (err: unknown) {
+    return { success: false, error: err instanceof Error ? err.message : "An unexpected error occurred." };
   }
 };

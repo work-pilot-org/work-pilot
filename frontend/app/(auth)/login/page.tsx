@@ -10,38 +10,40 @@ export const metadata = {
 export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center p-4 font-sans">
-      {/* Logo Section */}
-      <div className="mb-5 text-center flex flex-col items-center">
-        <div className="w-10 h-10 bg-[#2a2468] rounded-xl flex items-center justify-center mb-2 shadow-sm">
-          <Briefcase className="w-5 h-5 text-white" />
-        </div>
-        <h1 className="text-[24px] font-bold text-[#2a2468] tracking-tight">WorkPilot AI</h1>
-      </div>
-
-      {/* Main Card */}
-      <div className="bg-white rounded-[16px] shadow-sm border border-gray-100 p-6 w-full max-w-[400px]">
-        <div className="mb-6 text-center">
-          <h2 className="text-[20px] font-semibold text-gray-900 mb-1">Welcome back</h2>
-          <p className="text-gray-500 text-[13px]">Sign in to your account</p>
+      <div className="w-full max-w-[400px]">
+        
+        {/* Logo Section */}
+        <div className="mb-6 text-center flex flex-col items-center">
+          <div className="w-10 h-10 bg-gray-900 rounded flex items-center justify-center mb-3">
+            <Briefcase className="w-5 h-5 text-white" />
+          </div>
+          <h1 className="text-xl font-semibold text-gray-900 tracking-tight">WorkPilot AI</h1>
         </div>
 
-        {/* The Form Component */}
-        <LoginForm />
+        {/* Main Card */}
+        <div className="bg-white border border-gray-200 rounded-md shadow-sm p-6">
+          <div className="mb-6">
+            <h2 className="text-lg font-medium text-gray-900">Sign in</h2>
+            <p className="text-sm text-gray-500 mt-1">Access your workspace account</p>
+          </div>
 
-        <div className="mt-6 text-center text-[13px] text-gray-500 font-medium">
-          Don't have an account?{" "}
-          <Link href="/register" className="text-[#2a2468] font-bold hover:underline">
-            Sign up
-          </Link>
+          {/* The Form Component */}
+          <LoginForm />
+
+          <div className="mt-6 text-sm text-gray-600">
+            New to WorkPilot?{" "}
+            <Link href="/register" className="text-blue-600 hover:text-blue-700 hover:underline">
+              Create an account
+            </Link>
+          </div>
         </div>
-      </div>
 
-      {/* Footer Links */}
-      <div className="mt-6 flex gap-6 text-[12px] font-medium text-gray-400">
-        <Link href="/privacy" className="hover:text-gray-600 transition-colors">Privacy</Link>
-        <Link href="/terms" className="hover:text-gray-600 transition-colors">Terms</Link>
-        <Link href="/contact" className="hover:text-gray-600 transition-colors">Contact</Link>
-        <Link href="/help" className="hover:text-gray-600 transition-colors">Help</Link>
+        {/* Footer Links */}
+        <div className="mt-8 flex justify-center gap-6 text-xs text-gray-500">
+          <Link href="/privacy" className="hover:text-gray-900 hover:underline">Privacy</Link>
+          <Link href="/terms" className="hover:text-gray-900 hover:underline">Terms</Link>
+          <Link href="/contact" className="hover:text-gray-900 hover:underline">Contact</Link>
+        </div>
       </div>
     </div>
   );
