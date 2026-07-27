@@ -25,9 +25,13 @@ from .service import (
     ShiftService,
 )
 
+from src.core.rbac import Permission
+from src.core.dependencies import require_permissions
+
 router = APIRouter(
     prefix="/organization",
     tags=["Organization"],
+    dependencies=[Depends(require_permissions([Permission.ORGANIZATION_MANAGE]))],
 )
 
 @router.post(

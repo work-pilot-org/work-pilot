@@ -74,7 +74,8 @@ export const authRepository = {
         name: result.company_name,
         schemaName: result.schema_name,
         domain: result.domain,
-        isMfaEnabled: result.is_mfa_enabled
+        isMfaEnabled: result.is_mfa_enabled,
+        roles: result.roles || [],
       },
       token: result.access_token,
       ssoToken: result.sso_token
@@ -108,7 +109,8 @@ export const authRepository = {
         name: result.company_name,
         schemaName: result.schema_name,
         domain: result.domain,
-        isMfaEnabled: result.is_mfa_enabled
+        isMfaEnabled: result.is_mfa_enabled,
+        roles: result.roles || [],
       },
       token: result.access_token,
       ssoToken: result.sso_token
@@ -150,7 +152,8 @@ export const authRepository = {
         name: result.company_name,
         schemaName: result.schema_name,
         domain: result.domain,
-        isMfaEnabled: result.is_mfa_enabled
+        isMfaEnabled: result.is_mfa_enabled,
+        roles: result.roles || [],
       },
       token: result.access_token,
       ssoToken: result.sso_token

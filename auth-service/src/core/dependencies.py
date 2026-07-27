@@ -44,3 +44,21 @@ def get_current_user_and_set_schema(
     set_tenant_schema(db, schema_name)
     
     return payload
+
+from src.core.rbac import get_permissions_for_roles, Permission
+
+def require_permissions(required_permissions: list[Permission]):
+    def permission_dependency(
+        current_user: dict = Depends(get_current_user_and_set_schema)
+    ):
+        roles = current_user.get("roles", [])
+        user_perms = get_permissions_for_roles(roles)
+        
+        # Admin has all permissions if Permission.ADMIN_ALL is present
+        if Permission.ADMIN_ALL in user_perms:
+            return current_user
+            
+        if not all(p in user_perms for p in required_permissions):
+            raise HTTPException(status_code=403, detail="Forbidden: Insufficient permissions")
+        return current_user
+    return permission_dependency
