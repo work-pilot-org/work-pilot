@@ -14,16 +14,14 @@ import {
   Building2,
 } from "lucide-react";
 import { useState } from "react";
-import { RequirePermission } from "@/components/RequirePermission";
-
-export type Permission = string; // Future: define specific permission strings
+import { RequireRole } from "@/components/RequireRole";
 
 export interface NavItem {
   name: string;
   href: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   icon: any;
-  requiredPermissions?: Permission[];
+  allowedRoles?: string[];
   children?: Omit<NavItem, 'children'>[];
 }
 
@@ -32,20 +30,33 @@ const navConfig: NavItem[] = [
     name: "Dashboard", 
     href: "/dashboard", 
     icon: LayoutDashboard 
-    // globally accessible, no requiredPermissions
+    // globally accessible
   },
   { 
     name: "HR", 
     href: "/dashboard/hr", 
     icon: Users,
-    requiredPermissions: ["hr:manage"],
+    // Accessible by everyone since employees can check their own profile and attendance
     children: [
-      { name: "Employees", href: "/dashboard/hr", icon: Users, requiredPermissions: ["employee:manage"] },
-      { name: "Attendance", href: "/dashboard/hr/attendance", icon: UserCheck, requiredPermissions: ["attendance:read"] },
-      { name: "Leave", href: "/dashboard/hr/leave", icon: Calendar, requiredPermissions: ["hr:manage"] },
-      { name: "Organization", href: "/dashboard/hr/organization", icon: Building2, requiredPermissions: ["organization:manage"] },
+      { name: "Employees", href: "/dashboard/hr", icon: Users }, 
+      { name: "Attendance", href: "/dashboard/hr/attendance", icon: UserCheck },
+      { name: "Leave", href: "/dashboard/hr/leave", icon: Calendar },
+      { name: "Organization", href: "/dashboard/hr/organization", icon: Building2, allowedRoles: ["TENANT_ADMIN", "HR_ADMIN"] },
     ]
   },
+  {
+    name: "IT Service",
+    href: "/dashboard/it/tickets",
+    icon: LayoutDashboard,
+    children: [
+      { name: "Helpdesk", href: "/dashboard/it/tickets", icon: LayoutDashboard }
+    ]
+  },
+  {
+    name: "Workflows",
+    href: "/dashboard/workflows",
+    icon: Briefcase,
+  }
 ];
 
 export default function Sidebar() {
@@ -53,11 +64,7 @@ export default function Sidebar() {
   const { user } = useAuthStore();
   const [expandedNav, setExpandedNav] = useState<string[]>(["HR"]);
 
-  // Future RBAC Filter: 
-  // const userPermissions = user?.permissions || [];
-  // const visibleNavItems = navConfig.filter(item => hasPermission(item, userPermissions));
-  
-  const visibleNavItems = navConfig; // Currently rendering everything without filtering
+  const visibleNavItems = navConfig;
 
   const toggleExpand = (name: string) => {
     setExpandedNav(prev => 
@@ -135,11 +142,11 @@ export default function Sidebar() {
                         </li>
                       );
                       
-                      if (child.requiredPermissions && child.requiredPermissions.length > 0) {
+                      if (child.allowedRoles && child.allowedRoles.length > 0) {
                         return (
-                          <RequirePermission key={child.name} requiredPermissions={child.requiredPermissions}>
+                          <RequireRole key={child.name} allowedRoles={child.allowedRoles}>
                             {childNode}
-                          </RequirePermission>
+                          </RequireRole>
                         );
                       }
                       return childNode;
@@ -149,11 +156,11 @@ export default function Sidebar() {
               </li>
             );
 
-            if (item.requiredPermissions && item.requiredPermissions.length > 0) {
+            if (item.allowedRoles && item.allowedRoles.length > 0) {
               return (
-                <RequirePermission key={item.name} requiredPermissions={item.requiredPermissions}>
+                <RequireRole key={item.name} allowedRoles={item.allowedRoles}>
                   {navItemContent}
-                </RequirePermission>
+                </RequireRole>
               );
             }
             return navItemContent;

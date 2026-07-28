@@ -35,3 +35,38 @@ hrApi.interceptors.request.use((config) => {
   }
   return config;
 });
+
+const IT_SERVICE_URL = process.env.NEXT_PUBLIC_IT_SERVICE_URL || "http://localhost:8003";
+export const itApi = axios.create({
+  baseURL: IT_SERVICE_URL,
+  withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+itApi.interceptors.request.use((config) => {
+  const token = useAuthStore.getState().token;
+  if (token && config.headers) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+const WORKFLOW_SERVICE_URL = process.env.NEXT_PUBLIC_WORKFLOW_SERVICE_URL || "http://localhost:8004";
+export const workflowApi = axios.create({
+  baseURL: WORKFLOW_SERVICE_URL,
+  withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+workflowApi.interceptors.request.use((config) => {
+  const token = useAuthStore.getState().token;
+  if (token && config.headers) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
