@@ -208,7 +208,7 @@ def _inline_schema_refs(schema: dict[str, Any]) -> dict[str, Any]:
                 siblings = {
                     key: resolve(item)
                     for key, item in value.items()
-                    if key != "$ref"
+                    if key not in ("$ref", "additionalProperties", "additional_properties", "title")
                 }
 
                 return {
@@ -219,7 +219,7 @@ def _inline_schema_refs(schema: dict[str, Any]) -> dict[str, Any]:
             return {
                 key: resolve(item)
                 for key, item in value.items()
-                if key != "$defs"
+                if key not in ("$defs", "additionalProperties", "additional_properties", "title")
             }
 
         if isinstance(value, list):

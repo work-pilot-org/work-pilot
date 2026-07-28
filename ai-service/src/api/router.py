@@ -9,10 +9,12 @@ from pydantic import BaseModel
 
 from .dependencies import get_coordinator
 from modules.coordinator.agent import CoordinatorAgent
+from core.security import get_current_user
 
 router = APIRouter(
     prefix="/ai",
     tags=["AI"],
+    dependencies=[Depends(get_current_user)],
 )
 
 

@@ -30,10 +30,10 @@ def upgrade() -> None:
     op.alter_column('employees', 'is_active',
                existing_type=sa.BOOLEAN(),
                nullable=False)
-    op.drop_constraint(op.f('employees_employee_code_key'), 'employees', type_='unique')
-    op.drop_index(op.f('ix_employees_auth_user_id'), table_name='employees')
-    op.create_index('uq_employees_auth_user_id_active', 'employees', ['auth_user_id'], unique=True, postgresql_where=sa.text('is_active = true'))
-    op.create_index('uq_employees_employee_code_active', 'employees', ['employee_code'], unique=True, postgresql_where=sa.text('is_active = true'))
+    # op.drop_constraint(op.f('employees_employee_code_key'), 'employees', type_='unique')
+    # op.drop_index(op.f('ix_employees_auth_user_id'), table_name='employees')
+    # op.create_index('uq_employees_auth_user_id_active', 'employees', ['auth_user_id'], unique=True, postgresql_where=sa.text('is_active = true'))
+    # op.create_index('uq_employees_employee_code_active', 'employees', ['employee_code'], unique=True, postgresql_where=sa.text('is_active = true'))
     # ### end Alembic commands ###
 
 

@@ -3,6 +3,7 @@ from it_service.core.dependencies import require_permissions, get_current_user_a
 import uuid
 from typing import Annotated
 
+from it_service.core.security import get_current_user
 from fastapi import APIRouter, Depends, Query, Request, status
 from sqlalchemy.orm import Session
 
@@ -44,6 +45,7 @@ from it_service.modules.helpdesk.service import (
 router = APIRouter(dependencies=[Depends(get_current_user_and_set_schema)], 
     prefix="/tickets",
     tags=["Help Desk"],
+    dependencies=[Depends(get_current_user)],
 )
 
 # ==========================================================
