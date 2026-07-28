@@ -46,8 +46,8 @@ class CoordinatorAgent:
 
         # Temporary implementation:
         # Route everything to the IT Agent.
-        return await get_it_agent().execute(
-            tool_name=tool_name,
+        return await get_it_agent().run(
+            message=user_message,
             headers=headers,
         )
 
