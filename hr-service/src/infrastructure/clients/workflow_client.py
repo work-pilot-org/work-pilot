@@ -1,16 +1,16 @@
-import httpx
-from typing import Optional, Any
+from typing import Any
 from uuid import UUID
 
+import httpx
+
 from src.core.config import settings
-from src.core.exceptions import WorkPilotException
 
 
 class WorkflowClient:
     def __init__(self):
         self.base_url = settings.WORKFLOW_SERVICE_URL if hasattr(settings, "WORKFLOW_SERVICE_URL") else "http://workflow-service:8000"
 
-    def start_workflow(self, entity_id: UUID, entity_type: str, workflow_name: str, requested_by: str, token: Optional[str] = None) -> Any:
+    def start_workflow(self, entity_id: UUID, entity_type: str, workflow_name: str, requested_by: str, token: str | None = None) -> Any:
         """
         Start a workflow execution via the Workflow Service.
         """

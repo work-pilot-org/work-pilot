@@ -1,16 +1,14 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-
 from src.core.config import settings
 from src.infrastructure.database.base import TenantBase
+from src.modules.attendance.models import *
 
 # Import all models here
 from src.modules.employee.models import *
-from src.modules.attendance.models import *
 from src.modules.leave.models import *
 from src.modules.policies.models import *
 

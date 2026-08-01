@@ -1,11 +1,9 @@
 from datetime import date, datetime, time
-from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
 from src.modules.attendance.models import AttendanceStatus
-
 
 # =====================================================
 # Base Schema
@@ -13,10 +11,10 @@ from src.modules.attendance.models import AttendanceStatus
 
 class AttendanceBase(BaseModel):
     attendance_date: date
-    check_in: Optional[time] = None
-    check_out: Optional[time] = None
+    check_in: time | None = None
+    check_out: time | None = None
     status: AttendanceStatus = AttendanceStatus.PRESENT
-    remarks: Optional[str] = Field(
+    remarks: str | None = Field(
         default=None,
         max_length=500,
     )
@@ -37,11 +35,11 @@ class AttendanceCreate(AttendanceBase):
 # =====================================================
 
 class AttendanceUpdate(BaseModel):
-    attendance_date: Optional[date] = None
-    check_in: Optional[time] = None
-    check_out: Optional[time] = None
-    status: Optional[AttendanceStatus] = None
-    remarks: Optional[str] = Field(
+    attendance_date: date | None = None
+    check_in: time | None = None
+    check_out: time | None = None
+    status: AttendanceStatus | None = None
+    remarks: str | None = Field(
         default=None,
         max_length=500,
     )
@@ -86,15 +84,15 @@ class AttendanceResponse(BaseModel):
 
     attendance_date: date
 
-    check_in: Optional[time]
-    check_out: Optional[time]
+    check_in: time | None
+    check_out: time | None
 
     status: AttendanceStatus
 
     working_minutes: int
     overtime_minutes: int
 
-    remarks: Optional[str]
+    remarks: str | None
 
     created_at: datetime
     updated_at: datetime

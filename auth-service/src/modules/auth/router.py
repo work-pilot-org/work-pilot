@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response, Request, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
+from src.core.dependencies import get_current_user_and_set_schema
 from sqlalchemy.orm import Session
 
 from src.infrastructure.database.session import get_db
@@ -48,8 +49,6 @@ def register(
         request=request,
     )
 
-
-from fastapi import Response, Request, HTTPException
 
 @router.post(
     "/login",
@@ -142,8 +141,6 @@ def logout(response: Response):
     """
     response.delete_cookie(key="refresh_token", httponly=True, secure=True, samesite="none")
     return {"message": "Logged out successfully"}
-
-from src.core.dependencies import get_current_user_and_set_schema
 
 @router.get(
     "/me",

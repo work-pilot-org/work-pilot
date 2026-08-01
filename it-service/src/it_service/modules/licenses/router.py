@@ -1,10 +1,10 @@
-from it_service.core.rbac import Permission
-from it_service.core.dependencies import require_permissions
 import uuid
 
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
+from it_service.core.dependencies import require_permissions
+from it_service.core.rbac import Permission
 from it_service.infrastructure.database.session import get_db
 from it_service.modules.licenses.repository import LicenseAssignmentRepository, LicenseRepository
 from it_service.modules.licenses.schemas import (

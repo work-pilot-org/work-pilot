@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from .models import Department, Designation, Branch, Shift
+from .models import Branch, Department, Designation, Shift
 
 
 class DepartmentRepository:

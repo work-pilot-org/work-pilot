@@ -6,6 +6,7 @@ services:
     build:
       context: ./auth-service
       dockerfile: Dockerfile
+      target: dev
 
     container_name: workpilot_auth_service
 
@@ -32,6 +33,7 @@ services:
     build:
       context: ./hr-service
       dockerfile: Dockerfile
+      target: dev
     container_name: workpilot_hr_service
     restart: unless-stopped
 
@@ -50,6 +52,7 @@ services:
     build:
       context: ./it-service
       dockerfile: Dockerfile
+      target: dev
     container_name: workpilot_it_service
     restart: unless-stopped
 
@@ -68,6 +71,7 @@ services:
     build:
       context: ./workflow-service
       dockerfile: Dockerfile
+      target: dev
     container_name: workpilot_workflow_service
     restart: unless-stopped
 
@@ -86,6 +90,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      target: dev
     container_name: workpilot_frontend
     restart: unless-stopped
     depends_on:
@@ -105,6 +110,7 @@ services:
     build:
       context: ./ai-service
       dockerfile: Dockerfile
+      target: dev
 
     container_name: workpilot_ai_service
 

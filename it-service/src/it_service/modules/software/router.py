@@ -1,10 +1,10 @@
-from it_service.core.rbac import Permission
-from it_service.core.dependencies import require_permissions
 import uuid
 
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
+from it_service.core.dependencies import require_permissions
+from it_service.core.rbac import Permission
 from it_service.infrastructure.database.session import get_db
 from it_service.modules.software.enums import InstallationRequestStatus
 from it_service.modules.software.repository import (
@@ -19,7 +19,6 @@ from it_service.modules.software.schemas import (
     InstallationRequestResponse,
     InstalledSoftwareResponse,
     SoftwareResponse,
-   
     UpdateSoftwareRequest,
 )
 from it_service.modules.software.service import SoftwareService

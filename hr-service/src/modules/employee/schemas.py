@@ -1,10 +1,8 @@
 from datetime import date, datetime
 from enum import Enum
-from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
-
 
 # =====================================================
 # ENUMS
@@ -70,73 +68,73 @@ class EmployeeCreate(BaseModel):
     first_name: str = Field(..., min_length=1, max_length=100)
     last_name: str = Field(..., min_length=1, max_length=100)
 
-    phone: Optional[str] = Field(
+    phone: str | None = Field(
         default=None,
         min_length=10,
         max_length=15,
     )
 
-    gender: Optional[Gender] = None
-    date_of_birth: Optional[date] = None
+    gender: Gender | None = None
+    date_of_birth: date | None = None
 
     joining_date: date
 
     employment_type: EmploymentType
     employment_status: EmploymentStatus = EmploymentStatus.ACTIVE
 
-    department_id: Optional[UUID] = None
-    designation_id: Optional[UUID] = None
-    manager_id: Optional[UUID] = None
+    department_id: UUID | None = None
+    designation_id: UUID | None = None
+    manager_id: UUID | None = None
 
-    work_location: Optional[str] = Field(
+    work_location: str | None = Field(
         default=None,
         max_length=150,
     )
 
-    profile_photo: Optional[str] = None
+    profile_photo: str | None = None
 
 
 class EmployeeUpdate(BaseModel):
-    employee_code: Optional[str] = Field(
+    employee_code: str | None = Field(
         default=None,
         min_length=1,
         max_length=30,
     )
 
-    first_name: Optional[str] = Field(
+    first_name: str | None = Field(
         default=None,
         min_length=1,
         max_length=100,
     )
 
-    last_name: Optional[str] = Field(
+    last_name: str | None = Field(
         default=None,
         min_length=1,
         max_length=100,
     )
 
-    phone: Optional[str] = Field(
+    phone: str | None = Field(
         default=None,
         min_length=10,
         max_length=15,
     )
 
-    gender: Optional[Gender] = None
-    date_of_birth: Optional[date] = None
+    gender: Gender | None = None
+    date_of_birth: date | None = None
 
-    joining_date: Optional[date] = None
+    joining_date: date | None = None
 
-    employment_type: Optional[EmploymentType] = None
-    employment_status: Optional[EmploymentStatus] = None
+    employment_type: EmploymentType | None = None
+    employment_status: EmploymentStatus | None = None
 
-    department_id: Optional[UUID] = None
-    designation_id: Optional[UUID] = None
-    manager_id: Optional[UUID] = None
+    department_id: UUID | None = None
+    designation_id: UUID | None = None
+    manager_id: UUID | None = None
 
-    work_location: Optional[str] = None
-    profile_photo: Optional[str] = None
+    work_location: str | None = None
+    profile_photo: str | None = None
 
-    is_active: Optional[bool] = None
+    is_active: bool | None = None
 
     @model_validator(mode="after")
     def reject_explicit_nulls_for_required_fields(self):
@@ -166,21 +164,21 @@ class EmployeeResponse(BaseModel):
     first_name: str
     last_name: str
 
-    phone: Optional[str]
-    gender: Optional[Gender]
-    date_of_birth: Optional[date]
+    phone: str | None
+    gender: Gender | None
+    date_of_birth: date | None
 
     joining_date: date
 
     employment_type: EmploymentType
     employment_status: EmploymentStatus
 
-    department_id: Optional[UUID]
-    designation_id: Optional[UUID]
-    manager_id: Optional[UUID]
+    department_id: UUID | None
+    designation_id: UUID | None
+    manager_id: UUID | None
 
-    work_location: Optional[str]
-    profile_photo: Optional[str]
+    work_location: str | None
+    profile_photo: str | None
 
     is_active: bool
 
@@ -195,63 +193,63 @@ class EmployeeResponse(BaseModel):
 # =====================================================
 
 class EmployeeProfileCreate(BaseModel):
-    address: Optional[str] = None
-    city: Optional[str] = None
-    state: Optional[str] = None
-    country: Optional[str] = None
-    postal_code: Optional[str] = None
+    address: str | None = None
+    city: str | None = None
+    state: str | None = None
+    country: str | None = None
+    postal_code: str | None = None
 
-    emergency_contact_name: Optional[str] = None
+    emergency_contact_name: str | None = None
 
-    emergency_contact_phone: Optional[str] = Field(
+    emergency_contact_phone: str | None = Field(
         default=None,
         min_length=10,
         max_length=15,
     )
 
-    emergency_contact_relation: Optional[str] = None
+    emergency_contact_relation: str | None = None
 
-    blood_group: Optional[BloodGroup] = None
-    marital_status: Optional[MaritalStatus] = None
+    blood_group: BloodGroup | None = None
+    marital_status: MaritalStatus | None = None
 
 
 class EmployeeProfileUpdate(BaseModel):
-    address: Optional[str] = None
-    city: Optional[str] = None
-    state: Optional[str] = None
-    country: Optional[str] = None
-    postal_code: Optional[str] = None
+    address: str | None = None
+    city: str | None = None
+    state: str | None = None
+    country: str | None = None
+    postal_code: str | None = None
 
-    emergency_contact_name: Optional[str] = None
+    emergency_contact_name: str | None = None
 
-    emergency_contact_phone: Optional[str] = Field(
+    emergency_contact_phone: str | None = Field(
         default=None,
         min_length=10,
         max_length=15,
     )
 
-    emergency_contact_relation: Optional[str] = None
+    emergency_contact_relation: str | None = None
 
-    blood_group: Optional[BloodGroup] = None
-    marital_status: Optional[MaritalStatus] = None
+    blood_group: BloodGroup | None = None
+    marital_status: MaritalStatus | None = None
 
 
 class EmployeeProfileResponse(BaseModel):
     id: UUID
     employee_id: UUID
 
-    address: Optional[str]
-    city: Optional[str]
-    state: Optional[str]
-    country: Optional[str]
-    postal_code: Optional[str]
+    address: str | None
+    city: str | None
+    state: str | None
+    country: str | None
+    postal_code: str | None
 
-    emergency_contact_name: Optional[str]
-    emergency_contact_phone: Optional[str]
-    emergency_contact_relation: Optional[str]
+    emergency_contact_name: str | None
+    emergency_contact_phone: str | None
+    emergency_contact_relation: str | None
 
-    blood_group: Optional[BloodGroup]
-    marital_status: Optional[MaritalStatus]
+    blood_group: BloodGroup | None
+    marital_status: MaritalStatus | None
 
     created_at: datetime
     updated_at: datetime
@@ -287,12 +285,12 @@ class EmployeeDocumentResponse(BaseModel):
 # =====================================================
 
 class EmployeeSearch(BaseModel):
-    keyword: Optional[str] = None
+    keyword: str | None = None
 
-    department_id: Optional[UUID] = None
-    designation_id: Optional[UUID] = None
+    department_id: UUID | None = None
+    designation_id: UUID | None = None
 
-    employment_status: Optional[EmploymentStatus] = None
+    employment_status: EmploymentStatus | None = None
 
     page: int = Field(default=1, ge=1)
     size: int = Field(default=10, ge=1, le=100)
@@ -318,5 +316,5 @@ class EmployeeListResponse(BaseModel):
 # =====================================================
 
 class EmployeeCompleteResponse(EmployeeResponse):
-    profile: Optional[EmployeeProfileResponse] = None
+    profile: EmployeeProfileResponse | None = None
     documents: list[EmployeeDocumentResponse] = Field(default_factory=list)

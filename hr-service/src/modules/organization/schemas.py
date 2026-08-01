@@ -1,11 +1,11 @@
 from datetime import datetime, time
-from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, EmailStr
 
+
 class DepartmentBase(BaseModel):
     name: str
-    description: Optional[str] = None
+    description: str | None = None
 
 
 class DepartmentCreate(DepartmentBase):
@@ -13,9 +13,9 @@ class DepartmentCreate(DepartmentBase):
 
 
 class DepartmentUpdate(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
-    is_active: Optional[bool] = None
+    name: str | None = None
+    description: str | None = None
+    is_active: bool | None = None
 
 
 class DepartmentResponse(DepartmentBase):
@@ -28,8 +28,8 @@ class DepartmentResponse(DepartmentBase):
 
 class DesignationBase(BaseModel):
     name: str
-    description: Optional[str] = None
-    department_id: Optional[int] = None
+    description: str | None = None
+    department_id: int | None = None
 
 
 class DesignationCreate(DesignationBase):
@@ -37,10 +37,10 @@ class DesignationCreate(DesignationBase):
 
 
 class DesignationUpdate(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
-    department_id: Optional[int] = None
-    is_active: Optional[bool] = None
+    name: str | None = None
+    description: str | None = None
+    department_id: int | None = None
+    is_active: bool | None = None
 
 
 class DesignationResponse(DesignationBase):
@@ -53,14 +53,14 @@ class DesignationResponse(DesignationBase):
 
 class BranchBase(BaseModel):
     name: str
-    code: Optional[str] = None
-    address: Optional[str] = None
-    city: Optional[str] = None
-    state: Optional[str] = None
-    country: Optional[str] = None
-    postal_code: Optional[str] = None
-    phone: Optional[str] = None
-    email: Optional[EmailStr] = None
+    code: str | None = None
+    address: str | None = None
+    city: str | None = None
+    state: str | None = None
+    country: str | None = None
+    postal_code: str | None = None
+    phone: str | None = None
+    email: EmailStr | None = None
 
 
 class BranchCreate(BranchBase):
@@ -68,16 +68,16 @@ class BranchCreate(BranchBase):
 
 
 class BranchUpdate(BaseModel):
-    name: Optional[str] = None
-    code: Optional[str] = None
-    address: Optional[str] = None
-    city: Optional[str] = None
-    state: Optional[str] = None
-    country: Optional[str] = None
-    postal_code: Optional[str] = None
-    phone: Optional[str] = None
-    email: Optional[EmailStr] = None
-    is_active: Optional[bool] = None
+    name: str | None = None
+    code: str | None = None
+    address: str | None = None
+    city: str | None = None
+    state: str | None = None
+    country: str | None = None
+    postal_code: str | None = None
+    phone: str | None = None
+    email: EmailStr | None = None
+    is_active: bool | None = None
 
 
 class BranchResponse(BranchBase):
@@ -101,12 +101,12 @@ class ShiftCreate(ShiftBase):
 
 
 class ShiftUpdate(BaseModel):
-    name: Optional[str] = None
-    start_time: Optional[time] = None
-    end_time: Optional[time] = None
-    grace_time: Optional[int] = None
-    is_night_shift: Optional[bool] = None
-    is_active: Optional[bool] = None
+    name: str | None = None
+    start_time: time | None = None
+    end_time: time | None = None
+    grace_time: int | None = None
+    is_night_shift: bool | None = None
+    is_active: bool | None = None
 
 
 class ShiftResponse(ShiftBase):

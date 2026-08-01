@@ -1,10 +1,8 @@
 from logging.config import fileConfig
 
+from sqlalchemy import engine_from_config, pool
+
 from alembic import context
-
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-
 from src.core.config import settings
 from src.infrastructure.database.base import TenantBase
 from src.modules.workflow.models import *

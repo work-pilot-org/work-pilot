@@ -54,12 +54,8 @@ from src.modules.employee.models import (
 )
 
 from src.modules.password_reset.service import PasswordResetService
-from src.modules.password_reset.schemas import (
-    ForgotPasswordRequest,
-    ResetPasswordRequest,
-)
 
-from src.core.rbac import Role as RBACRole, ROLE_PERMISSIONS
+from src.core.rbac import Role as RBACRole
 from src.modules.rbac.models import Role as DBRole, UserRole
 
 
@@ -423,6 +419,8 @@ class AuthService:
         primary_domain = next((d.domain for d in tenant.domains if d.is_primary), tenant.domains[0].domain if tenant.domains else "localhost")
         
         # 5.5 Extract User Roles
+        from src.infrastructure.database.tenant_session import set_tenant_schema
+        set_tenant_schema(db, tenant.schema_name)
         user_roles_db = db.query(UserRole).filter(UserRole.user_id == user.id).all()
         roles_list = [r.role.name for r in user_roles_db] if user_roles_db else []
         
@@ -489,6 +487,8 @@ class AuthService:
             tenant = self.tenant_repository.get_tenant_by_id(db, profile.tenant_id)
             primary_domain = next((d.domain for d in tenant.domains if d.is_primary), tenant.domains[0].domain if tenant.domains else "localhost")
             
+            from src.infrastructure.database.tenant_session import set_tenant_schema
+            set_tenant_schema(db, tenant.schema_name)
             user_roles_db = db.query(UserRole).filter(UserRole.user_id == user.id).all()
             roles_list = [r.role.name for r in user_roles_db] if user_roles_db else []
             
@@ -536,6 +536,8 @@ class AuthService:
             
             primary_domain = next((d.domain for d in tenant.domains if d.is_primary), tenant.domains[0].domain if tenant.domains else "localhost")
             
+            from src.infrastructure.database.tenant_session import set_tenant_schema
+            set_tenant_schema(db, tenant.schema_name)
             user_roles_db = db.query(UserRole).filter(UserRole.user_id == user.id).all()
             roles_list = [r.role.name for r in user_roles_db] if user_roles_db else []
             
@@ -655,7 +657,7 @@ class AuthService:
         
         try:
             payload = verify_preauth_token(request.preauth_token)
-        except ValueError as e:
+        except ValueError:
             raise Exception("INVALID_PREAUTH_TOKEN")
             
         user_id = payload.get("sub")
@@ -677,6 +679,8 @@ class AuthService:
         db.add(user)
         db.commit()
         
+        from src.infrastructure.database.tenant_session import set_tenant_schema
+        set_tenant_schema(db, payload.get("schema_name"))
         user_roles_db = db.query(UserRole).filter(UserRole.user_id == user.id).all()
         roles_list = [r.role.name for r in user_roles_db] if user_roles_db else []
         

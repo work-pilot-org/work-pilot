@@ -9,12 +9,11 @@ from uuid import UUID
 from infrastructure.integrations.it_client import it_client
 from modules.it.registry import tool_registry
 from modules.it.schemas import (
-    CreateInstallRequest,
     CreateInstallationRequest,
+    CreateInstallRequest,
     CreateSoftwareRequest,
     UpdateSoftwareRequest,
 )
-
 
 # ==========================================================
 # Software Management

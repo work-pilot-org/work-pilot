@@ -4,12 +4,13 @@ AI Service API Router.
 
 from __future__ import annotations
 
-from pydantic import BaseModel
 from fastapi import APIRouter, Depends, Request
+from pydantic import BaseModel
 
-from .dependencies import get_coordinator
 from modules.coordinator.agent import CoordinatorAgent
 from modules.it.agent import ITAgent, get_it_agent
+
+from .dependencies import get_coordinator
 
 router = APIRouter(
     prefix="/ai",

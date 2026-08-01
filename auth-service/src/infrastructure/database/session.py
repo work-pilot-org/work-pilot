@@ -1,3 +1,4 @@
+from fastapi import Request
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -14,10 +15,7 @@ SessionLocal = sessionmaker(
     bind=engine
 )
 
-
-from fastapi import Request
-
-def get_db(request: Request = None):
+def get_db(request: Request = None):  # type: ignore[assignment]
     # If middleware already created the session, use it
     if request and hasattr(request.state, "db"):
         yield request.state.db

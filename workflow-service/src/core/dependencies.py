@@ -1,12 +1,11 @@
 from fastapi import Depends
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
 from src.core.exceptions import UnauthorizedException
 from src.core.security import verify_access_token
-from src.infrastructure.database.session import get_db
 from src.infrastructure.database.schema import set_schema
+from src.infrastructure.database.session import get_db
 
 security = HTTPBearer()
 
@@ -32,8 +31,10 @@ def get_current_user(
 
     return payload
 
-from src.core.rbac import get_permissions_for_roles, Permission
 from fastapi import HTTPException
+
+from src.core.rbac import Permission, get_permissions_for_roles
+
 
 def require_permissions(required_permissions: list[Permission]):
     def permission_dependency(

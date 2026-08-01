@@ -1,14 +1,12 @@
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field
-
 
 # ---------- Workflow ----------
 
 class WorkflowBase(BaseModel):
     name: str = Field(..., max_length=255)
-    description: Optional[str] = None
+    description: str | None = None
     is_active: bool = True
 
 
@@ -17,9 +15,9 @@ class WorkflowCreate(WorkflowBase):
 
 
 class WorkflowUpdate(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
-    is_active: Optional[bool] = None
+    name: str | None = None
+    description: str | None = None
+    is_active: bool | None = None
 
 
 class WorkflowResponse(WorkflowBase):
@@ -44,9 +42,9 @@ class WorkflowStepCreate(WorkflowStepBase):
 
 
 class WorkflowStepUpdate(BaseModel):
-    step_order: Optional[int] = None
-    step_name: Optional[str] = None
-    approver_role: Optional[str] = None
+    step_order: int | None = None
+    step_name: str | None = None
+    approver_role: str | None = None
 
 
 class WorkflowStepResponse(WorkflowStepBase):
@@ -83,12 +81,12 @@ class WorkflowExecutionResponse(BaseModel):
 class ApprovalCreate(BaseModel):
     execution_id: str
     approver_id: str
-    comments: Optional[str] = None
+    comments: str | None = None
 
 
 class ApprovalDecision(BaseModel):
     decision: str
-    comments: Optional[str] = None
+    comments: str | None = None
 
 
 class ApprovalResponse(BaseModel):
@@ -96,7 +94,7 @@ class ApprovalResponse(BaseModel):
     execution_id: str
     approver_id: str
     decision: str
-    comments: Optional[str]
-    decided_at: Optional[datetime]
+    comments: str | None
+    decided_at: datetime | None
 
     model_config = ConfigDict(from_attributes=True)

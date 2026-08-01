@@ -1,11 +1,15 @@
-from it_service.core.rbac import Permission
-from it_service.core.dependencies import require_permissions, get_current_user_and_set_schema, verify_ticket_ownership
 import uuid
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query, Request, status
 from sqlalchemy.orm import Session
 
+from it_service.core.dependencies import (
+    get_current_user_and_set_schema,
+    require_permissions,
+    verify_ticket_ownership,
+)
+from it_service.core.rbac import Permission
 from it_service.infrastructure.database.session import get_db
 from it_service.modules.helpdesk.activity_repository import (
     TicketActivityRepository,

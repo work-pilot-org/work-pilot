@@ -11,7 +11,7 @@ from __future__ import annotations
 import inspect
 from typing import Any, get_type_hints
 
-from pydantic import BaseModel, TypeAdapter, ValidationError
+from pydantic import TypeAdapter, ValidationError
 
 from core.logger import get_logger
 from modules.it.registry import tool_registry

@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List, Dict
+
 
 class Role(str, Enum):
     TENANT_ADMIN = "TENANT_ADMIN"
@@ -34,7 +34,7 @@ class Permission(str, Enum):
     WORKFLOW_APPROVE = "workflow:approve"
 
 # Mapping of roles to their default permissions
-ROLE_PERMISSIONS: Dict[Role, List[Permission]] = {
+ROLE_PERMISSIONS: dict[Role, list[Permission]] = {
     Role.TENANT_ADMIN: [
         Permission.ADMIN_ALL,
         Permission.HR_MANAGE, Permission.ORGANIZATION_MANAGE, Permission.DEPARTMENTS_MANAGE, 
@@ -63,14 +63,14 @@ ROLE_PERMISSIONS: Dict[Role, List[Permission]] = {
     ]
 }
 
-def get_permissions_for_role(role_name: str) -> List[str]:
+def get_permissions_for_role(role_name: str) -> list[str]:
     try:
         role = Role(role_name)
         return [p.value for p in ROLE_PERMISSIONS.get(role, [])]
     except ValueError:
         return []
 
-def get_permissions_for_roles(role_names: List[str]) -> List[str]:
+def get_permissions_for_roles(role_names: list[str]) -> list[str]:
     perms = set()
     for role_name in role_names:
         perms.update(get_permissions_for_role(role_name))

@@ -4,6 +4,8 @@ from src.core.config import settings
 from src.modules.auth.router import router as auth_router
 from fastapi.middleware.cors import CORSMiddleware
 from src.core.exceptions import WorkPilotException
+from src.infrastructure.middleware.tenant_middleware import TenantMiddleware
+from src.modules.invitation.router import router as invitation_router
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -21,7 +23,6 @@ origins = [
 ]
 
 # Include Middleware
-from src.infrastructure.middleware.tenant_middleware import TenantMiddleware
 
 app.add_middleware(TenantMiddleware)
 
@@ -35,7 +36,9 @@ app.add_middleware(
 )
 
 # Include Routers
+
 app.include_router(auth_router)
+app.include_router(invitation_router)
 
 
 @app.get("/")

@@ -5,14 +5,15 @@ from uuid import UUID
 from sqlalchemy import (
     Date,
     DateTime,
-    Enum as SQLEnum,
     ForeignKey,
     Integer,
     Text,
     Time,
     UniqueConstraint,
 )
-
+from sqlalchemy import (
+    Enum as SQLEnum,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.infrastructure.database.base import TenantBase

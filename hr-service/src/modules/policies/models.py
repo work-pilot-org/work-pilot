@@ -1,9 +1,19 @@
-from sqlalchemy import Column, String, Text, Boolean, Integer, Numeric, Time, func, DateTime
-from sqlalchemy.dialects.postgresql import UUID
 from uuid import uuid4
 
-from src.infrastructure.database.base import TenantBase
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    Integer,
+    Numeric,
+    String,
+    Text,
+    Time,
+    func,
+)
+from sqlalchemy.dialects.postgresql import UUID
 
+from src.infrastructure.database.base import TenantBase
 
 # ==================================================================
 # Base Policy Model (Mixins can be used, but explicit models are preferred)

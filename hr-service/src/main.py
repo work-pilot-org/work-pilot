@@ -4,28 +4,27 @@ from fastapi.responses import JSONResponse
 
 from src.core.config import settings
 from src.core.exceptions import WorkPilotException
-
-from src.modules.employee.router import router as employee_router
-from src.modules.organization.router import router as organization_router
 from src.modules.attendance.router import router as attendance_router
+from src.modules.employee.router import router as employee_router
+from src.modules.leave.router import (
+    employee_leave_router,
+    holiday_router,
+    leave_balance_router,
+    leave_calendar_router,
+    leave_report_router,
+    leave_type_router,
+)
 from src.modules.leave.router import (
     router as leave_router,
-    leave_type_router,
-    employee_leave_router,
-    leave_balance_router,
-    leave_report_router,
-    leave_calendar_router,
-    holiday_router,
 )
+from src.modules.organization.router import router as organization_router
 from src.modules.policies.router import (
-    leave_policy_router,
     attendance_policy_router,
-    shift_policy_router,
     holiday_policy_router,
+    leave_policy_router,
     probation_policy_router,
+    shift_policy_router,
 )
-
-
 
 app = FastAPI(
     title=settings.APP_NAME,
