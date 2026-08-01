@@ -18,9 +18,13 @@ from src.modules.attendance.schemas import (
 )
 from src.modules.attendance.service import AttendanceService
 
+from src.core.rbac import Permission
+from src.core.dependencies import require_permissions, get_current_user_and_set_schema, verify_employee_ownership
+
 router = APIRouter(
     prefix="/attendance",
     tags=["Attendance"],
+    dependencies=[Depends(get_current_user_and_set_schema)],
 )
 
 
@@ -39,8 +43,11 @@ def get_service(db: Session = Depends(get_db)) -> AttendanceService:
 )
 def check_in(
     request: AttendanceCheckIn,
+    current_user: dict = Depends(get_current_user_and_set_schema),
+    db: Session = Depends(get_db),
     service: AttendanceService = Depends(get_service),
 ):
+    verify_employee_ownership(request.employee_id, current_user, db, bypass_permissions=[Permission.ATTENDANCE_MANAGE])
     return service.check_in(request)
 
 
@@ -55,8 +62,11 @@ def check_in(
 )
 def check_out(
     request: AttendanceCheckOut,
+    current_user: dict = Depends(get_current_user_and_set_schema),
+    db: Session = Depends(get_db),
     service: AttendanceService = Depends(get_service),
 ):
+    verify_employee_ownership(request.employee_id, current_user, db, bypass_permissions=[Permission.ATTENDANCE_MANAGE])
     return service.check_out(request)
 
 
@@ -68,6 +78,7 @@ def check_out(
     "",
     response_model=AttendanceResponse,
     status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_permissions([Permission.ATTENDANCE_MANAGE]))],
 )
 def create_attendance(
     request: AttendanceCreate,
@@ -83,6 +94,7 @@ def create_attendance(
 @router.get(
     "",
     response_model=list[AttendanceResponse],
+    dependencies=[Depends(require_permissions([Permission.ATTENDANCE_MANAGE]))],
 )
 def get_all_attendance(
     skip: int = Query(0, ge=0),
@@ -99,6 +111,7 @@ def get_all_attendance(
 @router.get(
     "/{attendance_id}",
     response_model=AttendanceResponse,
+    dependencies=[Depends(require_permissions([Permission.ATTENDANCE_MANAGE]))],
 )
 def get_attendance(
     attendance_id: int,
@@ -114,6 +127,7 @@ def get_attendance(
 @router.put(
     "/{attendance_id}",
     response_model=AttendanceResponse,
+    dependencies=[Depends(require_permissions([Permission.ATTENDANCE_MANAGE]))],
 )
 def update_attendance(
     attendance_id: int,
@@ -130,6 +144,7 @@ def update_attendance(
 @router.delete(
     "/{attendance_id}",
     status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(require_permissions([Permission.ATTENDANCE_MANAGE]))],
 )
 def delete_attendance(
     attendance_id: int,
@@ -148,8 +163,11 @@ def delete_attendance(
 )
 def get_employee_attendance(
     employee_id: UUID,
+    current_user: dict = Depends(get_current_user_and_set_schema),
+    db: Session = Depends(get_db),
     service: AttendanceService = Depends(get_service),
 ):
+    verify_employee_ownership(employee_id, current_user, db, bypass_permissions=[Permission.ATTENDANCE_READ, Permission.ATTENDANCE_MANAGE])
     return service.get_employee_attendance(employee_id)
 
 
@@ -163,8 +181,11 @@ def get_employee_attendance(
 )
 def get_employee_summary(
     employee_id: UUID,
+    current_user: dict = Depends(get_current_user_and_set_schema),
+    db: Session = Depends(get_db),
     service: AttendanceService = Depends(get_service),
 ):
+    verify_employee_ownership(employee_id, current_user, db, bypass_permissions=[Permission.ATTENDANCE_READ, Permission.ATTENDANCE_MANAGE])
     return service.get_employee_summary(employee_id)
 
 
@@ -175,6 +196,7 @@ def get_employee_summary(
 @router.get(
     "/date/{attendance_date}",
     response_model=list[AttendanceResponse],
+    dependencies=[Depends(require_permissions([Permission.ATTENDANCE_MANAGE]))],
 )
 def get_attendance_by_date(
     attendance_date: date,
@@ -190,6 +212,7 @@ def get_attendance_by_date(
 @router.get(
     "/today",
     response_model=list[AttendanceResponse],
+    dependencies=[Depends(require_permissions([Permission.ATTENDANCE_MANAGE]))],
 )
 def get_today_attendance(
     service: AttendanceService = Depends(get_service),
@@ -204,6 +227,7 @@ def get_today_attendance(
 @router.get(
     "/active",
     response_model=list[AttendanceResponse],
+    dependencies=[Depends(require_permissions([Permission.ATTENDANCE_MANAGE]))],
 )
 def get_active_attendance(
     service: AttendanceService = Depends(get_service),
@@ -218,6 +242,7 @@ def get_active_attendance(
 @router.patch(
     "/{attendance_id}/status",
     response_model=AttendanceResponse,
+    dependencies=[Depends(require_permissions([Permission.ATTENDANCE_MANAGE]))],
 )
 def update_status(
     attendance_id: int,
@@ -234,6 +259,7 @@ def update_status(
 @router.get(
     "/report/monthly",
     response_model=MonthlyAttendanceReportResponse,
+    dependencies=[Depends(require_permissions([Permission.ATTENDANCE_READ]))],
 )
 def get_monthly_report(
     month: int,
@@ -250,6 +276,7 @@ def get_monthly_report(
 @router.get(
     "/export",
     response_model=AttendanceExportResponse,
+    dependencies=[Depends(require_permissions([Permission.ATTENDANCE_MANAGE]))],
 )
 def export_attendance(
     month: int = Query(..., ge=1, le=12),

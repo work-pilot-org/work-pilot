@@ -1,3 +1,5 @@
+from src.core.rbac import Permission
+from src.core.dependencies import require_permissions
 from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.orm import Session
 from uuid import UUID
@@ -21,7 +23,7 @@ from src.modules.policies.service import (
 # ==================================================================
 # Leave Policies Router
 # ==================================================================
-leave_policy_router = APIRouter(prefix="/leave-policies", tags=["Leave Policies"])
+leave_policy_router = APIRouter(dependencies=[Depends(require_permissions([Permission.HR_MANAGE]))], prefix="/leave-policies", tags=["Leave Policies"])
 
 @leave_policy_router.post("", response_model=LeavePolicyResponse, status_code=status.HTTP_201_CREATED)
 def create_leave_policy(policy: LeavePolicyCreate, db: Session = Depends(get_db)):
@@ -48,7 +50,7 @@ def delete_leave_policy(id: UUID, db: Session = Depends(get_db)):
 # ==================================================================
 # Attendance Policies Router
 # ==================================================================
-attendance_policy_router = APIRouter(prefix="/attendance-policies", tags=["Attendance Policies"])
+attendance_policy_router = APIRouter(dependencies=[Depends(require_permissions([Permission.HR_MANAGE]))], prefix="/attendance-policies", tags=["Attendance Policies"])
 
 @attendance_policy_router.post("", response_model=AttendancePolicyResponse, status_code=status.HTTP_201_CREATED)
 def create_attendance_policy(policy: AttendancePolicyCreate, db: Session = Depends(get_db)):
@@ -75,7 +77,7 @@ def delete_attendance_policy(id: UUID, db: Session = Depends(get_db)):
 # ==================================================================
 # Shift Policies Router
 # ==================================================================
-shift_policy_router = APIRouter(prefix="/shift-policies", tags=["Shift Policies"])
+shift_policy_router = APIRouter(dependencies=[Depends(require_permissions([Permission.HR_MANAGE]))], prefix="/shift-policies", tags=["Shift Policies"])
 
 @shift_policy_router.post("", response_model=ShiftPolicyResponse, status_code=status.HTTP_201_CREATED)
 def create_shift_policy(policy: ShiftPolicyCreate, db: Session = Depends(get_db)):
@@ -102,7 +104,7 @@ def delete_shift_policy(id: UUID, db: Session = Depends(get_db)):
 # ==================================================================
 # Holiday Policies Router
 # ==================================================================
-holiday_policy_router = APIRouter(prefix="/holiday-policies", tags=["Holiday Policies"])
+holiday_policy_router = APIRouter(dependencies=[Depends(require_permissions([Permission.HR_MANAGE]))], prefix="/holiday-policies", tags=["Holiday Policies"])
 
 @holiday_policy_router.post("", response_model=HolidayPolicyResponse, status_code=status.HTTP_201_CREATED)
 def create_holiday_policy(policy: HolidayPolicyCreate, db: Session = Depends(get_db)):
@@ -129,7 +131,7 @@ def delete_holiday_policy(id: UUID, db: Session = Depends(get_db)):
 # ==================================================================
 # Probation Policies Router
 # ==================================================================
-probation_policy_router = APIRouter(prefix="/probation-policies", tags=["Probation Policies"])
+probation_policy_router = APIRouter(dependencies=[Depends(require_permissions([Permission.HR_MANAGE]))], prefix="/probation-policies", tags=["Probation Policies"])
 
 @probation_policy_router.post("", response_model=ProbationPolicyResponse, status_code=status.HTTP_201_CREATED)
 def create_probation_policy(policy: ProbationPolicyCreate, db: Session = Depends(get_db)):

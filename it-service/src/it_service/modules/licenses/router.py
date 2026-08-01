@@ -1,5 +1,8 @@
+from it_service.core.rbac import Permission
+from it_service.core.dependencies import require_permissions
 import uuid
 
+from it_service.core.security import get_current_user
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
@@ -14,9 +17,10 @@ from it_service.modules.licenses.schemas import (
 )
 from it_service.modules.licenses.service import LicenseService
 
-router = APIRouter(
+router = APIRouter(dependencies=[Depends(require_permissions([Permission.IT_MANAGE]))], 
     prefix="/licenses",
     tags=["Licenses"],
+    dependencies=[Depends(get_current_user)],
 )
 
 

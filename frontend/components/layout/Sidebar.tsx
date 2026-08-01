@@ -14,15 +14,14 @@ import {
   Building2,
 } from "lucide-react";
 import { useState } from "react";
-
-export type Permission = string; // Future: define specific permission strings
+import { RequireRole } from "@/components/RequireRole";
 
 export interface NavItem {
   name: string;
   href: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   icon: any;
-  requiredPermissions?: Permission[];
+  allowedRoles?: string[];
   children?: Omit<NavItem, 'children'>[];
 }
 
@@ -31,20 +30,33 @@ const navConfig: NavItem[] = [
     name: "Dashboard", 
     href: "/dashboard", 
     icon: LayoutDashboard 
-    // globally accessible, no requiredPermissions
+    // globally accessible
   },
   { 
     name: "HR", 
     href: "/dashboard/hr", 
     icon: Users,
-    requiredPermissions: ["hr:view"], // Dummy permission for future implementation
+    // Accessible by everyone since employees can check their own profile and attendance
     children: [
-      { name: "Employees", href: "/dashboard/hr", icon: Users, requiredPermissions: ["hr:employee:view"] },
-      { name: "Attendance", href: "/dashboard/hr/attendance", icon: UserCheck, requiredPermissions: ["hr:attendance:view"] },
-      { name: "Leave", href: "/dashboard/hr/leave", icon: Calendar, requiredPermissions: ["hr:leave:view"] },
-      { name: "Organization", href: "/dashboard/hr/organization", icon: Building2, requiredPermissions: ["hr:org:view"] },
+      { name: "Employees", href: "/dashboard/hr", icon: Users }, 
+      { name: "Attendance", href: "/dashboard/hr/attendance", icon: UserCheck },
+      { name: "Leave", href: "/dashboard/hr/leave", icon: Calendar },
+      { name: "Organization", href: "/dashboard/hr/organization", icon: Building2, allowedRoles: ["TENANT_ADMIN", "HR_ADMIN"] },
     ]
   },
+  {
+    name: "IT Service",
+    href: "/dashboard/it/tickets",
+    icon: LayoutDashboard,
+    children: [
+      { name: "Helpdesk", href: "/dashboard/it/tickets", icon: LayoutDashboard }
+    ]
+  },
+  {
+    name: "Workflows",
+    href: "/dashboard/workflows",
+    icon: Briefcase,
+  }
 ];
 
 export default function Sidebar() {
@@ -52,11 +64,7 @@ export default function Sidebar() {
   const { user } = useAuthStore();
   const [expandedNav, setExpandedNav] = useState<string[]>(["HR"]);
 
-  // Future RBAC Filter: 
-  // const userPermissions = user?.permissions || [];
-  // const visibleNavItems = navConfig.filter(item => hasPermission(item, userPermissions));
-  
-  const visibleNavItems = navConfig; // Currently rendering everything without filtering
+  const visibleNavItems = navConfig;
 
   const toggleExpand = (name: string) => {
     setExpandedNav(prev => 
@@ -88,7 +96,7 @@ export default function Sidebar() {
             const Icon = item.icon;
             const hasChildren = item.children && item.children.length > 0;
             
-            return (
+            const navItemContent = (
               <li key={item.name} className="flex flex-col">
                 <div className="flex items-center">
                   <Link
@@ -119,7 +127,7 @@ export default function Sidebar() {
                   <ul className="mt-1 mb-2 ml-6 space-y-1 border-l border-border pl-2">
                     {item.children!.map((child) => {
                       const isChildLinkActive = pathname === child.href;
-                      return (
+                      const childNode = (
                         <li key={child.name}>
                           <Link
                             href={child.href}
@@ -129,16 +137,33 @@ export default function Sidebar() {
                                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
                             }`}
                           >
-                            {/* <ChildIcon className="w-3.5 h-3.5 opacity-70" /> */}
                             {child.name}
                           </Link>
                         </li>
                       );
+                      
+                      if (child.allowedRoles && child.allowedRoles.length > 0) {
+                        return (
+                          <RequireRole key={child.name} allowedRoles={child.allowedRoles}>
+                            {childNode}
+                          </RequireRole>
+                        );
+                      }
+                      return childNode;
                     })}
                   </ul>
                 )}
               </li>
             );
+
+            if (item.allowedRoles && item.allowedRoles.length > 0) {
+              return (
+                <RequireRole key={item.name} allowedRoles={item.allowedRoles}>
+                  {navItemContent}
+                </RequireRole>
+              );
+            }
+            return navItemContent;
           })}
         </ul>
       </nav>

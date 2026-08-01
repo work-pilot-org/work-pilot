@@ -1,3 +1,5 @@
+from src.core.rbac import Permission
+from src.core.dependencies import require_permissions
 from typing import List
 
 from fastapi import APIRouter, Depends, Query, status
@@ -33,6 +35,7 @@ router = APIRouter(
     status_code=status.HTTP_201_CREATED,
 )
 def create_workflow(
+    _rbac=Depends(require_permissions([Permission.WORKFLOW_MANAGE])),
     data: WorkflowCreate,
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
@@ -74,6 +77,7 @@ def get_workflow(
     response_model=WorkflowResponse,
 )
 def update_workflow(
+    _rbac=Depends(require_permissions([Permission.WORKFLOW_MANAGE])),
     workflow_id: str,
     data: WorkflowUpdate,
     db: Session = Depends(get_db),
@@ -88,6 +92,7 @@ def update_workflow(
     status_code=status.HTTP_204_NO_CONTENT,
 )
 def delete_workflow(
+    _rbac=Depends(require_permissions([Permission.WORKFLOW_MANAGE])),
     workflow_id: str,
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
@@ -132,6 +137,7 @@ def get_workflow_execution(
     response_model=ApprovalResponse,
 )
 async def approve_task(
+    _rbac=Depends(require_permissions([Permission.WORKFLOW_APPROVE])),
     task_id: str,
     data: ApprovalDecision,
     db: Session = Depends(get_db),

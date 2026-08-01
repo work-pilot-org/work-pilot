@@ -36,6 +36,10 @@ class Settings(BaseSettings):
     # Database
     database_url: str = Field(alias="DATABASE_URL")
 
+    # JWT Security
+    secret_key: str = Field(alias="SECRET_KEY")
+    algorithm: str = Field(default="HS256", alias="ALGORITHM")
+
     # Redis
     redis_url: str = Field(alias="REDIS_URL")
 
