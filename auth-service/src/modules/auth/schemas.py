@@ -76,6 +76,7 @@ class LoginResponse(BaseModel):
     domain: str
     is_mfa_enabled: bool = False
     sso_token: str | None = None
+    roles: list[str] = []
 
 class SSOExchangeRequest(BaseModel):
     sso_token: str

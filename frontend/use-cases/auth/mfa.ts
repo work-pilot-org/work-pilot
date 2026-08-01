@@ -17,8 +17,9 @@ export const executeMfaLogin = async (data: MFALoginRequest) => {
     
     // Optionally return response if the caller needs it
     return response;
-  } catch (error: any) {
-    setError(error.message || "Invalid MFA code.");
+  } catch (error: unknown) {
+    const errorMsg = error instanceof Error ? error.message : "Invalid MFA code.";
+    setError(errorMsg);
     throw error;
   } finally {
     setLoading(false);

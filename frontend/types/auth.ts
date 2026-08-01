@@ -24,6 +24,7 @@ export interface User {
   schemaName?: string;
   domain?: string;
   isMfaEnabled?: boolean;
+  roles?: string[];
 }
 
 export interface LoginCredentials {

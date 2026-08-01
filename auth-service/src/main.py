@@ -31,10 +31,7 @@ app.add_middleware(
 
 # Include Middleware
 from src.infrastructure.middleware.tenant_middleware import TenantMiddleware
-from src.infrastructure.middleware.rate_limit_middleware import RateLimitMiddleware
 
-# Rate limit: max 60 requests per 60 seconds per IP
-app.add_middleware(RateLimitMiddleware, max_requests=60, window_seconds=60)
 app.add_middleware(TenantMiddleware)
 
 # Include Routers

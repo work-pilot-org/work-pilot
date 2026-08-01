@@ -1,0 +1,722 @@
+{
+  "endpoints": [
+    {
+      "service": "auth-service",
+      "method": "GET",
+      "path": "/",
+      "file": "d:\\work-pilot-clone\\auth-service\\src\\main.py"
+    },
+    {
+      "service": "auth-service",
+      "method": "POST",
+      "path": "/register",
+      "file": "d:\\work-pilot-clone\\auth-service\\src\\modules\\auth\\router.py"
+    },
+    {
+      "service": "auth-service",
+      "method": "POST",
+      "path": "/login",
+      "file": "d:\\work-pilot-clone\\auth-service\\src\\modules\\auth\\router.py"
+    },
+    {
+      "service": "auth-service",
+      "method": "POST",
+      "path": "/sso-exchange",
+      "file": "d:\\work-pilot-clone\\auth-service\\src\\modules\\auth\\router.py"
+    },
+    {
+      "service": "auth-service",
+      "method": "POST",
+      "path": "/swagger-login",
+      "file": "d:\\work-pilot-clone\\auth-service\\src\\modules\\auth\\router.py"
+    },
+    {
+      "service": "auth-service",
+      "method": "POST",
+      "path": "/refresh",
+      "file": "d:\\work-pilot-clone\\auth-service\\src\\modules\\auth\\router.py"
+    },
+    {
+      "service": "auth-service",
+      "method": "POST",
+      "path": "/logout",
+      "file": "d:\\work-pilot-clone\\auth-service\\src\\modules\\auth\\router.py"
+    },
+    {
+      "service": "auth-service",
+      "method": "GET",
+      "path": "/me",
+      "file": "d:\\work-pilot-clone\\auth-service\\src\\modules\\auth\\router.py"
+    },
+    {
+      "service": "auth-service",
+      "method": "POST",
+      "path": "/forgot-password",
+      "file": "d:\\work-pilot-clone\\auth-service\\src\\modules\\auth\\router.py"
+    },
+    {
+      "service": "auth-service",
+      "method": "POST",
+      "path": "/reset-password",
+      "file": "d:\\work-pilot-clone\\auth-service\\src\\modules\\auth\\router.py"
+    },
+    {
+      "service": "auth-service",
+      "method": "POST",
+      "path": "/mfa/setup",
+      "file": "d:\\work-pilot-clone\\auth-service\\src\\modules\\auth\\router.py"
+    },
+    {
+      "service": "auth-service",
+      "method": "POST",
+      "path": "/mfa/enable",
+      "file": "d:\\work-pilot-clone\\auth-service\\src\\modules\\auth\\router.py"
+    },
+    {
+      "service": "auth-service",
+      "method": "POST",
+      "path": "/mfa/disable",
+      "file": "d:\\work-pilot-clone\\auth-service\\src\\modules\\auth\\router.py"
+    },
+    {
+      "service": "auth-service",
+      "method": "POST",
+      "path": "/login/mfa",
+      "file": "d:\\work-pilot-clone\\auth-service\\src\\modules\\auth\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "GET",
+      "path": "/",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\main.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "GET",
+      "path": "/health",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\main.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "POST",
+      "path": "/check-in",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\attendance\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "POST",
+      "path": "/check-out",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\attendance\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "GET",
+      "path": "/{attendance_id}",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\attendance\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "PUT",
+      "path": "/{attendance_id}",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\attendance\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "DELETE",
+      "path": "/{attendance_id}",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\attendance\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "GET",
+      "path": "/employee/{employee_id}",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\attendance\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "GET",
+      "path": "/employee/{employee_id}/summary",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\attendance\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "GET",
+      "path": "/date/{attendance_date}",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\attendance\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "GET",
+      "path": "/today",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\attendance\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "GET",
+      "path": "/active",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\attendance\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "PATCH",
+      "path": "/{attendance_id}/status",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\attendance\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "GET",
+      "path": "/report/monthly",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\attendance\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "GET",
+      "path": "/export",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\attendance\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "GET",
+      "path": "/{employee_id}",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\employee\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "PUT",
+      "path": "/{employee_id}",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\employee\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "DELETE",
+      "path": "/{employee_id}",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\employee\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "GET",
+      "path": "/search/",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\employee\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "GET",
+      "path": "/{employee_id}/profile",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\employee\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "PUT",
+      "path": "/{employee_id}/profile",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\employee\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "POST",
+      "path": "/{employee_id}/documents",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\employee\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "GET",
+      "path": "/{employee_id}/documents",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\employee\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "DELETE",
+      "path": "/{employee_id}/documents/{document_id}",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\employee\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "POST",
+      "path": "/departments",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "GET",
+      "path": "/departments",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "PUT",
+      "path": "/departments/{department_id}",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "DELETE",
+      "path": "/departments/{department_id}",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "POST",
+      "path": "/designations",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "GET",
+      "path": "/designations",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "PUT",
+      "path": "/designations/{designation_id}",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "DELETE",
+      "path": "/designations/{designation_id}",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "POST",
+      "path": "/branches",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "GET",
+      "path": "/branches",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "PUT",
+      "path": "/branches/{branch_id}",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "DELETE",
+      "path": "/branches/{branch_id}",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "POST",
+      "path": "/shifts",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "GET",
+      "path": "/shifts",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "PUT",
+      "path": "/shifts/{shift_id}",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+    },
+    {
+      "service": "hr-service",
+      "method": "DELETE",
+      "path": "/shifts/{shift_id}",
+      "file": "d:\\work-pilot-clone\\hr-service\\src\\modules\\organization\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "GET",
+      "path": "/",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\main.py"
+    },
+    {
+      "service": "it-service",
+      "method": "GET",
+      "path": "/health",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\main.py"
+    },
+    {
+      "service": "it-service",
+      "method": "GET",
+      "path": "/{request_id}",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\access\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "PUT",
+      "path": "/{request_id}",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\access\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "PATCH",
+      "path": "/{request_id}/status",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\access\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "DELETE",
+      "path": "/{request_id}",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\access\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "GET",
+      "path": "/{asset_id}",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\assets\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "PUT",
+      "path": "/{asset_id}",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\assets\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "POST",
+      "path": "/{asset_id}/assign",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\assets\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "POST",
+      "path": "/{asset_id}/return",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\assets\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "DELETE",
+      "path": "/{asset_id}",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\assets\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "GET",
+      "path": "/{device_id}",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\devices\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "PUT",
+      "path": "/{device_id}",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\devices\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "POST",
+      "path": "/{device_id}/assign",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\devices\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "POST",
+      "path": "/{device_id}/return",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\devices\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "DELETE",
+      "path": "/{device_id}",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\devices\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "POST",
+      "path": "/{device_id}/maintenance",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\devices\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "GET",
+      "path": "/{device_id}/maintenance",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\devices\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "GET",
+      "path": "/{ticket_id}",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\helpdesk\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "PATCH",
+      "path": "/{ticket_id}",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\helpdesk\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "PATCH",
+      "path": "/{ticket_id}/status",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\helpdesk\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "PATCH",
+      "path": "/{ticket_id}/assign",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\helpdesk\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "DELETE",
+      "path": "/{ticket_id}",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\helpdesk\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "POST",
+      "path": "/{ticket_id}/comments",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\helpdesk\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "GET",
+      "path": "/{ticket_id}/comments",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\helpdesk\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "GET",
+      "path": "/comments/{comment_id}",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\helpdesk\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "PATCH",
+      "path": "/comments/{comment_id}",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\helpdesk\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "DELETE",
+      "path": "/comments/{comment_id}",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\helpdesk\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "GET",
+      "path": "/{license_id}",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\licenses\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "PUT",
+      "path": "/{license_id}",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\licenses\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "DELETE",
+      "path": "/{license_id}",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\licenses\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "POST",
+      "path": "/{license_id}/assign",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\licenses\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "DELETE",
+      "path": "/assignments/{assignment_id}",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\licenses\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "GET",
+      "path": "/assignments/user/{user_id}",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\licenses\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "GET",
+      "path": "/{record_id}",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\maintenance\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "PUT",
+      "path": "/{record_id}",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\maintenance\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "POST",
+      "path": "/{record_id}/start",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\maintenance\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "POST",
+      "path": "/{record_id}/complete",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\maintenance\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "POST",
+      "path": "/{record_id}/cancel",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\maintenance\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "DELETE",
+      "path": "/{record_id}",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\maintenance\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "GET",
+      "path": "/{software_id}",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\software\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "PUT",
+      "path": "/{software_id}",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\software\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "DELETE",
+      "path": "/{software_id}",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\software\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "POST",
+      "path": "/{software_id}/install",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\software\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "DELETE",
+      "path": "/installations/{install_id}",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\software\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "GET",
+      "path": "/installations/device/{device_id}",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\software\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "GET",
+      "path": "/installations/user/{user_id}",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\software\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "POST",
+      "path": "/requests",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\software\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "GET",
+      "path": "/requests",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\software\\router.py"
+    },
+    {
+      "service": "it-service",
+      "method": "GET",
+      "path": "/requests/{request_id}",
+      "file": "d:\\work-pilot-clone\\it-service\\src\\it_service\\modules\\software\\router.py"
+    },
+    {
+      "service": "workflow-service",
+      "method": "GET",
+      "path": "/",
+      "file": "d:\\work-pilot-clone\\workflow-service\\src\\main.py"
+    },
+    {
+      "service": "workflow-service",
+      "method": "GET",
+      "path": "/health",
+      "file": "d:\\work-pilot-clone\\workflow-service\\src\\main.py"
+    },
+    {
+      "service": "workflow-service",
+      "method": "POST",
+      "path": "/workflows",
+      "file": "d:\\work-pilot-clone\\workflow-service\\src\\modules\\workflow\\router.py"
+    },
+    {
+      "service": "workflow-service",
+      "method": "GET",
+      "path": "/workflows",
+      "file": "d:\\work-pilot-clone\\workflow-service\\src\\modules\\workflow\\router.py"
+    },
+    {
+      "service": "workflow-service",
+      "method": "GET",
+      "path": "/workflows/{workflow_id}",
+      "file": "d:\\work-pilot-clone\\workflow-service\\src\\modules\\workflow\\router.py"
+    },
+    {
+      "service": "workflow-service",
+      "method": "PUT",
+      "path": "/workflows/{workflow_id}",
+      "file": "d:\\work-pilot-clone\\workflow-service\\src\\modules\\workflow\\router.py"
+    },
+    {
+      "service": "workflow-service",
+      "method": "DELETE",
+      "path": "/workflows/{workflow_id}",
+      "file": "d:\\work-pilot-clone\\workflow-service\\src\\modules\\workflow\\router.py"
+    },
+    {
+      "service": "workflow-service",
+      "method": "POST",
+      "path": "/workflow-executions",
+      "file": "d:\\work-pilot-clone\\workflow-service\\src\\modules\\workflow\\router.py"
+    },
+    {
+      "service": "workflow-service",
+      "method": "GET",
+      "path": "/workflow-executions/{execution_id}",
+      "file": "d:\\work-pilot-clone\\workflow-service\\src\\modules\\workflow\\router.py"
+    },
+    {
+      "service": "workflow-service",
+      "method": "PATCH",
+      "path": "/tasks/{task_id}/approve",
+      "file": "d:\\work-pilot-clone\\workflow-service\\src\\modules\\workflow\\router.py"
+    },
+    {
+      "service": "workflow-service",
+      "method": "PATCH",
+      "path": "/workflow-executions/{execution_id}/cancel",
+      "file": "d:\\work-pilot-clone\\workflow-service\\src\\modules\\workflow\\router.py"
+    },
+    {
+      "service": "workflow-service",
+      "method": "PATCH",
+      "path": "/workflow-executions/{execution_id}/restart",
+      "file": "d:\\work-pilot-clone\\workflow-service\\src\\modules\\workflow\\router.py"
+    },
+    {
+      "service": "workflow-service",
+      "method": "GET",
+      "path": "/workflow-executions/{execution_id}/history",
+      "file": "d:\\work-pilot-clone\\workflow-service\\src\\modules\\workflow\\router.py"
+    }
+  ],
+  "client_calls": [
+    {
+      "caller_service": "workflow-service",
+      "target_service": "hr-service",
+      "method": "PATCH",
+      "path": "/leave-requests/{execution.entity_id}/status",
+      "file": "d:\\work-pilot-clone\\workflow-service\\src\\modules\\workflow\\service.py"
+    },
+    {
+      "caller_service": "workflow-service",
+      "target_service": "it-service",
+      "method": "PATCH",
+      "path": "/access/{execution.entity_id}/status",
+      "file": "d:\\work-pilot-clone\\workflow-service\\src\\modules\\workflow\\service.py"
+    }
+  ]
+}
