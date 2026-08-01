@@ -34,6 +34,9 @@ dependencies = [
     # Logging
     "structlog>=25.4.0",
 
+    # JWT
+    "python-jose[cryptography]>=3.3.0",
+
     # Google Gemini SDK
     "google-genai>=1.30.0",
 ]

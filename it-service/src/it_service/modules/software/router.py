@@ -1,5 +1,6 @@
 import uuid
 
+from it_service.core.security import get_current_user
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
@@ -26,6 +27,7 @@ from it_service.modules.software.service import SoftwareService
 router = APIRouter(dependencies=[Depends(require_permissions([Permission.IT_MANAGE]))], 
     prefix="/software",
     tags=["Software"],
+    dependencies=[Depends(get_current_user)],
 )
 
 
