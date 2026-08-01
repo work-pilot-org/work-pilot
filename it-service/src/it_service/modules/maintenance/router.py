@@ -2,6 +2,7 @@ from it_service.core.rbac import Permission
 from it_service.core.dependencies import require_permissions
 import uuid
 
+from it_service.core.security import get_current_user
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
@@ -19,6 +20,7 @@ from it_service.modules.maintenance.service import MaintenanceService
 router = APIRouter(dependencies=[Depends(require_permissions([Permission.IT_MANAGE]))], 
     prefix="/maintenance",
     tags=["Maintenance"],
+    dependencies=[Depends(get_current_user)],
 )
 
 

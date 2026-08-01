@@ -4,6 +4,7 @@ import uuid
 
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
+from it_service.core.security import get_current_user
 
 from it_service.infrastructure.database.session import get_db
 from it_service.modules.access.enums import AccessRequestStatus, AccessRequestType
@@ -19,6 +20,7 @@ from it_service.modules.access.service import AccessService
 router = APIRouter(dependencies=[Depends(require_permissions([Permission.IT_MANAGE]))], 
     prefix="/access",
     tags=["Access"],
+    dependencies=[Depends(get_current_user)],
 )
 
 
