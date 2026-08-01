@@ -4,6 +4,12 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
+from src.core.dependencies import (
+    get_current_user_and_set_schema,
+    require_permissions,
+    verify_employee_ownership,
+)
+from src.core.rbac import Permission
 from src.infrastructure.database.session import get_db
 from src.modules.attendance.schemas import (
     AttendanceCheckIn,
@@ -17,9 +23,6 @@ from src.modules.attendance.schemas import (
     MonthlyAttendanceReportResponse,
 )
 from src.modules.attendance.service import AttendanceService
-
-from src.core.rbac import Permission
-from src.core.dependencies import require_permissions, get_current_user_and_set_schema, verify_employee_ownership
 
 router = APIRouter(
     prefix="/attendance",

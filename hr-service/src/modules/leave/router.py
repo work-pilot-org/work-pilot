@@ -1,42 +1,40 @@
-from src.core.rbac import Permission
-from src.core.dependencies import require_permissions
+from datetime import date
+from uuid import UUID
+
 from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.orm import Session
 
+from src.core.dependencies import require_permissions
+from src.core.rbac import Permission
 from src.infrastructure.database.session import get_db
 from src.modules.leave.schemas import (
+    CalendarEvent,
+    DepartmentLeaveReportResponse,
+    EmployeeLeaveBalanceResponse,
+    EmployeeLeaveSummaryResponse,
+    HolidayCreate,
+    HolidayResponse,
+    LeaveBalanceCreate,
+    LeaveBalanceResponse,
+    LeaveBalanceUpdate,
+    LeaveRequestCreate,
+    LeaveRequestListResponse,
+    LeaveRequestResponse,
+    LeaveRequestStatusUpdate,
+    LeaveRequestUpdate,
     LeaveTypeCreate,
     LeaveTypeResponse,
     LeaveTypeUpdate,
-    LeaveRequestCreate,
-    LeaveRequestUpdate,
-    LeaveRequestStatusUpdate,
-    LeaveRequestResponse,
-    LeaveRequestListResponse,
-    LeaveBalanceCreate,
-    LeaveBalanceUpdate,
-    LeaveBalanceResponse,
-    EmployeeLeaveBalanceResponse,
-    EmployeeLeaveSummaryResponse,
-    OrganizationLeaveReportResponse,
     MonthlyLeaveReportResponse,
-    DepartmentLeaveReportResponse,
-    HolidayCreate,
-    HolidayResponse,
-    CalendarEvent,
+    OrganizationLeaveReportResponse,
 )
 from src.modules.leave.service import (
-    LeaveTypeService,
-    LeaveRequestService,
+    HolidayService,
     LeaveBalanceService,
     LeaveReportService,
-    HolidayService,
+    LeaveRequestService,
+    LeaveTypeService,
 )
-
-from uuid import UUID
-from datetime import date
-from typing import Optional
-
 
 # ==================================================================
 # Leave Types Router
@@ -438,8 +436,8 @@ leave_report_router = APIRouter(dependencies=[Depends(require_permissions([Permi
     summary="Get Organization Leave Report",
 )
 def get_organization_leave_report(
-    start_date: Optional[date] = None,
-    end_date: Optional[date] = None,
+    start_date: date | None = None,
+    end_date: date | None = None,
     db: Session = Depends(get_db),
 ):
     """Retrieve organization-wide leave reports."""
@@ -453,7 +451,7 @@ def get_organization_leave_report(
 )
 def get_monthly_leave_report(
     year: int,
-    month: Optional[int] = None,
+    month: int | None = None,
     db: Session = Depends(get_db),
 ):
     """Retrieve monthly leave reports."""
@@ -467,8 +465,8 @@ def get_monthly_leave_report(
 )
 def get_department_leave_report(
     department_id: UUID,
-    start_date: Optional[date] = None,
-    end_date: Optional[date] = None,
+    start_date: date | None = None,
+    end_date: date | None = None,
     db: Session = Depends(get_db),
 ):
     """Retrieve department-wise leave reports."""
@@ -491,8 +489,8 @@ leave_calendar_router = APIRouter(dependencies=[Depends(require_permissions([Per
     summary="Get Leave Calendar",
 )
 def get_leave_calendar(
-    start_date: Optional[date] = None,
-    end_date: Optional[date] = None,
+    start_date: date | None = None,
+    end_date: date | None = None,
     db: Session = Depends(get_db),
 ):
     """Retrieve the leave calendar showing approved leaves and holidays."""

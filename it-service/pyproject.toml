@@ -74,3 +74,5 @@ ignore = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+[tool.ruff.lint]
+ignore = ['B008', 'E402', 'DTZ003', 'BLE001']

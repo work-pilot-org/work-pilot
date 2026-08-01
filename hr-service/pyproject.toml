@@ -16,3 +16,6 @@ dependencies = [
     "httpx>=0.28.1",
     "python-jose[cryptography]>=3.3.0",
 ]
+
+[tool.ruff.lint]
+ignore = ['B008', 'E402', 'DTZ003', 'BLE001']

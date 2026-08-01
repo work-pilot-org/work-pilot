@@ -127,3 +127,18 @@ def hash_reset_token(token: str) -> str:
     Hash the reset token for secure storage.
     """
     return hashlib.sha256(token.encode()).hexdigest()
+
+def validate_password_complexity(value: str) -> str:
+    """
+    Validates that a password meets complexity requirements.
+    Raises ValueError if it does not.
+    """
+    if not any(char.isupper() for char in value):
+        raise ValueError("Password must contain at least one uppercase letter.")
+    if not any(char.islower() for char in value):
+        raise ValueError("Password must contain at least one lowercase letter.")
+    if not any(char.isdigit() for char in value):
+        raise ValueError("Password must contain at least one number.")
+    if not any(not char.isalnum() for char in value):
+        raise ValueError("Password must contain at least one special character.")
+    return value

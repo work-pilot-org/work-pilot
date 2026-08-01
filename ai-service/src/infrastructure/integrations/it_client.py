@@ -12,32 +12,29 @@ from uuid import UUID
 from core.config import settings
 from infrastructure.integrations.base_client import BaseClient
 from modules.it.schemas import (
-    AssignAssetRequest,
-    AssignTicketRequest,
-    CreateAssetRequest,
-    CreateTicketRequest,
-    UpdateAssetRequest,
-    UpdateTicketRequest,
-    AssignDeviceRequest,
-    CreateDeviceRequest,
-    UpdateDeviceRequest,
-    CreateMaintenanceHistoryRequest,
-    CreateSoftwareRequest,
-    UpdateSoftwareRequest,
-    CreateInstallRequest,
-    CreateInstallationRequest,
-    AssignLicenseRequest,
-    CreateLicenseRequest,
-    UpdateLicenseRequest,
-    CreateAccessRequest,
-    UpdateAccessRequest,
     AccessRequestStatusUpdate,
-
-    CreateMaintenanceRecord,
-    UpdateMaintenanceRecord,
+    AssignAssetRequest,
+    AssignDeviceRequest,
+    AssignLicenseRequest,
+    AssignTicketRequest,
     CompleteMaintenanceRequest,
-
-
+    CreateAccessRequest,
+    CreateAssetRequest,
+    CreateDeviceRequest,
+    CreateInstallationRequest,
+    CreateInstallRequest,
+    CreateLicenseRequest,
+    CreateMaintenanceHistoryRequest,
+    CreateMaintenanceRecord,
+    CreateSoftwareRequest,
+    CreateTicketRequest,
+    UpdateAccessRequest,
+    UpdateAssetRequest,
+    UpdateDeviceRequest,
+    UpdateLicenseRequest,
+    UpdateMaintenanceRecord,
+    UpdateSoftwareRequest,
+    UpdateTicketRequest,
 )
 
 

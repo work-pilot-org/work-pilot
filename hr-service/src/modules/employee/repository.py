@@ -1,4 +1,3 @@
-from typing import Optional
 from uuid import UUID
 
 from sqlalchemy import or_, select
@@ -28,7 +27,7 @@ class EmployeeRepository:
     def get_employee_by_id(
         self,
         employee_id: UUID,
-    ) -> Optional[Employee]:
+    ) -> Employee | None:
         result = self.db.execute(
             select(Employee)
             .where(
@@ -45,7 +44,7 @@ class EmployeeRepository:
     def get_employee_by_auth_user_id(
         self,
         auth_user_id: UUID,
-    ) -> Optional[Employee]:
+    ) -> Employee | None:
         result = self.db.execute(
             select(Employee).where(
                 Employee.auth_user_id == auth_user_id,
@@ -57,7 +56,7 @@ class EmployeeRepository:
     def get_employee_by_code(
         self,
         employee_code: str,
-    ) -> Optional[Employee]:
+    ) -> Employee | None:
         result = self.db.execute(
             select(Employee).where(
                 Employee.employee_code == employee_code,
@@ -138,7 +137,7 @@ class EmployeeRepository:
     def get_profile(
         self,
         employee_id: UUID,
-    ) -> Optional[EmployeeProfile]:
+    ) -> EmployeeProfile | None:
         result = self.db.execute(
             select(EmployeeProfile).where(
                 EmployeeProfile.employee_id == employee_id
@@ -183,7 +182,7 @@ class EmployeeRepository:
     def get_document_by_id(
         self,
         document_id: UUID,
-    ) -> Optional[EmployeeDocument]:
+    ) -> EmployeeDocument | None:
         result = self.db.execute(
             select(EmployeeDocument).where(
                 EmployeeDocument.id == document_id

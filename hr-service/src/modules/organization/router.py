@@ -1,32 +1,30 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
+from src.core.dependencies import require_permissions
+from src.core.rbac import Permission
 from src.infrastructure.database.session import get_db
 
 from .schemas import (
-    DepartmentCreate,
-    DepartmentUpdate,
-    DepartmentResponse,
-    DesignationCreate,
-    DesignationUpdate,
-    DesignationResponse,
     BranchCreate,
-    BranchUpdate,
     BranchResponse,
+    BranchUpdate,
+    DepartmentCreate,
+    DepartmentResponse,
+    DepartmentUpdate,
+    DesignationCreate,
+    DesignationResponse,
+    DesignationUpdate,
     ShiftCreate,
-    ShiftUpdate,
     ShiftResponse,
+    ShiftUpdate,
 )
-
 from .service import (
+    BranchService,
     DepartmentService,
     DesignationService,
-    BranchService,
     ShiftService,
 )
-
-from src.core.rbac import Permission
-from src.core.dependencies import require_permissions
 
 router = APIRouter(
     prefix="/organization",

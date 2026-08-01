@@ -1,9 +1,8 @@
-from pydantic import BaseModel, ConfigDict, Field
-from typing import Optional
-from uuid import UUID
 from datetime import datetime, time
 from decimal import Decimal
+from uuid import UUID
 
+from pydantic import BaseModel, ConfigDict, Field
 
 # ==================================================================
 # Base Policy Schemas
@@ -11,7 +10,7 @@ from decimal import Decimal
 
 class PolicyBase(BaseModel):
     name: str = Field(..., min_length=3, max_length=150)
-    description: Optional[str] = None
+    description: str | None = None
     is_active: bool = True
 
 class PolicyResponseMixin(BaseModel):
@@ -41,7 +40,7 @@ class LeavePolicyCreate(LeavePolicyBase):
     pass
 
 class LeavePolicyUpdate(LeavePolicyBase):
-    name: Optional[str] = Field(None, min_length=3, max_length=150)
+    name: str | None = Field(None, min_length=3, max_length=150)
 
 class LeavePolicyResponse(LeavePolicyBase, PolicyResponseMixin):
     pass
@@ -57,13 +56,13 @@ class AttendancePolicyBase(PolicyBase):
     late_mark_limit: int = 3
     half_day_after_hours: Decimal = Field(default=Decimal("4.0"))
     auto_checkout: bool = False
-    weekend_policy: Optional[str] = None
+    weekend_policy: str | None = None
 
 class AttendancePolicyCreate(AttendancePolicyBase):
     pass
 
 class AttendancePolicyUpdate(AttendancePolicyBase):
-    name: Optional[str] = Field(None, min_length=3, max_length=150)
+    name: str | None = Field(None, min_length=3, max_length=150)
 
 class AttendancePolicyResponse(AttendancePolicyBase, PolicyResponseMixin):
     pass
@@ -77,16 +76,16 @@ class ShiftPolicyBase(PolicyBase):
     shift_start: time
     shift_end: time
     break_duration: int = 60
-    weekly_off: Optional[str] = None
+    weekly_off: str | None = None
     night_shift: bool = False
 
 class ShiftPolicyCreate(ShiftPolicyBase):
     pass
 
 class ShiftPolicyUpdate(ShiftPolicyBase):
-    name: Optional[str] = Field(None, min_length=3, max_length=150)
-    shift_start: Optional[time] = None
-    shift_end: Optional[time] = None
+    name: str | None = Field(None, min_length=3, max_length=150)
+    shift_start: time | None = None
+    shift_end: time | None = None
 
 class ShiftPolicyResponse(ShiftPolicyBase, PolicyResponseMixin):
     pass
@@ -99,16 +98,16 @@ class ShiftPolicyResponse(ShiftPolicyBase, PolicyResponseMixin):
 class HolidayPolicyBase(PolicyBase):
     calendar_name: str = Field(..., max_length=150)
     country: str = Field(..., max_length=100)
-    state: Optional[str] = Field(None, max_length=100)
+    state: str | None = Field(None, max_length=100)
     floating_holidays: int = 0
 
 class HolidayPolicyCreate(HolidayPolicyBase):
     pass
 
 class HolidayPolicyUpdate(HolidayPolicyBase):
-    name: Optional[str] = Field(None, min_length=3, max_length=150)
-    calendar_name: Optional[str] = Field(None, max_length=150)
-    country: Optional[str] = Field(None, max_length=100)
+    name: str | None = Field(None, min_length=3, max_length=150)
+    calendar_name: str | None = Field(None, max_length=150)
+    country: str | None = Field(None, max_length=100)
 
 class HolidayPolicyResponse(HolidayPolicyBase, PolicyResponseMixin):
     pass
@@ -128,7 +127,7 @@ class ProbationPolicyCreate(ProbationPolicyBase):
     pass
 
 class ProbationPolicyUpdate(ProbationPolicyBase):
-    name: Optional[str] = Field(None, min_length=3, max_length=150)
+    name: str | None = Field(None, min_length=3, max_length=150)
 
 class ProbationPolicyResponse(ProbationPolicyBase, PolicyResponseMixin):
     pass

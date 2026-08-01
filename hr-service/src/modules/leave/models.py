@@ -1,25 +1,25 @@
+from enum import Enum
+from uuid import uuid4
+
 from sqlalchemy import (
     Boolean,
-    Integer,
-    Numeric,
-    String,
-    Text,
     Column,
     Date,
     DateTime,
     ForeignKey,
-    Enum as SqlEnum,
+    Integer,
+    Numeric,
+    String,
+    Text,
     func,
 )
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import (
+    Enum as SqlEnum,
+)
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.infrastructure.database.base import TenantBase
-
-from enum import Enum
-from uuid import uuid4
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import relationship
-
 
 # ------------------------------------------------------------------
 # Enums

@@ -1,29 +1,27 @@
-from typing import List, Optional
 from datetime import datetime
 
 from sqlalchemy.orm import Session
 
-from .models import Workflow, WorkflowStep, WorkflowExecution, Approval
-from .schemas import (
-    WorkflowCreate,
-    WorkflowUpdate,
-    WorkflowStepCreate,
-    WorkflowStepUpdate,
-    WorkflowExecutionCreate,
-    ApprovalDecision,
-)
-from .repository import WorkflowRepository
-from .exceptions import (
-    WorkflowNotFoundException,
-    WorkflowStepNotFoundException,
-    WorkflowExecutionNotFoundException,
-    TaskNotFoundException,
-    InvalidWorkflowStateException,
-    UnauthorizedApproverException,
-)
 from src.infrastructure.clients.hr_client import hr_client
 from src.infrastructure.clients.it_client import it_client
 from src.infrastructure.clients.notification_client import notification_client
+
+from .exceptions import (
+    InvalidWorkflowStateException,
+    TaskNotFoundException,
+    UnauthorizedApproverException,
+    WorkflowExecutionNotFoundException,
+    WorkflowNotFoundException,
+)
+from .models import Approval, Workflow, WorkflowExecution, WorkflowStep
+from .repository import WorkflowRepository
+from .schemas import (
+    ApprovalDecision,
+    WorkflowCreate,
+    WorkflowExecutionCreate,
+    WorkflowStepCreate,
+    WorkflowUpdate,
+)
 
 
 class WorkflowService:
@@ -51,7 +49,7 @@ class WorkflowService:
             raise WorkflowNotFoundException()
         return workflow
 
-    def get_all_workflows(self) -> List[Workflow]:
+    def get_all_workflows(self) -> list[Workflow]:
         return self.repository.get_all_workflows()
 
     def update_workflow(self, workflow_id: str, data: WorkflowUpdate) -> Workflow:
@@ -87,7 +85,7 @@ class WorkflowService:
         self.db.commit()
         return step
 
-    def get_workflow_steps(self, workflow_id: str) -> List[WorkflowStep]:
+    def get_workflow_steps(self, workflow_id: str) -> list[WorkflowStep]:
         self.get_workflow(workflow_id)
         return self.repository.get_steps(workflow_id)
 
@@ -95,7 +93,7 @@ class WorkflowService:
     # Engine / Execution Operations
     # ---------------------------------------------------------
     async def start_workflow_execution(
-        self, data: WorkflowExecutionCreate, token: Optional[str] = None
+        self, data: WorkflowExecutionCreate, token: str | None = None
     ) -> WorkflowExecution:
         # 1. Validate workflow and get steps
         workflow = self.get_workflow(data.workflow_id)
@@ -148,12 +146,12 @@ class WorkflowService:
             raise WorkflowExecutionNotFoundException()
         return execution
         
-    def get_history(self, execution_id: str) -> List[Approval]:
+    def get_history(self, execution_id: str) -> list[Approval]:
         self.get_execution(execution_id)
         return self.repository.get_approvals(execution_id)
 
     async def approve_step(
-        self, task_id: str, user_id: str, user_role: str, decision_data: ApprovalDecision, token: Optional[str] = None
+        self, task_id: str, user_id: str, user_role: str, decision_data: ApprovalDecision, token: str | None = None
     ) -> Approval:
         
         # We lookup the task directly by approval ID
@@ -259,7 +257,7 @@ class WorkflowService:
         self.db.commit()
         return execution
 
-    async def restart_workflow(self, execution_id: str, user_id: str, token: Optional[str] = None) -> WorkflowExecution:
+    async def restart_workflow(self, execution_id: str, user_id: str, token: str | None = None) -> WorkflowExecution:
         execution = self.get_execution(execution_id)
         if execution.status not in ["cancelled", "rejected"]:
             raise InvalidWorkflowStateException("Only cancelled or rejected workflows can be restarted")
@@ -293,7 +291,7 @@ class WorkflowService:
             
         return execution
 
-    async def _handle_workflow_completion(self, execution: WorkflowExecution, token: Optional[str] = None):
+    async def _handle_workflow_completion(self, execution: WorkflowExecution, token: str | None = None):
         """
         Generic dispatch to external services upon workflow completion.
         """

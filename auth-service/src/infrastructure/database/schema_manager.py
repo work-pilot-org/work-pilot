@@ -2,7 +2,6 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from src.infrastructure.database.base import TenantBase
-from src.modules.rbac.models import Role, UserRole
 
 class SchemaManager:
 

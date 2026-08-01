@@ -9,8 +9,6 @@ from src.core.config import settings
 from src.infrastructure.database.base import PublicBase
 
 # Import all public models so Alembic can detect them
-from src.modules.tenant.models import Tenant, Domain
-from src.modules.user.models import User, UserProfile
 
 # Alembic Config object
 config = context.config
@@ -36,6 +34,11 @@ def run_migrations_offline() -> None:
 
     url = config.get_main_option("sqlalchemy.url")
 
+    def include_name(name, type_, parent_names):
+        if type_ == "schema":
+            return name in [None, "public"]
+        return True
+
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -44,6 +47,7 @@ def run_migrations_offline() -> None:
             "paramstyle": "named",
         },
         include_schemas=True,
+        include_name=include_name,
         version_table="alembic_version",
     )
 
@@ -67,10 +71,16 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
 
+        def include_name(name, type_, parent_names):
+            if type_ == "schema":
+                return name in [None, "public"]
+            return True
+
         context.configure(
             connection=connection,
             target_metadata=target_metadata,
             include_schemas=True,
+            include_name=include_name,
             compare_type=True,
             version_table="alembic_version",
         )

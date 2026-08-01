@@ -1,21 +1,25 @@
-from sqlalchemy.orm import Session
-from sqlalchemy import func
+from datetime import date
+from decimal import Decimal
+from uuid import UUID
 
-from src.modules.leave.models import LeaveTypeConfig, LeaveRequest, LeaveBalance, LeaveStatus, LeaveType, Holiday
+from sqlalchemy.orm import Session
+
 from src.modules.employee.models import Employee
+from src.modules.leave.models import (
+    Holiday,
+    LeaveBalance,
+    LeaveRequest,
+    LeaveStatus,
+    LeaveTypeConfig,
+)
 from src.modules.leave.schemas import (
-    LeaveTypeCreate,
-    LeaveTypeUpdate,
-    LeaveRequestCreate,
-    LeaveRequestUpdate,
+    HolidayCreate,
     LeaveBalanceCreate,
     LeaveBalanceUpdate,
-    HolidayCreate,
+    LeaveRequestUpdate,
+    LeaveTypeCreate,
+    LeaveTypeUpdate,
 )
-from uuid import UUID
-from decimal import Decimal
-from datetime import date
-
 
 # ==================================================================
 # LeaveTypeRepository

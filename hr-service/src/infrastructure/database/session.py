@@ -17,6 +17,7 @@ SessionLocal = sessionmaker(
 
 from fastapi import Request
 
+
 def get_db(request: Request = None):
     # If middleware already created the session, use it
     if request and hasattr(request.state, "db"):

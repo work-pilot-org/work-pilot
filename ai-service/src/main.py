@@ -9,9 +9,10 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from .api.router import router as ai_router
 from core.config import settings
 from infrastructure.providers.http_client import http_client_provider
+
+from .api.router import router as ai_router
 
 
 @asynccontextmanager

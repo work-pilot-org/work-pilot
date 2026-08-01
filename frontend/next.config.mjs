@@ -9,6 +9,7 @@ const nextConfig = {
     "account.localhost",
     "next.localhost"
   ],
+  output: "standalone",
 };
 
 export default nextConfig;

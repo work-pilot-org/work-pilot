@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from src.core.config import settings
 from src.infrastructure.database.session import get_db
 from src.infrastructure.database.tenant_session import set_tenant_schema
+from src.core.rbac import get_permissions_for_roles, Permission
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/swagger-login")
 
@@ -44,8 +45,6 @@ def get_current_user_and_set_schema(
     set_tenant_schema(db, schema_name)
     
     return payload
-
-from src.core.rbac import get_permissions_for_roles, Permission
 
 def require_permissions(required_permissions: list[Permission]):
     def permission_dependency(

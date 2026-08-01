@@ -1,27 +1,58 @@
-# Use Python 3.13 Slim Image
-FROM python:3.13-slim
+# ---------------------------------------
+# Base Stage
+# ---------------------------------------
+FROM python:3.13-slim AS base
 
-# Environment Variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Set Working Directory
 WORKDIR /app
+
+# ---------------------------------------
+# Builder Stage
+# ---------------------------------------
+FROM base AS builder
 
 # Install uv
 RUN pip install --no-cache-dir uv
 
 # Copy dependency files
-COPY pyproject.toml uv.lock ./
+COPY pyproject.toml uv.lock* README.md* ./
 
-# Install project dependencies
+# Create a virtual environment and sync production dependencies
+RUN uv sync --frozen --no-dev
+
+# ---------------------------------------
+# Development Stage
+# ---------------------------------------
+FROM base AS dev
+
+RUN pip install --no-cache-dir uv
+COPY pyproject.toml uv.lock* README.md* ./
 RUN uv sync --frozen
 
 # Copy application source code
 COPY . .
 
-# Expose FastAPI Port
-EXPOSE 8000
 
-# Run FastAPI
+
+EXPOSE 8000
 CMD ["uv", "run", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+# ---------------------------------------
+# Production Stage
+# ---------------------------------------
+FROM base AS prod
+
+# Copy the virtual environment from the builder stage
+COPY --from=builder /app/.venv /app/.venv
+
+# Copy the application source code
+COPY . .
+
+# Ensure the virtual environment is used
+ENV PATH="/app/.venv/bin:$PATH"
+
+
+EXPOSE 8000
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]

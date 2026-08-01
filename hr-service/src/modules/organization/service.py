@@ -1,23 +1,24 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
-from .models import Department, Designation, Branch, Shift
+from .models import Branch, Department, Designation, Shift
+from .repository import (
+    BranchRepository,
+    DepartmentRepository,
+    DesignationRepository,
+    ShiftRepository,
+)
 from .schemas import (
+    BranchCreate,
+    BranchUpdate,
     DepartmentCreate,
     DepartmentUpdate,
     DesignationCreate,
     DesignationUpdate,
-    BranchCreate,
-    BranchUpdate,
     ShiftCreate,
     ShiftUpdate,
 )
-from .repository import (
-    DepartmentRepository,
-    DesignationRepository,
-    BranchRepository,
-    ShiftRepository,
-)
+
 
 class DepartmentService:
 
@@ -201,7 +202,7 @@ class BranchService:
 
         update_data = data.model_dump(exclude_unset=True)
 
-        if "code" in update_data and update_data["code"]:
+        if update_data.get("code"):
 
             existing = BranchRepository.get_by_code(db, update_data["code"])
 

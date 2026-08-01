@@ -1,11 +1,13 @@
+from typing import Any
+
 import httpx
-from typing import Optional, Dict, Any
+
 
 class BaseClient:
     def __init__(self, base_url: str):
         self.base_url = base_url.rstrip('/')
 
-    def _get_headers(self, token: Optional[str] = None) -> Dict[str, str]:
+    def _get_headers(self, token: str | None = None) -> dict[str, str]:
         headers = {"Content-Type": "application/json"}
         if token:
             headers["Authorization"] = f"Bearer {token}"
@@ -15,7 +17,7 @@ class BaseClient:
         self, 
         method: str, 
         endpoint: str, 
-        token: Optional[str] = None, 
+        token: str | None = None, 
         **kwargs
     ) -> Any:
         url = f"{self.base_url}/{endpoint.lstrip('/')}"
@@ -33,18 +35,18 @@ class BaseClient:
                 return response.json()
             return response.text
 
-    async def get(self, endpoint: str, token: Optional[str] = None, **kwargs) -> Any:
+    async def get(self, endpoint: str, token: str | None = None, **kwargs) -> Any:
         return await self._request("GET", endpoint, token, **kwargs)
 
-    async def post(self, endpoint: str, token: Optional[str] = None, **kwargs) -> Any:
+    async def post(self, endpoint: str, token: str | None = None, **kwargs) -> Any:
         return await self._request("POST", endpoint, token, **kwargs)
 
-    async def put(self, endpoint: str, token: Optional[str] = None, **kwargs) -> Any:
+    async def put(self, endpoint: str, token: str | None = None, **kwargs) -> Any:
         return await self._request("PUT", endpoint, token, **kwargs)
 
-    async def delete(self, endpoint: str, token: Optional[str] = None, **kwargs) -> Any:
+    async def delete(self, endpoint: str, token: str | None = None, **kwargs) -> Any:
         return await self._request("DELETE", endpoint, token, **kwargs)
 
-    async def patch(self, endpoint: str, token: Optional[str] = None, **kwargs) -> Any:
+    async def patch(self, endpoint: str, token: str | None = None, **kwargs) -> Any:
         return await self._request("PATCH", endpoint, token, **kwargs)
 

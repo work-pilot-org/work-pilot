@@ -3,6 +3,7 @@ import uuid
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
+from it_service.infrastructure.clients.workflow_client import workflow_client
 from it_service.modules.access.enums import AccessRequestStatus
 from it_service.modules.access.models import AccessRequest
 from it_service.modules.access.repository import AccessRequestRepository
@@ -10,7 +11,6 @@ from it_service.modules.access.schemas import (
     CreateAccessRequest,
     UpdateAccessRequest,
 )
-from it_service.infrastructure.clients.workflow_client import workflow_client
 
 
 class AccessService:

@@ -1,19 +1,19 @@
-from it_service.core.rbac import Permission
-from it_service.core.dependencies import require_permissions
 import uuid
 
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 from it_service.core.security import get_current_user
 
+from it_service.core.dependencies import require_permissions
+from it_service.core.rbac import Permission
 from it_service.infrastructure.database.session import get_db
 from it_service.modules.access.enums import AccessRequestStatus, AccessRequestType
 from it_service.modules.access.repository import AccessRequestRepository
 from it_service.modules.access.schemas import (
     AccessRequestResponse,
+    AccessRequestStatusUpdate,
     CreateAccessRequest,
     UpdateAccessRequest,
-    AccessRequestStatusUpdate,
 )
 from it_service.modules.access.service import AccessService
 

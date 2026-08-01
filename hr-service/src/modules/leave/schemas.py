@@ -1,12 +1,9 @@
-from typing import Optional
-from decimal import Decimal
-
-from pydantic import BaseModel, ConfigDict, Field, field_validator
-from enum import Enum
-
 from datetime import date, datetime
+from decimal import Decimal
+from enum import Enum
 from uuid import UUID
 
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 # ==================================================================
 # Leave Type Config Schemas
@@ -14,7 +11,7 @@ from uuid import UUID
 
 class LeaveTypeBase(BaseModel):
     name: str = Field(..., min_length=2, max_length=100)
-    description: Optional[str] = None
+    description: str | None = None
     days_per_year: int = Field(..., ge=0)
     is_paid: bool = True
     carry_forward: bool = False
@@ -25,12 +22,12 @@ class LeaveTypeCreate(LeaveTypeBase):
 
 
 class LeaveTypeUpdate(BaseModel):
-    name: Optional[str] = Field(None, min_length=2, max_length=100)
-    description: Optional[str] = None
-    days_per_year: Optional[int] = Field(None, ge=0)
-    is_paid: Optional[bool] = None
-    carry_forward: Optional[bool] = None
-    is_active: Optional[bool] = None
+    name: str | None = Field(None, min_length=2, max_length=100)
+    description: str | None = None
+    days_per_year: int | None = Field(None, ge=0)
+    is_paid: bool | None = None
+    carry_forward: bool | None = None
+    is_active: bool | None = None
 
 
 class LeaveTypeResponse(LeaveTypeBase):
@@ -81,8 +78,8 @@ class LeaveRequestCreate(BaseModel):
     end_date: date
     reason: str = Field(..., min_length=5, max_length=1000)
     is_half_day: bool = False
-    attachment_url: Optional[str] = None
-    emergency_contact: Optional[str] = Field(None, max_length=100)
+    attachment_url: str | None = None
+    emergency_contact: str | None = Field(None, max_length=100)
 
     @field_validator("end_date")
     @classmethod
@@ -98,13 +95,13 @@ class LeaveRequestCreate(BaseModel):
 # ------------------------------------------------------------------
 
 class LeaveRequestUpdate(BaseModel):
-    leave_type: Optional[LeaveType] = None
-    start_date: Optional[date] = None
-    end_date: Optional[date] = None
-    reason: Optional[str] = Field(None, min_length=5, max_length=1000)
-    is_half_day: Optional[bool] = None
-    attachment_url: Optional[str] = None
-    emergency_contact: Optional[str] = Field(None, max_length=100)
+    leave_type: LeaveType | None = None
+    start_date: date | None = None
+    end_date: date | None = None
+    reason: str | None = Field(None, min_length=5, max_length=1000)
+    is_half_day: bool | None = None
+    attachment_url: str | None = None
+    emergency_contact: str | None = Field(None, max_length=100)
 
 class LeaveRequestStatusUpdate(BaseModel):
     status: LeaveStatus
@@ -125,10 +122,10 @@ class LeaveRequestResponse(BaseModel):
     total_days: int
     reason: str
     is_half_day: bool
-    attachment_url: Optional[str]
-    emergency_contact: Optional[str]
+    attachment_url: str | None
+    emergency_contact: str | None
     status: LeaveStatus
-    workflow_instance_id: Optional[UUID]
+    workflow_instance_id: UUID | None
     created_at: datetime
     updated_at: datetime
 
@@ -165,7 +162,7 @@ class LeaveBalanceCreate(BaseModel):
     year: int = Field(..., ge=2000, le=2100)
     allocated_days: Decimal = Field(..., ge=0, decimal_places=1)
     carried_forward_days: Decimal = Field(default=Decimal("0.0"), ge=0, decimal_places=1)
-    notes: Optional[str] = None
+    notes: str | None = None
 
 
 # ------------------------------------------------------------------
@@ -175,10 +172,10 @@ class LeaveBalanceCreate(BaseModel):
 class LeaveBalanceUpdate(BaseModel):
     """Payload to update an existing leave balance record."""
 
-    allocated_days: Optional[Decimal] = Field(None, ge=0, decimal_places=1)
-    used_days: Optional[Decimal] = Field(None, ge=0, decimal_places=1)
-    carried_forward_days: Optional[Decimal] = Field(None, ge=0, decimal_places=1)
-    notes: Optional[str] = None
+    allocated_days: Decimal | None = Field(None, ge=0, decimal_places=1)
+    used_days: Decimal | None = Field(None, ge=0, decimal_places=1)
+    carried_forward_days: Decimal | None = Field(None, ge=0, decimal_places=1)
+    notes: str | None = None
 
 
 # ------------------------------------------------------------------
@@ -196,7 +193,7 @@ class LeaveBalanceResponse(BaseModel):
     used_days: Decimal
     carried_forward_days: Decimal
     remaining_days: Decimal  # computed field — set by service
-    notes: Optional[str]
+    notes: str | None
     created_at: datetime
     updated_at: datetime
 
@@ -278,8 +275,8 @@ class LeaveReportItem(BaseModel):
 
 class OrganizationLeaveReportResponse(BaseModel):
     """Organization-wide leave report."""
-    start_date: Optional[date] = None
-    end_date: Optional[date] = None
+    start_date: date | None = None
+    end_date: date | None = None
     total_employees_on_leave: int
     report_items: list[LeaveReportItem]
 
@@ -298,8 +295,8 @@ class MonthlyLeaveReportResponse(BaseModel):
 class DepartmentLeaveReportResponse(BaseModel):
     """Department-wise leave report."""
     department_id: UUID
-    start_date: Optional[date] = None
-    end_date: Optional[date] = None
+    start_date: date | None = None
+    end_date: date | None = None
     total_employees_on_leave: int
     report_items: list[LeaveReportItem]
 
@@ -320,7 +317,7 @@ class CalendarEvent(BaseModel):
     date: date
     event_type: EventType
     # For LEAVE events
-    employee_id: Optional[UUID] = None
-    leave_status: Optional[LeaveStatus] = None
+    employee_id: UUID | None = None
+    leave_status: LeaveStatus | None = None
     # For HOLIDAY events
-    is_optional_holiday: Optional[bool] = None
+    is_optional_holiday: bool | None = None

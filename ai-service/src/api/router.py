@@ -7,9 +7,10 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel
 
-from .dependencies import get_coordinator
 from modules.coordinator.agent import CoordinatorAgent
 from core.security import get_current_user
+
+from .dependencies import get_coordinator
 
 router = APIRouter(
     prefix="/ai",

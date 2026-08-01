@@ -1,12 +1,12 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jose import jwt, JWTError
+from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 
 from src.core.config import settings
+from src.core.rbac import Permission, get_permissions_for_roles
 from src.infrastructure.database.session import get_db
 from src.infrastructure.database.tenant_session import set_tenant_schema
-from src.core.rbac import get_permissions_for_roles, Permission
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/swagger-login")
 
@@ -51,7 +51,9 @@ def require_permissions(required_permissions: list[Permission]):
     return permission_dependency
 
 from uuid import UUID
+
 from src.modules.employee.models import Employee
+
 
 def verify_employee_ownership(
     target_employee_id: UUID,

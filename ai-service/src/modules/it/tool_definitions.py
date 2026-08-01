@@ -13,11 +13,10 @@ from typing import Any, get_type_hints
 from google.genai import types
 from pydantic import TypeAdapter
 
-from core.logger import get_logger
-from modules.it.registry import tool_registry
-
 # Import all tool modules so their registration code executes.
 import modules.it.tools  # noqa: F401
+from core.logger import get_logger
+from modules.it.registry import tool_registry
 
 logger = get_logger(__name__)
 

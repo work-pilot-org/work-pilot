@@ -3,7 +3,6 @@ Tests for IT Agent tool registration and definitions.
 """
 
 import modules.it.tools  # noqa: F401
-
 from modules.it.registry import tool_registry
 from modules.it.tool_definitions import get_it_tool_definitions
 

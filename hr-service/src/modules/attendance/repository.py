@@ -1,5 +1,4 @@
 from datetime import date
-from typing import Optional
 from uuid import UUID
 
 from sqlalchemy import and_, func, select
@@ -29,7 +28,7 @@ class AttendanceRepository:
     def get_by_id(
         self,
         attendance_id: int,
-    ) -> Optional[Attendance]:
+    ) -> Attendance | None:
         return self.db.get(Attendance, attendance_id)
 
     # =====================================================
@@ -105,7 +104,7 @@ class AttendanceRepository:
         self,
         employee_id: UUID,
         attendance_date: date,
-    ) -> Optional[Attendance]:
+    ) -> Attendance | None:
 
         stmt = (
             select(Attendance)
