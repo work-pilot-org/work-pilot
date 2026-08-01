@@ -3,13 +3,13 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
-from src.core.dependencies import (
+from shared_infrastructure.core.dependencies import (
     get_current_user_and_set_schema,
     require_permissions,
     verify_employee_ownership,
 )
-from src.core.rbac import Permission
-from src.infrastructure.database.session import get_db
+from shared_infrastructure.core.rbac import Permission
+from shared_infrastructure.database.session import get_db
 from src.modules.employee.schemas import (
     EmployeeCreate,
     EmployeeDocumentCreate,
@@ -20,7 +20,7 @@ from src.modules.employee.schemas import (
     EmployeeUpdate,
 )
 from src.modules.employee.service import EmployeeService
-from src.core.security import get_current_user
+from shared_infrastructure.core.security import get_current_user
 
 router = APIRouter(
     prefix="/employees",

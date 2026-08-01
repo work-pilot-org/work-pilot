@@ -1,8 +1,8 @@
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
-from src.infrastructure.database.session import SessionLocal
+from shared_infrastructure.database.session import SessionLocal
 from src.modules.tenant.repository import TenantRepository
-from src.infrastructure.database.tenant_session import set_tenant_schema, set_public_schema
+from shared_infrastructure.database.tenant_session import set_tenant_schema, set_public_schema
 
 class TenantMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):

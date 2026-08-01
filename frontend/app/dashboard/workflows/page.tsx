@@ -70,7 +70,7 @@ export default function WorkflowsPage() {
                   {workflow.id}
                 </TableCell>
                 <TableCell>{workflow.name}</TableCell>
-                <TableCell>{workflow.status}</TableCell>
+                <TableCell>{workflow.is_active ? 'Active' : 'Inactive'}</TableCell>
                 <TableCell>{new Date(workflow.created_at).toLocaleDateString()}</TableCell>
               </TableRow>
             ))}

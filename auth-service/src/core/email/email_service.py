@@ -4,7 +4,7 @@ from jinja2 import Environment, FileSystemLoader
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 
-from src.core.config import settings
+from shared_infrastructure.core.config import settings
 
 
 class EmailService:

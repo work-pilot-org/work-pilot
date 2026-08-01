@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from it_service.core.config import settings
+from shared_infrastructure.core.config import settings
 from it_service.modules.access.router import router as access_router
 from it_service.modules.assets.router import router as assets_router
 from it_service.modules.devices.router import router as devices_router

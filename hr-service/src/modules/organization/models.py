@@ -10,7 +10,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
-from src.infrastructure.database.base import TenantBase
+from shared_infrastructure.database.base import TenantBase
 
 
 class Department(TenantBase):

@@ -1,12 +1,12 @@
-from src.core.rbac import Permission
-from src.core.dependencies import require_permissions
+from shared_infrastructure.core.rbac import Permission
+from shared_infrastructure.core.dependencies import require_permissions
 from typing import List
 
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
-from src.infrastructure.database.session import get_db
-from src.core.dependencies import get_current_user, security
+from shared_infrastructure.database.session import get_db
+from shared_infrastructure.core.dependencies import get_current_user, security
 from fastapi.security import HTTPAuthorizationCredentials
 
 from .schemas import (

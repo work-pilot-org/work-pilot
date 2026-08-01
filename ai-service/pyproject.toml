@@ -9,36 +9,28 @@ dependencies = [
     # FastAPI
     "fastapi>=0.116.1",
     "uvicorn[standard]>=0.35.0",
-
     # Database
     "sqlalchemy>=2.0.41",
     "alembic>=1.16.4",
     "psycopg[binary]>=3.2.9",
-
     # Validation & Settings
     "pydantic>=2.11.7",
     "pydantic-settings>=2.10.1",
-
     # Environment Variables
     "python-dotenv>=1.1.1",
-
     # Forms & File Uploads
     "python-multipart>=0.0.20",
-
     # HTTP Client (Microservice Communication)
     "httpx>=0.28.1",
-
     # Redis
     "redis>=6.2.0",
-
     # Logging
     "structlog>=25.4.0",
-
     # JWT
     "python-jose[cryptography]>=3.3.0",
-
     # Google Gemini SDK
     "google-genai>=1.30.0",
+    "shared-infrastructure",
 ]
 
 [dependency-groups]
@@ -78,3 +70,6 @@ testpaths = ["tests"]
 pythonpath = ["src"]
 [tool.hatch.build.targets.wheel]
 packages = ["src"]
+
+[tool.uv.sources]
+shared-infrastructure = { workspace = true }

@@ -36,3 +36,31 @@ export interface AssetResponse {
   type: string;
   status: string;
 }
+
+export type AccessRequestType = "VPN" | "APPLICATION" | "DATABASE";
+
+export type AccessRequestStatus = "PENDING" | "APPROVED" | "REJECTED" | "REVOKED";
+
+export interface AccessRequestResponse {
+  id: string;
+  request_type: AccessRequestType;
+  target_resource: string;
+  requested_by: string;
+  status: AccessRequestStatus;
+  approved_by?: string;
+  reason?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateAccessRequest {
+  request_type: AccessRequestType;
+  target_resource: string;
+  requested_by: string;
+  reason?: string;
+}
+
+export interface UpdateAccessRequest {
+  target_resource?: string;
+  reason?: string;
+}

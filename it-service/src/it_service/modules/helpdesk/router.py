@@ -1,17 +1,17 @@
 import uuid
 from typing import Annotated
 
-from it_service.core.security import get_current_user
+from shared_infrastructure.core.security import get_current_user
 from fastapi import APIRouter, Depends, Query, Request, status
 from sqlalchemy.orm import Session
 
-from it_service.core.dependencies import (
+from shared_infrastructure.core.dependencies import (
     get_current_user_and_set_schema,
     require_permissions,
     verify_ticket_ownership,
 )
-from it_service.core.rbac import Permission
-from it_service.infrastructure.database.session import get_db
+from shared_infrastructure.core.rbac import Permission
+from shared_infrastructure.database.session import get_db
 from it_service.modules.helpdesk.activity_repository import (
     TicketActivityRepository,
 )

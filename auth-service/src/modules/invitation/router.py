@@ -3,9 +3,9 @@ from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
 from typing import List
 
-from src.infrastructure.database.session import get_db
-from src.core.dependencies import require_permissions
-from src.core.rbac import Permission
+from shared_infrastructure.database.session import get_db
+from shared_infrastructure.core.dependencies import require_permissions
+from shared_infrastructure.core.rbac import Permission
 from src.modules.invitation.schemas import (
     InvitationCreateRequest,
     InvitationResponse,
@@ -18,7 +18,7 @@ from src.modules.invitation.repository import InvitationRepository
 from src.modules.invitation.models import InvitationStatus
 
 from jose import jwt, JWTError
-from src.core.config import settings
+from shared_infrastructure.core.config import settings
 
 router = APIRouter(
     prefix="/invitations",

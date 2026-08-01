@@ -12,7 +12,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.infrastructure.database.base import TenantBase
+from shared_infrastructure.database.base import TenantBase
 
 
 class Role(str, Enum):

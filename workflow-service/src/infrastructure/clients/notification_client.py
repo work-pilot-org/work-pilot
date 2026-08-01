@@ -1,6 +1,6 @@
 from typing import Any
 
-from src.core.config import settings
+from shared_infrastructure.core.config import settings
 from src.infrastructure.clients.base_client import BaseClient
 
 

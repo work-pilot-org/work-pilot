@@ -1,4 +1,4 @@
-from src.core.exceptions import (
+from shared_infrastructure.core.exceptions import (
     BadRequestException,
     ForbiddenException,
     NotFoundException,

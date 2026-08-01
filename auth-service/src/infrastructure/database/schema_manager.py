@@ -1,7 +1,7 @@
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from src.infrastructure.database.base import TenantBase
+from shared_infrastructure.database.base import TenantBase
 
 class SchemaManager:
 

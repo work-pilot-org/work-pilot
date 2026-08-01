@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import JWTError, jwt
 
-from core.config import settings
+from shared_infrastructure.core.config import settings
 
 security = HTTPBearer()
 
@@ -10,8 +10,8 @@ def verify_access_token(token: str):
     try:
         payload = jwt.decode(
             token,
-            settings.secret_key,
-            algorithms=[settings.algorithm],
+            settings.SECRET_KEY,
+            algorithms=[settings.ALGORITHM],
         )
         return payload
     except JWTError:

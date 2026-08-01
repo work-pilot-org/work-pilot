@@ -14,7 +14,7 @@ from sqlalchemy import (
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from it_service.infrastructure.database.base import TenantBase
+from shared_infrastructure.database.base import TenantBase
 from it_service.modules.helpdesk.enums import (
     TicketCategory,
     TicketPriority,

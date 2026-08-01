@@ -2,8 +2,8 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from src.core.config import settings
-from src.core.exceptions import WorkPilotException
+from shared_infrastructure.core.config import settings
+from shared_infrastructure.core.exceptions import WorkPilotException
 from src.modules.attendance.router import router as attendance_router
 from src.modules.employee.router import router as employee_router
 from src.modules.leave.router import (

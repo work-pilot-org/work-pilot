@@ -34,10 +34,13 @@ export interface AttendanceResponse {
   updated_at: string;
 }
 
+export type LeaveStatus = "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
+export type LeaveType = "CASUAL" | "SICK" | "EARNED" | "MATERNITY" | "PATERNITY" | "COMP_OFF" | "UNPAID" | "OTHER";
+
 export interface LeaveRequestResponse {
   id: string;
   employee_id: string;
-  leave_type: string;
+  leave_type: LeaveType;
   start_date: string;
   end_date: string;
   total_days: number;
@@ -45,7 +48,7 @@ export interface LeaveRequestResponse {
   is_half_day: boolean;
   attachment_url?: string;
   emergency_contact?: string;
-  status: string;
+  status: LeaveStatus;
   workflow_instance_id?: string;
   created_at: string;
   updated_at: string;

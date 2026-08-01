@@ -2,7 +2,7 @@ import re
 
 from sqlalchemy.orm import Session
 
-from src.core.exceptions import (
+from shared_infrastructure.core.exceptions import (
     CompanyAlreadyExistsException,
     DomainAlreadyExistsException,
     EmailAlreadyExistsException,
@@ -24,7 +24,7 @@ from src.modules.employee.repository import EmployeeRepository
 from src.modules.tenant.repository import TenantRepository
 from src.modules.user.repository import UserRepository
 
-from src.core.security import (
+from shared_infrastructure.core.security import (
     hash_password,
     verify_password,
     create_access_token,
@@ -43,7 +43,7 @@ from src.modules.user.models import (
 )
 
 from src.infrastructure.database.schema_manager import SchemaManager
-from src.infrastructure.database.tenant_session import (
+from shared_infrastructure.database.tenant_session import (
     set_tenant_schema,
     set_public_schema,
 )
@@ -55,7 +55,7 @@ from src.modules.employee.models import (
 
 from src.modules.password_reset.service import PasswordResetService
 
-from src.core.rbac import Role as RBACRole
+from shared_infrastructure.core.rbac import Role as RBACRole
 from src.modules.rbac.models import Role as DBRole, UserRole
 
 
@@ -419,7 +419,7 @@ class AuthService:
         primary_domain = next((d.domain for d in tenant.domains if d.is_primary), tenant.domains[0].domain if tenant.domains else "localhost")
         
         # 5.5 Extract User Roles
-        from src.infrastructure.database.tenant_session import set_tenant_schema
+        from shared_infrastructure.database.tenant_session import set_tenant_schema
         set_tenant_schema(db, tenant.schema_name)
         user_roles_db = db.query(UserRole).filter(UserRole.user_id == user.id).all()
         roles_list = [r.role.name for r in user_roles_db] if user_roles_db else []
@@ -440,7 +440,7 @@ class AuthService:
             return PreAuthResponse(preauth_token=preauth_token), None
         
         access_token = create_access_token(token_data)
-        from src.core.security import create_refresh_token, create_sso_token
+        from shared_infrastructure.core.security import create_refresh_token, create_sso_token
         refresh_token = create_refresh_token(token_data)
         sso_token = create_sso_token(token_data)
         
@@ -463,8 +463,8 @@ class AuthService:
         sso_token: str,
     ) -> str:
         from jose import jwt, JWTError
-        from src.core.config import settings
-        from src.core.security import create_refresh_token
+        from shared_infrastructure.core.config import settings
+        from shared_infrastructure.core.security import create_refresh_token
         
         try:
             payload = jwt.decode(
@@ -487,7 +487,7 @@ class AuthService:
             tenant = self.tenant_repository.get_tenant_by_id(db, profile.tenant_id)
             primary_domain = next((d.domain for d in tenant.domains if d.is_primary), tenant.domains[0].domain if tenant.domains else "localhost")
             
-            from src.infrastructure.database.tenant_session import set_tenant_schema
+            from shared_infrastructure.database.tenant_session import set_tenant_schema
             set_tenant_schema(db, tenant.schema_name)
             user_roles_db = db.query(UserRole).filter(UserRole.user_id == user.id).all()
             roles_list = [r.role.name for r in user_roles_db] if user_roles_db else []
@@ -512,7 +512,7 @@ class AuthService:
         refresh_token: str,
     ) -> LoginResponse:
         from jose import jwt, JWTError
-        from src.core.config import settings
+        from shared_infrastructure.core.config import settings
         
         try:
             payload = jwt.decode(
@@ -536,7 +536,7 @@ class AuthService:
             
             primary_domain = next((d.domain for d in tenant.domains if d.is_primary), tenant.domains[0].domain if tenant.domains else "localhost")
             
-            from src.infrastructure.database.tenant_session import set_tenant_schema
+            from shared_infrastructure.database.tenant_session import set_tenant_schema
             set_tenant_schema(db, tenant.schema_name)
             user_roles_db = db.query(UserRole).filter(UserRole.user_id == user.id).all()
             roles_list = [r.role.name for r in user_roles_db] if user_roles_db else []
@@ -551,7 +551,7 @@ class AuthService:
             }
             
             new_access_token = create_access_token(token_data)
-            from src.core.security import create_sso_token
+            from shared_infrastructure.core.security import create_sso_token
             sso_token = create_sso_token(token_data)
             
             return LoginResponse(
@@ -653,7 +653,7 @@ class AuthService:
     def login_mfa(self, db: Session, request: MFALoginRequest) -> tuple[LoginResponse, str]:
         import pyotp
         from datetime import datetime, timezone
-        from src.core.security import create_sso_token, create_refresh_token
+        from shared_infrastructure.core.security import create_sso_token, create_refresh_token
         
         try:
             payload = verify_preauth_token(request.preauth_token)
@@ -679,7 +679,7 @@ class AuthService:
         db.add(user)
         db.commit()
         
-        from src.infrastructure.database.tenant_session import set_tenant_schema
+        from shared_infrastructure.database.tenant_session import set_tenant_schema
         set_tenant_schema(db, payload.get("schema_name"))
         user_roles_db = db.query(UserRole).filter(UserRole.user_id == user.id).all()
         roles_list = [r.role.name for r in user_roles_db] if user_roles_db else []

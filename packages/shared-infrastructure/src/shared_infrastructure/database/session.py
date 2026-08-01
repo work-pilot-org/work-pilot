@@ -1,8 +1,7 @@
-from fastapi import Request
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from src.core.config import settings
+from shared_infrastructure.core.config import settings
 
 engine = create_engine(
     settings.DATABASE_URL,
@@ -15,7 +14,11 @@ SessionLocal = sessionmaker(
     bind=engine
 )
 
-def get_db(request: Request = None):  # type: ignore[assignment]
+
+from fastapi import Request
+
+
+def get_db(request: Request = None):
     # If middleware already created the session, use it
     if request and hasattr(request.state, "db"):
         yield request.state.db

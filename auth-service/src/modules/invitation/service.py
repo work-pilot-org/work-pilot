@@ -5,8 +5,8 @@ from uuid import UUID
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from src.core.email.email_service import EmailService
-from src.core.security import hash_password
-from src.infrastructure.database.tenant_session import set_tenant_schema, set_public_schema
+from shared_infrastructure.core.security import hash_password
+from shared_infrastructure.database.tenant_session import set_tenant_schema, set_public_schema
 
 from src.modules.invitation.models import Invitation, InvitationStatus, default_expiry
 from src.modules.invitation.repository import InvitationRepository

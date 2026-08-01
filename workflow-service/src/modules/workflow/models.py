@@ -4,7 +4,7 @@ from uuid import uuid4
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.infrastructure.database.base import TenantBase
+from shared_infrastructure.database.base import TenantBase
 
 
 class Workflow(TenantBase):

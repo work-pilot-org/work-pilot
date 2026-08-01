@@ -3,7 +3,7 @@ from uuid import UUID
 
 import httpx
 
-from src.core.config import settings
+from shared_infrastructure.core.config import settings
 
 
 class WorkflowClient:
