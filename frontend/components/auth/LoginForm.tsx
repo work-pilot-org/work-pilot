@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -27,7 +27,13 @@ export const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [preAuthToken, setPreAuthToken] = useState<string | null>(null);
   const router = useRouter();
-  const { isLoading, error } = useAuthStore();
+  const { isLoading, error, isAuthenticated, isInitialized } = useAuthStore();
+
+  useEffect(() => {
+    if (isInitialized && isAuthenticated) {
+      router.replace("/dashboard");
+    }
+  }, [isInitialized, isAuthenticated, router]);
 
   const {
     register,

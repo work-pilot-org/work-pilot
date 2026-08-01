@@ -37,13 +37,8 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(`${proto}://${baseDomain}${url.pathname}${url.search}`);
   }
 
-  // Check if the user is logged in (has the refresh token cookie)
-  const hasToken = request.cookies.has("refresh_token");
-
-  // If user is already logged in and tries to access login/register on the main domain, redirect them to home
-  if (hasToken && isAuthPage) {
-    return NextResponse.redirect(new URL('/', request.url));
-  }
+  // We no longer blindly redirect away from login based on cookie presence.
+  // The frontend AuthProvider and page-level logic will verify the token.
 
   // If it's a specific subdomain (not the main domain), you can rewrite the URL 
   // to a specific Next.js app directory like /app/tenant/[domain]/...

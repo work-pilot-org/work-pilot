@@ -16,6 +16,7 @@ from src.modules.employee.schemas import (
 )
 
 from src.modules.employee.service import EmployeeService
+from src.core.security import get_current_user
 
 from src.core.rbac import Permission
 from src.core.dependencies import require_permissions, get_current_user_and_set_schema, verify_employee_ownership
@@ -24,8 +25,8 @@ router = APIRouter(
     prefix="/employees",
     tags=["Employees"],
     dependencies=[Depends(get_current_user_and_set_schema)],
+    dependencies=[Depends(get_current_user)],
 )
-
 
 # =====================================================
 # Employee
