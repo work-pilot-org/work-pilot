@@ -20,6 +20,11 @@ origins = [
     "http://localhost:3000",
 ]
 
+# Include Middleware
+from src.infrastructure.middleware.tenant_middleware import TenantMiddleware
+
+app.add_middleware(TenantMiddleware)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -28,11 +33,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Include Middleware
-from src.infrastructure.middleware.tenant_middleware import TenantMiddleware
-
-app.add_middleware(TenantMiddleware)
 
 # Include Routers
 app.include_router(auth_router)
