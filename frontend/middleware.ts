@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const url = request.nextUrl;
   
   // Get hostname of request (e.g. apple.localhost:3000 -> apple.localhost:3000)
@@ -37,14 +37,22 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(`${proto}://${baseDomain}${url.pathname}${url.search}`);
   }
 
-  // We no longer blindly redirect away from login based on cookie presence.
-  // The frontend AuthProvider and page-level logic will verify the token.
+  const hasRefreshToken = request.cookies.has("refresh_token");
+  const isProtectedRoute = url.pathname.startsWith('/dashboard') || url.pathname.startsWith('/mfa');
 
-  // If it's a specific subdomain (not the main domain), you can rewrite the URL 
-  // to a specific Next.js app directory like /app/tenant/[domain]/...
-  // if (subdomain && subdomain !== "www") {
-  //   return NextResponse.rewrite(new URL(`/tenant/${subdomain}${url.pathname}`, request.url));
-  // }
+  if (isProtectedRoute && !hasRefreshToken) {
+    const proto = request.headers.get("x-forwarded-proto") || (host.includes("localhost") ? "http" : "https");
+    return NextResponse.redirect(`${proto}://${baseDomain}/login`);
+  }
+
+  // If visiting the root on a tenant subdomain without auth, redirect to login
+  if (subdomain && subdomain !== "www" && url.pathname === "/" && !hasRefreshToken) {
+    const proto = request.headers.get("x-forwarded-proto") || (host.includes("localhost") ? "http" : "https");
+    return NextResponse.redirect(`${proto}://${baseDomain}/login`);
+  }
+
+  // Rewrite logic was removed because Next.js app router handles routes globally 
+  // and we use page-level logic (and useAuthStore) for tenant context.
 
   return NextResponse.next();
 }

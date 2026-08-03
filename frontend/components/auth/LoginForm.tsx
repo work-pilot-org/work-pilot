@@ -50,7 +50,7 @@ export const LoginForm = () => {
       if (preAuthToken) {
         if (!data.totpCode) return;
         const result = await executeMfaLogin({ preauth_token: preAuthToken, code: data.totpCode });
-        handleLoginSuccess(result);
+        handleLoginSuccess({ ...result, requires_mfa: false });
       } else {
         if (!data.email || !data.password) return;
         const result = await executeLogin({ email: data.email, password: data.password });
@@ -69,7 +69,7 @@ export const LoginForm = () => {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleLoginSuccess = (result: any) => {
-    if (result.user.domain) {
+    if (result.user?.domain) {
       let url = getTenantDomainUrl(result.user.domain, "/dashboard");
       if (result.ssoToken) {
         url += `?sso_token=${result.ssoToken}`;

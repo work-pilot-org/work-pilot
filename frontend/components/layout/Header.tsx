@@ -17,7 +17,8 @@ export default function Header() {
     try {
       setIsLoggingOut(true);
       await logout();
-      router.push("/login");
+      const { getBaseDomainUrl } = await import("@/lib/auth");
+      window.location.href = getBaseDomainUrl("/login?logout=true");
     } catch (error) {
       console.error("Logout failed", error);
       setIsLoggingOut(false);

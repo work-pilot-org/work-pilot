@@ -1,5 +1,5 @@
 import { itApi } from "@/lib/axios";
-import { TicketResponse, CreateTicketRequest, UpdateTicketRequest } from "@/types/it";
+import { TicketResponse, CreateTicketRequest } from "@/types/it";
 import axios from "axios";
 import { ApiError } from "@/types/auth";
 

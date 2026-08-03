@@ -34,8 +34,8 @@ export function InviteEmployeeModal({ isOpen, onClose, onSuccess }: InviteEmploy
       setRole("EMPLOYEE");
       onSuccess();
       onClose();
-    } catch (error: any) {
-      toast.error(error.message || "Failed to send invitation");
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message :  "Failed to send invitation");
     } finally {
       setIsSubmitting(false);
     }
