@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock
 
-from src.infrastructure.database.base import TenantBase
+from shared_infrastructure.database.base import TenantBase
 from src.infrastructure.database.schema_manager import SchemaManager
 
 
@@ -36,7 +36,7 @@ class TestCreateTenantTables:
         fake_connection = MagicMock()
         db.connection.return_value = fake_connection
 
-        SchemaManager.create_tenant_tables(db)
+        SchemaManager.create_tenant_tables(db, "tenant_test")
 
         db.connection.assert_called_once_with()
 
@@ -50,6 +50,6 @@ class TestCreateTenantTables:
         mock_create_all = MagicMock()
         monkeypatch.setattr(TenantBase.metadata, "create_all", mock_create_all)
 
-        SchemaManager.create_tenant_tables(db)
+        SchemaManager.create_tenant_tables(db, "tenant_test")
 
         mock_create_all.assert_called_once_with(bind=fake_connection)

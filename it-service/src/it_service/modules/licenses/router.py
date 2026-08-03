@@ -17,10 +17,13 @@ from it_service.modules.licenses.schemas import (
 )
 from it_service.modules.licenses.service import LicenseService
 
-router = APIRouter(dependencies=[Depends(require_permissions([Permission.IT_MANAGE]))], 
+router = APIRouter(
     prefix="/licenses",
     tags=["Licenses"],
-    dependencies=[Depends(get_current_user)],
+    dependencies=[
+        Depends(get_current_user),
+        Depends(require_permissions([Permission.ASSETS_MANAGE]))
+    ],
 )
 
 

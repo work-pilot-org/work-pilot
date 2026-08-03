@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from src.infrastructure.database.tenant_session import (
+from shared_infrastructure.database.tenant_session import (
     set_public_schema,
     set_tenant_schema,
 )

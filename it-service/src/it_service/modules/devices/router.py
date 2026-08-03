@@ -22,10 +22,13 @@ from it_service.modules.devices.schemas import (
 )
 from it_service.modules.devices.service import DeviceService
 
-router = APIRouter(dependencies=[Depends(require_permissions([Permission.DEVICES_MANAGE]))], 
+router = APIRouter(
     prefix="/devices",
     tags=["Devices"],
-    dependencies=[Depends(get_current_user)],
+    dependencies=[
+        Depends(get_current_user),
+        Depends(require_permissions([Permission.ASSETS_MANAGE]))
+    ],
 )
 
 

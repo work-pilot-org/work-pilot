@@ -13,13 +13,13 @@ WORKDIR /app
 # ---------------------------------------
 FROM base AS builder
 
-# Install uv
 RUN pip install --no-cache-dir uv
 
-# Copy dependency files
-COPY pyproject.toml uv.lock* README.md* ./
+COPY pyproject.toml uv.lock* ./
+COPY packages/shared-infrastructure /app/packages/shared-infrastructure
+COPY it-service/pyproject.toml it-service/README.md* /app/it-service/
 
-# Create a virtual environment and sync production dependencies
+WORKDIR /app/it-service
 RUN uv sync --frozen --no-dev
 
 # ---------------------------------------
@@ -28,14 +28,16 @@ RUN uv sync --frozen --no-dev
 FROM base AS dev
 
 RUN pip install --no-cache-dir uv
-COPY pyproject.toml uv.lock* README.md* ./
+COPY pyproject.toml uv.lock* /app/
+COPY packages/shared-infrastructure /app/packages/shared-infrastructure
+COPY it-service/pyproject.toml it-service/README.md* /app/it-service/
+
+WORKDIR /app/it-service
 RUN uv sync --frozen
 
-# Copy application source code
-COPY . .
+COPY it-service /app/it-service
 
-
-
+ENV PYTHONPATH=/app/it-service/src
 EXPOSE 8000
 CMD ["uv", "run", "uvicorn", "src.it_service.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
@@ -44,15 +46,14 @@ CMD ["uv", "run", "uvicorn", "src.it_service.main:app", "--host", "0.0.0.0", "--
 # ---------------------------------------
 FROM base AS prod
 
-# Copy the virtual environment from the builder stage
-COPY --from=builder /app/.venv /app/.venv
+COPY --from=builder /app/it-service/.venv /app/it-service/.venv
+COPY packages/shared-infrastructure /app/packages/shared-infrastructure
+COPY it-service /app/it-service
 
-# Copy the application source code
-COPY . .
+WORKDIR /app/it-service
 
-# Ensure the virtual environment is used
-ENV PATH="/app/.venv/bin:$PATH"
-
+ENV PATH="/app/it-service/.venv/bin:$PATH"
+ENV PYTHONPATH=/app/it-service/src
 
 EXPOSE 8000
 CMD ["uvicorn", "src.it_service.main:app", "--host", "0.0.0.0", "--port", "8000"]

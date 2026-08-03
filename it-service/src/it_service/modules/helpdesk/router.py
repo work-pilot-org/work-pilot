@@ -46,10 +46,13 @@ from it_service.modules.helpdesk.service import (
     TicketService,
 )
 
-router = APIRouter(dependencies=[Depends(get_current_user_and_set_schema)], 
+router = APIRouter(
     prefix="/tickets",
     tags=["Help Desk"],
-    dependencies=[Depends(get_current_user)],
+    dependencies=[
+        Depends(get_current_user),
+        Depends(get_current_user_and_set_schema)
+    ],
 )
 
 # ==========================================================

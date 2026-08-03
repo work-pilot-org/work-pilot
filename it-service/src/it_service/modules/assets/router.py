@@ -17,10 +17,13 @@ from it_service.modules.assets.schemas import (
 )
 from it_service.modules.assets.service import AssetService
 
-router = APIRouter(dependencies=[Depends(require_permissions([Permission.ASSETS_MANAGE]))], 
+router = APIRouter(
     prefix="/assets",
     tags=["Assets"],
-    dependencies=[Depends(get_current_user)],
+    dependencies=[
+        Depends(get_current_user),
+        Depends(require_permissions([Permission.ASSETS_MANAGE]))
+    ],
 )
 
 

@@ -9,6 +9,7 @@ and Tool Executor, strictly avoiding any business logic execution itself.
 
 from typing import Any
 
+from shared_infrastructure.core.config import settings
 from core.logger import get_logger
 from modules.coordinator.intent_detector import intent_detector
 from modules.coordinator.planner import orchestration_planner

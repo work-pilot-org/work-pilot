@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from google import genai
 
-from core.config import settings
+from shared_infrastructure.core.config import settings
 
 
 class GeminiClient:

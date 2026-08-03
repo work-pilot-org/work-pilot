@@ -9,7 +9,7 @@ from __future__ import annotations
 from typing import Any
 from uuid import UUID
 
-from core.config import settings
+from shared_infrastructure.core.config import settings
 from infrastructure.integrations.base_client import BaseClient
 from modules.it.schemas import (
     AccessRequestStatusUpdate,

@@ -24,10 +24,13 @@ from it_service.modules.software.schemas import (
 )
 from it_service.modules.software.service import SoftwareService
 
-router = APIRouter(dependencies=[Depends(require_permissions([Permission.IT_MANAGE]))], 
+router = APIRouter(
     prefix="/software",
     tags=["Software"],
-    dependencies=[Depends(get_current_user)],
+    dependencies=[
+        Depends(get_current_user),
+        Depends(require_permissions([Permission.ASSETS_MANAGE]))
+    ],
 )
 
 

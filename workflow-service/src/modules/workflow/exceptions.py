@@ -1,28 +1,28 @@
 from shared_infrastructure.core.exceptions import (
     BadRequestException,
     ForbiddenException,
-    NotFoundException,
+    ResourceNotFoundException,
 )
 
 
-class WorkflowNotFoundException(NotFoundException):
+class WorkflowNotFoundException(ResourceNotFoundException):
     def __init__(self):
-        super().__init__(detail="Workflow template not found")
+        super().__init__(message="Workflow template not found")
 
 
-class WorkflowStepNotFoundException(NotFoundException):
+class WorkflowStepNotFoundException(ResourceNotFoundException):
     def __init__(self):
-        super().__init__(detail="Workflow step not found")
+        super().__init__(message="Workflow step not found")
 
 
-class WorkflowExecutionNotFoundException(NotFoundException):
+class WorkflowExecutionNotFoundException(ResourceNotFoundException):
     def __init__(self):
-        super().__init__(detail="Workflow execution not found")
+        super().__init__(message="Workflow execution not found")
 
 
-class TaskNotFoundException(NotFoundException):
+class TaskNotFoundException(ResourceNotFoundException):
     def __init__(self):
-        super().__init__(detail="Approval task not found")
+        super().__init__(message="Approval task not found")
 
 
 class InvalidWorkflowStateException(BadRequestException):

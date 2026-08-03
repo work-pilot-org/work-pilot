@@ -932,7 +932,7 @@ class HRClient:
         )
 
 
-from core.config import settings
+from shared_infrastructure.core.config import settings
 
 hr_client = HRClient(
     base_url=settings.hr_service_url,

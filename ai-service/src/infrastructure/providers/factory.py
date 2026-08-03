@@ -7,7 +7,7 @@ provider-specific implementations to the application layer.
 
 from __future__ import annotations
 
-from core.config import settings
+from shared_infrastructure.core.config import settings
 from infrastructure.providers.base_provider import BaseLLMProvider
 from infrastructure.providers.gemini_provider import GeminiProvider
 

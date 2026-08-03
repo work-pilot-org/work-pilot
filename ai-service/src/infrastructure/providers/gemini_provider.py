@@ -12,7 +12,7 @@ from typing import Any
 from google import genai
 from google.genai import errors, types
 
-from core.config import settings
+from shared_infrastructure.core.config import settings
 from core.logger import get_logger
 from infrastructure.providers.base_provider import BaseLLMProvider
 

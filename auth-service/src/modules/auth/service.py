@@ -315,6 +315,7 @@ class AuthService:
 
             SchemaManager.create_tenant_tables(
                 db,
+                schema_name,
             )
 
             # ------------------------------------------

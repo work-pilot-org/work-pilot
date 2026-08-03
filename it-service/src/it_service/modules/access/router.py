@@ -17,10 +17,10 @@ from it_service.modules.access.schemas import (
 )
 from it_service.modules.access.service import AccessService
 
-router = APIRouter(dependencies=[Depends(require_permissions([Permission.IT_MANAGE]))], 
+router = APIRouter(
     prefix="/access",
     tags=["Access"],
-    dependencies=[Depends(get_current_user)],
+    dependencies=[Depends(require_permissions([Permission.IT_MANAGE])), Depends(get_current_user)],
 )
 
 

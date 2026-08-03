@@ -26,7 +26,6 @@ router = APIRouter(
     prefix="/employees",
     tags=["Employees"],
     dependencies=[Depends(get_current_user_and_set_schema)],
-    dependencies=[Depends(get_current_user)],
 )
 
 # =====================================================
