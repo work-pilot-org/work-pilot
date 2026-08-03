@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from src.core.config import settings
+from shared_infrastructure.core.config import settings
 from src.core.logging import logger
 from src.modules.workflow.router import router as workflow_router
 

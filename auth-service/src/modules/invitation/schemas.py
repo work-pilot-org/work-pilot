@@ -52,7 +52,7 @@ class AcceptInvitationRequest(BaseModel):
 
     @validator('password')
     def validate_complexity(cls, v):
-        from src.core.security import validate_password_complexity
+        from shared_infrastructure.core.security import validate_password_complexity
         return validate_password_complexity(v)
 
     @validator('confirm_password')

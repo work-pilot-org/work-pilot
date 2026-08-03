@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from src.core.dependencies import require_permissions
-from src.core.rbac import Permission
-from src.infrastructure.database.session import get_db
+from shared_infrastructure.core.dependencies import require_permissions
+from shared_infrastructure.core.rbac import Permission
+from shared_infrastructure.database.session import get_db
 
 from .schemas import (
     BranchCreate,

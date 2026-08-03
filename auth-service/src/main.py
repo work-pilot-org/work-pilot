@@ -1,9 +1,9 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-from src.core.config import settings
+from shared_infrastructure.core.config import settings
 from src.modules.auth.router import router as auth_router
 from fastapi.middleware.cors import CORSMiddleware
-from src.core.exceptions import WorkPilotException
+from shared_infrastructure.core.exceptions import WorkPilotException
 from src.infrastructure.middleware.tenant_middleware import TenantMiddleware
 from src.modules.invitation.router import router as invitation_router
 

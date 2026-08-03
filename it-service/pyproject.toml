@@ -9,31 +9,25 @@ dependencies = [
     # FastAPI
     "fastapi>=0.116.1",
     "uvicorn[standard]>=0.35.0",
-
     # Database
     "sqlalchemy>=2.0.41",
     "alembic>=1.16.4",
     "psycopg[binary]>=3.2.9",
-
     # Validation & Settings
     "pydantic>=2.11.7",
     "pydantic-settings>=2.10.1",
-
     # Environment Variables
     "python-dotenv>=1.1.1",
-
     # Authentication
     "python-jose[cryptography]>=3.5.0",
     "passlib[bcrypt]>=1.7.4",
-
     # Forms & File Uploads
     "python-multipart>=0.0.20",
-
     # HTTP Client (Microservice Communication)
     "httpx>=0.28.1",
-
     # Logging
     "structlog>=25.4.0",
+    "shared-infrastructure",
 ]
 
 [dependency-groups]
@@ -74,5 +68,6 @@ ignore = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
-[tool.ruff.lint]
-ignore = ['B008', 'E402', 'DTZ003', 'BLE001']
+
+[tool.uv.sources]
+shared-infrastructure = { workspace = true }

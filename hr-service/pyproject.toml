@@ -3,8 +3,8 @@ name = "hr-service"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.14"
-dependencies = []
+requires-python = ">=3.13"
+
 dependencies = [
     "alembic>=1.18.5",
     "email-validator>=2.3.0",
@@ -15,7 +15,11 @@ dependencies = [
     "uvicorn>=0.51.0",
     "httpx>=0.28.1",
     "python-jose[cryptography]>=3.3.0",
+    "shared-infrastructure",
 ]
 
 [tool.ruff.lint]
 ignore = ['B008', 'E402', 'DTZ003', 'BLE001']
+
+[tool.uv.sources]
+shared-infrastructure = { workspace = true }

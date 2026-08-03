@@ -13,7 +13,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.dialects.postgresql import UUID
 
-from src.infrastructure.database.base import TenantBase
+from shared_infrastructure.database.base import TenantBase
 
 # ==================================================================
 # Base Policy Model (Mixins can be used, but explicit models are preferred)

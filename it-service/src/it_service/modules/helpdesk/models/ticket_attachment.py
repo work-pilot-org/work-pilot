@@ -9,7 +9,7 @@ from sqlalchemy import DateTime, ForeignKey, Index, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from it_service.infrastructure.database.base import TenantBase
+from shared_infrastructure.database.base import TenantBase
 
 
 class TicketAttachment(TenantBase):

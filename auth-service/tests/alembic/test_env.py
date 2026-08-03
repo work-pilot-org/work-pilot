@@ -6,7 +6,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from src.core.config import settings
+from shared_infrastructure.core.config import settings
 
 ENV_PY_PATH = Path(__file__).resolve().parents[2] / "alembic" / "env.py"
 

@@ -9,7 +9,7 @@ import sys
 
 import structlog
 
-from core.config import settings
+from shared_infrastructure.core.config import settings
 
 
 def configure_logging() -> None:

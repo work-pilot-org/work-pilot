@@ -105,3 +105,52 @@ class InternalServerException(WorkPilotException):
             message=message,
             status_code=500,
         )
+
+
+class CompanyAlreadyExistsException(ConflictException):
+    """
+    Raised when a company already exists.
+    """
+
+    def __init__(
+        self,
+        message: str = "Company already exists.",
+    ):
+        super().__init__(
+            message=message,
+        )
+
+
+class DomainAlreadyExistsException(ConflictException):
+    def __init__(self, message: str = "Domain already exists."):
+        super().__init__(message=message)
+
+
+class EmailAlreadyExistsException(ConflictException):
+    def __init__(self, message: str = "Email already exists."):
+        super().__init__(message=message)
+
+
+class InvalidCredentialsException(UnauthorizedException):
+    def __init__(self, message: str = "Invalid credentials."):
+        super().__init__(message=message)
+
+
+class EmployeeNotFoundException(ResourceNotFoundException):
+    def __init__(self, message: str = "Employee not found."):
+        super().__init__(message=message)
+
+
+class InvalidDomainException(BadRequestException):
+    def __init__(self, message: str = "Invalid domain."):
+        super().__init__(message=message)
+
+
+class TenantNotFoundException(ResourceNotFoundException):
+    def __init__(self, message: str = "Tenant not found."):
+        super().__init__(message=message)
+
+
+class UserNotFoundException(ResourceNotFoundException):
+    def __init__(self, message: str = "User not found."):
+        super().__init__(message=message)

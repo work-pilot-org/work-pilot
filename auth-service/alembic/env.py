@@ -1,12 +1,16 @@
 from logging.config import fileConfig
+import sys
+import os
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
 
-from src.core.config import settings
-from src.infrastructure.database.base import PublicBase
+from shared_infrastructure.core.config import settings
+from shared_infrastructure.database.base import PublicBase
 
 # Import all public models so Alembic can detect them
 

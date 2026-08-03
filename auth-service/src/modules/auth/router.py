@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, Response, Request, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
-from src.core.dependencies import get_current_user_and_set_schema
+from shared_infrastructure.core.dependencies import get_current_user_and_set_schema
 from sqlalchemy.orm import Session
 
-from src.infrastructure.database.session import get_db
+from shared_infrastructure.database.session import get_db
 from src.modules.auth.schemas import (
     RegisterRequest,
     RegisterResponse,

@@ -1,7 +1,7 @@
 from sqlalchemy import Integer
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-from src.infrastructure.database.base import PublicBase, TenantBase
+from shared_infrastructure.database.base import PublicBase, TenantBase
 
 
 class TestPublicBase:

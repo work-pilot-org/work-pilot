@@ -1,6 +1,6 @@
 from fastapi import status
 
-from src.core.exceptions import WorkPilotException
+from shared_infrastructure.core.exceptions import WorkPilotException
 
 
 class EmployeeNotFoundException(WorkPilotException):

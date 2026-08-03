@@ -3,9 +3,9 @@ from datetime import datetime, timedelta
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
-from src.core.config import settings
+from shared_infrastructure.core.config import settings
 from src.core.email.email_service import EmailService
-from src.core.security import (
+from shared_infrastructure.core.security import (
     generate_reset_token,
     hash_password,
     hash_reset_token,

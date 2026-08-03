@@ -3,8 +3,8 @@ from unittest.mock import MagicMock
 import pytest
 from sqlalchemy.orm import sessionmaker
 
-from src.core.config import settings
-from src.infrastructure.database import session as session_module
+from shared_infrastructure.core.config import settings
+from shared_infrastructure.database import session as session_module
 
 
 class TestEngineConfiguration:

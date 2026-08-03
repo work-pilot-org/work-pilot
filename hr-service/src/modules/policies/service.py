@@ -2,7 +2,7 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
-from src.core.exceptions import ResourceNotFoundException
+from shared_infrastructure.core.exceptions import ResourceNotFoundException
 from src.modules.policies.repository import (
     AttendancePolicyRepository,
     HolidayPolicyRepository,

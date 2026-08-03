@@ -2,7 +2,7 @@ import sys
 import logging
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
-from src.infrastructure.database.session import SessionLocal
+from shared_infrastructure.database.session import SessionLocal
 from src.modules.invitation.models import Invitation, InvitationStatus
 
 logging.basicConfig(level=logging.INFO)

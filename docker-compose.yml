@@ -1,91 +1,82 @@
 services:
-
-
-
   auth-service:
     build:
-      context: ./auth-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: auth-service/Dockerfile
       target: dev
-
     container_name: workpilot_auth_service
-
     restart: unless-stopped
-
-
-
     env_file:
-      - ./auth-service/.env
-
+    - ./auth-service/.env
     ports:
-      - "8001:8000"
-
+    - 8001:8000
     volumes:
-      - ./auth-service:/app
-      - /app/.venv
+    - ./auth-service:/app/auth-service
+    - ./packages/shared-infrastructure:/app/packages/shared-infrastructure
+    - /app/auth-service/.venv
+    working_dir: /app/auth-service
+    command: 'sh -c "uv run alembic upgrade head && uv run uvicorn src.main:app --host
+      0.0.0.0 --port 8000 --reload"
 
-    working_dir: /app
-
-    command: >
-      sh -c "uv run alembic upgrade head && uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"
-
+      '
   hr-service:
     build:
-      context: ./hr-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: hr-service/Dockerfile
       target: dev
     container_name: workpilot_hr_service
     restart: unless-stopped
-
     env_file:
-      - ./hr-service/.env
+    - ./hr-service/.env
     ports:
-      - "8002:8000"
+    - 8002:8000
     volumes:
-      - ./hr-service:/app
-      - /app/.venv
-    working_dir: /app
-    command: >
-      sh -c "uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"
+    - ./hr-service:/app/hr-service
+    - ./packages/shared-infrastructure:/app/packages/shared-infrastructure
+    - /app/hr-service/.venv
+    working_dir: /app/hr-service
+    command: 'sh -c "uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"
 
+      '
   it-service:
     build:
-      context: ./it-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: it-service/Dockerfile
       target: dev
     container_name: workpilot_it_service
     restart: unless-stopped
-
     env_file:
-      - ./it-service/.env
+    - ./it-service/.env
     ports:
-      - "8004:8000"
+    - 8004:8000
     volumes:
-      - ./it-service:/app
-      - /app/.venv
-    working_dir: /app
-    command: >
-      sh -c "uv run uvicorn src.it_service.main:app --host 0.0.0.0 --port 8000 --reload"
+    - ./it-service:/app/it-service
+    - ./packages/shared-infrastructure:/app/packages/shared-infrastructure
+    - /app/it-service/.venv
+    working_dir: /app/it-service
+    command: 'sh -c "uv run uvicorn src.it_service.main:app --host 0.0.0.0 --port
+      8000 --reload"
 
+      '
   workflow-service:
     build:
-      context: ./workflow-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: workflow-service/Dockerfile
       target: dev
     container_name: workpilot_workflow_service
     restart: unless-stopped
-
     env_file:
-      - ./workflow-service/.env
+    - ./workflow-service/.env
     ports:
-      - "8005:8000"
+    - 8005:8000
     volumes:
-      - ./workflow-service:/app
-      - /app/.venv
-    working_dir: /app
-    command: >
-      sh -c "uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"
+    - ./workflow-service:/app/workflow-service
+    - ./packages/shared-infrastructure:/app/packages/shared-infrastructure
+    - /app/workflow-service/.venv
+    working_dir: /app/workflow-service
+    command: 'sh -c "uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"
 
+      '
   frontend:
     build:
       context: ./frontend
@@ -94,42 +85,34 @@ services:
     container_name: workpilot_frontend
     restart: unless-stopped
     depends_on:
-      - auth-service
+    - auth-service
     ports:
-      - "3000:3000"
+    - 3000:3000
     volumes:
-      - ./frontend:/app
-      - /app/node_modules
-      - /app/.next
+    - ./frontend:/app
+    - /app/node_modules
+    - /app/.next
     environment:
-      - NEXT_PUBLIC_AUTH_SERVICE_URL=http://localhost:8001
-      - WATCHPACK_POLLING=true
-      - CHOKIDAR_USEPOLLING=true
+    - NEXT_PUBLIC_AUTH_SERVICE_URL=http://localhost:8001
+    - WATCHPACK_POLLING=true
+    - CHOKIDAR_USEPOLLING=true
     command: npm run dev
   ai-service:
     build:
-      context: ./ai-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ai-service/Dockerfile
       target: dev
-
     container_name: workpilot_ai_service
-
     restart: unless-stopped
-
     env_file:
-      - ./ai-service/.env
-
+    - ./ai-service/.env
     ports:
-      - "8003:8000"
-
+    - 8003:8000
     volumes:
-      - ./ai-service:/app
-      - /app/.venv
-
-    working_dir: /app
-
+    - ./ai-service:/app/ai-service
+    - ./packages/shared-infrastructure:/app/packages/shared-infrastructure
+    - /app/ai-service/.venv
+    working_dir: /app/ai-service
     environment:
-      - PYTHONPATH=/app/src
-
-    command: >
-      sh -c "uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"
+    - PYTHONPATH=/app/ai-service/src
+    command: sh -c "uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"

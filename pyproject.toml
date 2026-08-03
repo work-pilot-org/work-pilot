@@ -1,0 +1,15 @@
+[project]
+name = "work-pilot-workspace"
+version = "0.1.0"
+description = "WorkPilot Monorepo"
+requires-python = ">=3.13"
+
+[tool.uv.workspace]
+members = [
+    "packages/shared-infrastructure",
+    "auth-service",
+    "hr-service",
+    "it-service",
+    "workflow-service",
+    "ai-service"
+]

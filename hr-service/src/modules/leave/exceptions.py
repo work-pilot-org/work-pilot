@@ -1,6 +1,6 @@
 from fastapi import status
 
-from src.core.exceptions import WorkPilotException
+from shared_infrastructure.core.exceptions import WorkPilotException
 
 
 class LeaveTypeNotFoundException(WorkPilotException):
@@ -49,4 +49,4 @@ class LeaveBalanceNotFoundException(WorkPilotException):
         super().__init__(
             message=message,
             status_code=status.HTTP_404_NOT_FOUND,
-        )
+        )

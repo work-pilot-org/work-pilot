@@ -1,7 +1,11 @@
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from src.infrastructure.database.base import TenantBase
+from shared_infrastructure.database.base import TenantBase
+
+# Import tenant models to register them with TenantBase.metadata before create_all
+from src.modules.rbac.models import Role, UserRole
+from src.modules.employee.models import Employee
 
 class SchemaManager:
 
@@ -21,6 +25,7 @@ class SchemaManager:
     @staticmethod
     def create_tenant_tables(
         db: Session,
+        schema_name: str,
     ) -> None:
         """
         Create all tenant-specific tables
@@ -28,7 +33,13 @@ class SchemaManager:
         """
 
         connection = db.connection()
-
+        
+        # Temporarily isolate search_path so SQLAlchemy doesn't see tables in public and skip them
+        connection.execute(text(f'SET search_path TO "{schema_name}"'))
+        
         TenantBase.metadata.create_all(
             bind=connection,
         )
+        
+        # Restore normal tenant search_path
+        connection.execute(text(f'SET search_path TO "{schema_name}", public'))

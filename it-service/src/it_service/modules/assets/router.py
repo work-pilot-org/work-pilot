@@ -1,12 +1,12 @@
 import uuid
 
-from it_service.core.security import get_current_user
+from shared_infrastructure.core.security import get_current_user
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
-from it_service.core.dependencies import require_permissions
-from it_service.core.rbac import Permission
-from it_service.infrastructure.database.session import get_db
+from shared_infrastructure.core.dependencies import require_permissions
+from shared_infrastructure.core.rbac import Permission
+from shared_infrastructure.database.session import get_db
 from it_service.modules.assets.enums import AssetCategory, AssetStatus
 from it_service.modules.assets.repository import AssetRepository
 from it_service.modules.assets.schemas import (
@@ -17,10 +17,13 @@ from it_service.modules.assets.schemas import (
 )
 from it_service.modules.assets.service import AssetService
 
-router = APIRouter(dependencies=[Depends(require_permissions([Permission.ASSETS_MANAGE]))], 
+router = APIRouter(
     prefix="/assets",
     tags=["Assets"],
-    dependencies=[Depends(get_current_user)],
+    dependencies=[
+        Depends(get_current_user),
+        Depends(require_permissions([Permission.ASSETS_MANAGE]))
+    ],
 )
 
 

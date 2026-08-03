@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from src.core.config import Settings
+from shared_infrastructure.core.config import Settings
 
 
 REQUIRED_ENV = {

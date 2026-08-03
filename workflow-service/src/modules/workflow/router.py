@@ -1,12 +1,13 @@
-from src.core.rbac import Permission
-from src.core.dependencies import require_permissions
+from shared_infrastructure.core.rbac import Permission
+from shared_infrastructure.core.dependencies import require_permissions
 from typing import List
 
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
-from src.infrastructure.database.session import get_db
-from src.core.dependencies import get_current_user, security
+from shared_infrastructure.database.session import get_db
+from shared_infrastructure.core.dependencies import get_current_user_and_set_schema
+from shared_infrastructure.core.security import get_current_user, security
 from fastapi.security import HTTPAuthorizationCredentials
 
 from .schemas import (
@@ -35,8 +36,8 @@ router = APIRouter(
     status_code=status.HTTP_201_CREATED,
 )
 def create_workflow(
-    _rbac=Depends(require_permissions([Permission.WORKFLOW_MANAGE])),
     data: WorkflowCreate,
+    _rbac=Depends(require_permissions([Permission.WORKFLOW_MANAGE])),
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
@@ -77,9 +78,9 @@ def get_workflow(
     response_model=WorkflowResponse,
 )
 def update_workflow(
-    _rbac=Depends(require_permissions([Permission.WORKFLOW_MANAGE])),
     workflow_id: str,
     data: WorkflowUpdate,
+    _rbac=Depends(require_permissions([Permission.WORKFLOW_MANAGE])),
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
@@ -92,8 +93,8 @@ def update_workflow(
     status_code=status.HTTP_204_NO_CONTENT,
 )
 def delete_workflow(
-    _rbac=Depends(require_permissions([Permission.WORKFLOW_MANAGE])),
     workflow_id: str,
+    _rbac=Depends(require_permissions([Permission.WORKFLOW_MANAGE])),
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
@@ -137,9 +138,9 @@ def get_workflow_execution(
     response_model=ApprovalResponse,
 )
 async def approve_task(
-    _rbac=Depends(require_permissions([Permission.WORKFLOW_APPROVE])),
     task_id: str,
     data: ApprovalDecision,
+    _rbac=Depends(require_permissions([Permission.WORKFLOW_APPROVE])),
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
     credentials: HTTPAuthorizationCredentials = Depends(security),

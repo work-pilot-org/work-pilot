@@ -1,12 +1,12 @@
 import uuid
 
-from it_service.core.security import get_current_user
+from shared_infrastructure.core.security import get_current_user
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
-from it_service.core.dependencies import require_permissions
-from it_service.core.rbac import Permission
-from it_service.infrastructure.database.session import get_db
+from shared_infrastructure.core.dependencies import require_permissions
+from shared_infrastructure.core.rbac import Permission
+from shared_infrastructure.database.session import get_db
 from it_service.modules.devices.enums import DeviceStatus
 from it_service.modules.devices.repository import (
     DeviceMaintenanceHistoryRepository,
@@ -22,10 +22,13 @@ from it_service.modules.devices.schemas import (
 )
 from it_service.modules.devices.service import DeviceService
 
-router = APIRouter(dependencies=[Depends(require_permissions([Permission.DEVICES_MANAGE]))], 
+router = APIRouter(
     prefix="/devices",
     tags=["Devices"],
-    dependencies=[Depends(get_current_user)],
+    dependencies=[
+        Depends(get_current_user),
+        Depends(require_permissions([Permission.ASSETS_MANAGE]))
+    ],
 )
 
 
