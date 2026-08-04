@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from shared_infrastructure.core.exceptions import WorkPilotException
 from src.infrastructure.middleware.tenant_middleware import TenantMiddleware
 from src.modules.invitation.router import router as invitation_router
+from src.modules.invitation.internal_router import internal_router as invitation_internal_router
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -39,6 +40,7 @@ app.add_middleware(
 
 app.include_router(auth_router)
 app.include_router(invitation_router)
+app.include_router(invitation_internal_router)
 
 
 @app.get("/")

@@ -15,9 +15,9 @@ import {
 import { api } from "@/lib/axios";
 import axios from "axios";
 
-// In a microservices architecture, you might have different URLs for different services,
-// or a single API Gateway URL. Here we assume a dedicated environment variable for the auth service.
-const AUTH_SERVICE_URL = process.env.NEXT_PUBLIC_AUTH_SERVICE_URL || "http://localhost:8000";
+// In a microservices architecture, we proxy requests through Next.js
+// so that HttpOnly cookies are correctly scoped to the tenant's subdomain.
+const AUTH_SERVICE_URL = "/api";
 
 export const authRepository = {
   async register(data: RegisterRequest): Promise<RegisterResponse> {

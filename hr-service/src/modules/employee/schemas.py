@@ -61,12 +61,15 @@ class DocumentType(str, Enum):
 # =====================================================
 
 class EmployeeCreate(BaseModel):
-    auth_user_id: UUID
+    auth_user_id: UUID | None = None
 
     employee_code: str = Field(..., min_length=1, max_length=30)
 
     first_name: str = Field(..., min_length=1, max_length=100)
     last_name: str = Field(..., min_length=1, max_length=100)
+
+    email: str = Field(..., min_length=1, max_length=255) # Needed to send the invite
+    role: str = "EMPLOYEE"
 
     phone: str | None = Field(
         default=None,
@@ -135,6 +138,7 @@ class EmployeeUpdate(BaseModel):
     profile_photo: str | None = None
 
     is_active: bool | None = None
+    invitation_status: str | None = None
 
     @model_validator(mode="after")
     def reject_explicit_nulls_for_required_fields(self):
@@ -157,7 +161,8 @@ class EmployeeUpdate(BaseModel):
 
 class EmployeeResponse(BaseModel):
     id: UUID
-    auth_user_id: UUID
+    auth_user_id: UUID | None = None
+    invitation_status: str | None = None
 
     employee_code: str
 

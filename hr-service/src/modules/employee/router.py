@@ -45,6 +45,20 @@ def create_employee(
     service = EmployeeService(db)
     return service.create_employee(employee)
 
+@router.post(
+    "/onboard",
+    response_model=EmployeeResponse,
+    status_code=201,
+    dependencies=[Depends(require_permissions([Permission.EMPLOYEE_MANAGE]))],
+)
+def onboard_employee(
+    employee: EmployeeCreate,
+    current_user: dict = Depends(get_current_user_and_set_schema),
+    db: Session = Depends(get_db),
+):
+    service = EmployeeService(db)
+    return service.onboard_employee(employee, current_user)
+
 
 @router.get(
     "",

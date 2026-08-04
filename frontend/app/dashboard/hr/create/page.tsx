@@ -24,7 +24,9 @@ export default function CreateEmployeePage() {
     joining_date: "",
     employment_type: "FULL_TIME",
     employment_status: "ACTIVE",
-    work_location: "HEAD_OFFICE"
+    work_location: "HEAD_OFFICE",
+    email: "",
+    role: "EMPLOYEE"
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -39,7 +41,7 @@ export default function CreateEmployeePage() {
     setIsSubmitting(true);
     setError(null);
     try {
-      await hrRepository.createEmployee(formData);
+      await hrRepository.onboardEmployee(formData);
       router.push("/dashboard/hr");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to create employee");
@@ -94,6 +96,27 @@ export default function CreateEmployeePage() {
             <div className="space-y-2">
               <Label htmlFor="last_name">Last Name <span className="text-red-500">*</span></Label>
               <Input required id="last_name" name="last_name" value={formData.last_name} onChange={handleChange} placeholder="Doe" />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="email">Work Email <span className="text-red-500">*</span></Label>
+              <Input required type="email" id="email" name="email" value={formData.email} onChange={handleChange} placeholder="john.doe@company.com" />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="role">Role <span className="text-red-500">*</span></Label>
+              <select 
+                id="role" 
+                name="role" 
+                value={formData.role} 
+                onChange={handleChange}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="EMPLOYEE">Employee</option>
+                <option value="MANAGER">Manager</option>
+                <option value="HR_ADMIN">HR Admin</option>
+                <option value="IT_ADMIN">IT Admin</option>
+              </select>
             </div>
 
             <div className="space-y-2">

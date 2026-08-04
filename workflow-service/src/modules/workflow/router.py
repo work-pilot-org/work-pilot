@@ -121,6 +121,19 @@ async def start_workflow_execution(
 
 
 @router.get(
+    "/workflow-executions",
+    response_model=List[WorkflowExecutionResponse],
+)
+def get_workflow_executions(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=1000),
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    service = WorkflowService(db)
+    return service.get_all_executions(skip=skip, limit=limit)
+
+@router.get(
     "/workflow-executions/{execution_id}",
     response_model=WorkflowExecutionResponse,
 )

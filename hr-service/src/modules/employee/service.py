@@ -29,11 +29,12 @@ class EmployeeService:
     # =====================================================
 
     def create_employee(self, employee_data: EmployeeCreate) -> Employee:
-        existing_employee = self.repository.get_employee_by_auth_user_id(
-            employee_data.auth_user_id
-        )
-        if existing_employee:
-            raise EmployeeAlreadyExistsException()
+        if employee_data.auth_user_id is not None:
+            existing_employee = self.repository.get_employee_by_auth_user_id(
+                employee_data.auth_user_id
+            )
+            if existing_employee:
+                raise EmployeeAlreadyExistsException()
 
         existing_code = self.repository.get_employee_by_code(
             employee_data.employee_code
@@ -69,6 +70,94 @@ class EmployeeService:
 
         employee = self.repository.create_employee(employee)
         self.db.commit()
+        return employee
+
+    def onboard_employee(self, employee_data: EmployeeCreate, current_user: dict) -> Employee:
+        if employee_data.auth_user_id is not None:
+            existing_employee = self.repository.get_employee_by_auth_user_id(
+                employee_data.auth_user_id
+            )
+            if existing_employee:
+                raise EmployeeAlreadyExistsException()
+
+        existing_code = self.repository.get_employee_by_code(
+            employee_data.employee_code
+        )
+        if existing_code:
+            raise EmployeeCodeAlreadyExistsException()
+
+        employee = Employee(
+            auth_user_id=employee_data.auth_user_id,
+            employee_code=employee_data.employee_code,
+            first_name=employee_data.first_name,
+            last_name=employee_data.last_name,
+            phone=employee_data.phone,
+            gender=employee_data.gender.value if employee_data.gender else None,
+            date_of_birth=employee_data.date_of_birth,
+            joining_date=employee_data.joining_date,
+            employment_type=(
+                employee_data.employment_type.value
+                if employee_data.employment_type
+                else None
+            ),
+            employment_status=(
+                employee_data.employment_status.value
+                if employee_data.employment_status
+                else None
+            ),
+            department_id=employee_data.department_id,
+            designation_id=employee_data.designation_id,
+            manager_id=employee_data.manager_id,
+            work_location=employee_data.work_location,
+            profile_photo=employee_data.profile_photo,
+            invitation_status="PENDING",
+        )
+
+        employee = self.repository.create_employee(employee)
+        self.db.commit()
+
+        # Generate Invitation via auth-service
+        import httpx
+        from shared_infrastructure.core.config import settings
+        from fastapi import HTTPException
+        
+        auth_url = f"{settings.AUTH_SERVICE_URL}/invitations"
+        try:
+            # We use the current user's token directly since this endpoint requires admin rights
+            # But the hr-service needs to pass the Authorization header.
+            # We can construct a system token or just use the current user's token from the request.
+            # Wait, `current_user` dict doesn't contain the raw token.
+            # Instead, we will call an internal API in auth-service.
+            pass
+        except Exception:
+            pass
+
+        # Since we don't have the raw token, let's create a new POST /internal/invitations in auth-service.
+        auth_internal_url = f"{settings.AUTH_SERVICE_URL}/internal/invitations"
+        try:
+            response = httpx.post(
+                auth_internal_url,
+                json={
+                    "email": employee_data.email,
+                    "role": employee_data.role,
+                    "employee_id": str(employee.id)
+                },
+                headers={
+                    "X-Internal-Token": settings.SECRET_KEY, 
+                    "X-Tenant-Id": str(current_user["tenant_id"]),
+                    "X-Actor-Id": str(current_user["sub"])
+                },
+                timeout=5.0
+            )
+            if response.status_code not in (200, 201):
+                self.db.delete(employee)
+                self.db.commit()
+                raise HTTPException(status_code=500, detail="Failed to create invitation in auth service.")
+        except Exception as e:
+            self.db.delete(employee)
+            self.db.commit()
+            raise HTTPException(status_code=500, detail="Failed to communicate with Auth service.")
+            
         return employee
 
     # =====================================================

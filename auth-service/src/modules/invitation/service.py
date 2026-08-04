@@ -18,15 +18,13 @@ from src.modules.invitation.schemas import (
 from src.modules.tenant.repository import TenantRepository
 from src.modules.user.repository import UserRepository
 from src.modules.user.models import User
-from src.modules.employee.repository import EmployeeRepository
-from src.modules.employee.models import Employee
+from shared_infrastructure.core.config import settings
 
 class InvitationService:
     def __init__(self):
         self.repository = InvitationRepository()
         self.tenant_repo = TenantRepository()
         self.user_repo = UserRepository()
-        self.employee_repo = EmployeeRepository()
         self.email_service = EmailService()
 
     def generate_token(self) -> str:
@@ -55,17 +53,7 @@ class InvitationService:
         if existing:
             raise HTTPException(status_code=409, detail="A pending invitation already exists for this email.")
 
-        # Check if user is already an employee
         user = self.user_repo.get_user_by_email(db, email)
-        if user:
-            # We must switch to the tenant schema to check employee
-            try:
-                set_tenant_schema(db, tenant.schema_name)
-                emp = self.employee_repo.get_employee_by_user_id(db, user.id)
-            finally:
-                set_public_schema(db)
-            if emp:
-                raise HTTPException(status_code=409, detail="User is already an employee of this company.")
 
         raw_token = self.generate_token()
         token_hash = self.hash_token(raw_token)
@@ -74,6 +62,7 @@ class InvitationService:
             tenant_id=tenant_id,
             email=email,
             role=req.role,
+            employee_id=req.employee_id,
             token_hash=token_hash,
             status=InvitationStatus.PENDING,
             created_by=actor_id,
@@ -176,40 +165,58 @@ class InvitationService:
                 )
             # Create user
             hashed_pwd = hash_password(req.password)
+            from src.modules.user.models import UserProfile
             target_user = User(
                 email=invitation.email,
-                hashed_password=hashed_pwd,
-                full_name=req.full_name,
+                password=hashed_pwd,
                 is_active=True
+            )
+            target_user.profile = UserProfile(
+                tenant_id=tenant.id,
+                full_name=req.full_name
             )
             self.user_repo.create_user(db, target_user)
             db.flush()
 
-        # 4. Employee creation in tenant schema
-        try:
-            set_tenant_schema(db, tenant.schema_name)
+        # 4. Call hr-service to link user to employee
+        if invitation.employee_id:
+            import httpx
+            hr_url = f"{settings.HR_SERVICE_URL}/internal/employees/{invitation.employee_id}/link-user"
             
-            # Check if already employee
-            if self.employee_repo.get_employee_by_user_id(db, target_user.id):
+            try:
+                # In a real system, we'd use a service-to-service token or API key.
+                # Here we just pass a simple internal header.
+                response = httpx.post(
+                    hr_url,
+                    json={
+                        "auth_user_id": str(target_user.id),
+                        "schema_name": tenant.schema_name
+                    },
+                    headers={"X-Internal-Token": settings.SECRET_KEY, "X-Tenant-Id": str(tenant.id)},
+                    timeout=5.0
+                )
+                if response.status_code != 200:
+                    db.rollback()
+                    raise HTTPException(status_code=500, detail="Failed to link user to employee record.")
+            except Exception as e:
                 db.rollback()
-                raise HTTPException(status_code=409, detail="User is already an employee of this company.")
+                raise HTTPException(status_code=500, detail="Failed to communicate with HR service.")
 
-            emp = Employee(
-                user_id=target_user.id,
-                full_name=target_user.full_name,
-                email=target_user.email,
-                role=invitation.role
-            )
-            self.employee_repo.create_employee(db, emp)
-            db.flush()
-
-        finally:
-            # 5. Invitation status update
-            set_public_schema(db)
             
         invitation.status = InvitationStatus.ACCEPTED
         invitation.accepted_by_user_id = target_user.id
         self.repository.update_invitation(db, invitation)
+
+        # 5. Assign Role
+        from src.modules.rbac.models import DBRole, UserRole
+        from shared_infrastructure.database.tenant_session import set_tenant_schema
+        set_tenant_schema(db, tenant.schema_name)
+        
+        target_role = db.query(DBRole).filter(DBRole.name == invitation.role.value).first()
+        if target_role:
+            user_role = UserRole(user_id=target_user.id, role_id=target_role.id)
+            db.add(user_role)
+            db.flush()
 
         # 6. Commit
         try:

@@ -146,6 +146,9 @@ class WorkflowService:
             raise WorkflowExecutionNotFoundException()
         return execution
         
+    def get_all_executions(self, skip: int = 0, limit: int = 100) -> list[WorkflowExecution]:
+        return self.repository.get_all_executions(skip=skip, limit=limit)
+        
     def get_history(self, execution_id: str) -> list[Approval]:
         self.get_execution(execution_id)
         return self.repository.get_approvals(execution_id)

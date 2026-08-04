@@ -58,6 +58,19 @@ export const hrRepository = {
     }
   },
 
+  async onboardEmployee(employee: Partial<EmployeeResponse>): Promise<EmployeeResponse> {
+    try {
+      const response = await hrApi.post<EmployeeResponse>("/employees/onboard", employee);
+      return response.data;
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err) && err.response?.data) {
+        const detail = (err.response.data as ApiError).detail;
+        throw new Error(typeof detail === "string" ? detail : "Failed to onboard employee.");
+      }
+      throw new Error(err instanceof Error ? err.message : "An unexpected error occurred.");
+    }
+  },
+
   async updateEmployee(id: string, employee: Partial<EmployeeResponse>): Promise<EmployeeResponse> {
     try {
       const response = await hrApi.put<EmployeeResponse>(`/employees/${id}`, employee);

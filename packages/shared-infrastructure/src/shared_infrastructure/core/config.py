@@ -28,11 +28,25 @@ class Settings(BaseSettings):
     AI_SERVICE_URL: str | None = None
     AUTH_SERVICE_URL: str | None = None
 
+    # AI Service Settings
+    gemini_api_key: str | None = None
+    gemini_model: str = "gemini-2.5-flash"
+    
+    # General fields used by some services
+    LLM_PROVIDER: str = "gemini"
+    LOG_LEVEL: str = "INFO"
+    APP_VERSION: str = "1.0.0"
 
     model_config = SettingsConfigDict(
         env_file=".env",
         extra="ignore",
     )
+
+    def __getattr__(self, name: str):
+        upper_name = name.upper()
+        if upper_name in self.model_fields:
+            return getattr(self, upper_name)
+        raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
 
 
 settings = Settings()
