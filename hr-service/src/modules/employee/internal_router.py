@@ -1,7 +1,7 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Header, Request
 from sqlalchemy.orm import Session
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, field_validator
 
 from shared_infrastructure.database.session import get_db
 from shared_infrastructure.database.tenant_session import set_tenant_schema, set_public_schema
@@ -22,6 +22,17 @@ def verify_internal_token(x_internal_token: str = Header(...)):
 class InitTenantRequest(BaseModel):
     schema_name: str
 
+    @field_validator("schema_name")
+    @classmethod
+    def validate_schema_name(cls, value: str) -> str:
+        if not value:
+            raise ValueError("schema_name cannot be empty")
+        if not (value[0].isalpha() or value[0] == "_"):
+            raise ValueError("schema_name must start with a letter or underscore")
+        if not all(ch.isalnum() or ch == "_" for ch in value):
+            raise ValueError("schema_name must contain only letters, numbers, and underscores")
+        return value
+
 @internal_router.post("/tenants/init", dependencies=[Depends(verify_internal_token)])
 def init_tenant_tables(
     req: InitTenantRequest,
@@ -36,10 +47,10 @@ def init_tenant_tables(
     import src.modules.organization.models
     
     connection = db.connection()
-    connection.execute(text(f'SET search_path TO "{req.schema_name}"'))
+    connection.execute(text("SET search_path TO :schema"), {"schema": req.schema_name})
     TenantBase.metadata.create_all(bind=connection)
     db.commit()
-    db.execute(text(f'SET search_path TO "{req.schema_name}", public'))
+    db.execute(text("SET search_path TO :schema, public"), {"schema": req.schema_name})
     return {"status": "ok"}
 
 
