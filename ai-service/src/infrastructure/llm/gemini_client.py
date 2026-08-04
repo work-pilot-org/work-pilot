@@ -16,10 +16,10 @@ class GeminiClient:
 
     def __init__(self) -> None:
         self.client = genai.Client(
-            api_key=settings.gemini_api_key,
+        api_key=settings.GEMINI_API_KEY,
         )
 
-        self.model = settings.gemini_model
+        self.model = settings.GEMINI_MODEL
 
     async def generate(
         self,

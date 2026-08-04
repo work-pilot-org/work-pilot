@@ -46,22 +46,6 @@ class CoordinatorAgent:
             message=user_message,
         )
 
-        # Ask Gemini to determine which tool should be used.
-        tool_name = await gemini_client.generate(user_message)
-
-        tool_name = tool_name.strip()
-
-        logger.info(
-            "Gemini selected tool",
-            tool_name=tool_name,
-        )
-
-        # Temporary implementation:
-        # Route everything to the IT Agent.
-        return await get_it_agent().run(
-            message=user_message,
-            headers=headers,
-        )
         logger.info("Coordinator Agent pipeline started")
         
         try:
