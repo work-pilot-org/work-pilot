@@ -86,3 +86,16 @@ def generate_reset_token() -> str:
 
 def hash_reset_token(token: str) -> str:
     return hashlib.sha256(token.encode()).hexdigest()
+
+def validate_password_complexity(password: str) -> str:
+    if len(password) < 8:
+        raise ValueError("Password must be at least 8 characters long")
+    if not any(char.isupper() for char in password):
+        raise ValueError("Password must contain at least one uppercase letter")
+    if not any(char.islower() for char in password):
+        raise ValueError("Password must contain at least one lowercase letter")
+    if not any(char.isdigit() for char in password):
+        raise ValueError("Password must contain at least one digit")
+    if not any(char in "!@#$%^&*()-_=+[]{}|;:'\",.<>/?`~" for char in password):
+        raise ValueError("Password must contain at least one special character")
+    return password

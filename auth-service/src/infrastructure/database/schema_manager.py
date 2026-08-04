@@ -5,7 +5,6 @@ from shared_infrastructure.database.base import TenantBase
 
 # Import tenant models to register them with TenantBase.metadata before create_all
 from src.modules.rbac.models import Role, UserRole
-from src.modules.employee.models import Employee
 
 class SchemaManager:
 

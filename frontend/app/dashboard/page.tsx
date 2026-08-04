@@ -1,41 +1,34 @@
+
 "use client";
-
 import { useAuthStore } from "@/store/authStore";
-import { LayoutDashboard } from "lucide-react";
-import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { EmptyState } from "@/components/common/EmptyState";
-
+import { useEffect, useState } from "react";
 export default function DashboardPage() {
   const { user } = useAuthStore();
-
+  const [isLoading, setIsLoading] = useState(true);
+  useEffect(() => { setTimeout(() => setIsLoading(false), 500) }, []);
+  
+  if (isLoading) return <div className="p-12 text-center text-gray-500 animate-pulse">Loading statistics...</div>;
+  
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      {/* Welcome Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">
-            Welcome, {user?.name?.split(' ')[0] || "Admin"}
-          </CardTitle>
-          <CardDescription className="max-w-2xl text-base mt-2">
-            Manage your organization's resources, monitor system status, and access workflows from your central dashboard.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Link href="/dashboard/hr" passHref legacyBehavior>
-            <Button variant="primary">Go to HR Module</Button>
-          </Link>
-        </CardContent>
-      </Card>
-
-      {/* KPI Cards (Empty State because no backend data exists currently) */}
-      <div className="grid grid-cols-1">
-        <EmptyState
-          title="No Metrics Available"
-          description="Dashboard statistics and KPI metrics have not been configured for your workspace yet."
-          icon={<LayoutDashboard className="h-6 w-6" />}
-        />
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold tracking-tight text-foreground">Welcome back, {user?.name || 'User'}!</h1>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+          <h3 className="text-sm font-medium text-gray-500">Pending Approvals</h3>
+          <p className="text-3xl font-semibold mt-2">0</p>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+          <h3 className="text-sm font-medium text-gray-500">Active Tickets</h3>
+          <p className="text-3xl font-semibold mt-2">0</p>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+          <h3 className="text-sm font-medium text-gray-500">Upcoming Leave</h3>
+          <p className="text-3xl font-semibold mt-2">None</p>
+        </div>
+      </div>
+      <div className="mt-8 bg-white p-6 rounded-lg shadow-sm border border-gray-100 min-h-[300px]">
+        <h3 className="text-lg font-medium mb-4">Recent Activity Feed</h3>
+        <p className="text-gray-500 text-sm italic">No recent activity to display.</p>
       </div>
     </div>
   );

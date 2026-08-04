@@ -6,6 +6,7 @@ from shared_infrastructure.core.config import settings
 from shared_infrastructure.core.exceptions import WorkPilotException
 from src.modules.attendance.router import router as attendance_router
 from src.modules.employee.router import router as employee_router
+from src.modules.employee.internal_router import internal_router
 from src.modules.leave.router import (
     employee_leave_router,
     holiday_router,
@@ -73,6 +74,7 @@ app.add_middleware(
 # =====================================================
 
 app.include_router(employee_router)
+app.include_router(internal_router)
 app.include_router(organization_router)
 app.include_router(attendance_router)
 app.include_router(leave_router)

@@ -10,6 +10,7 @@ from src.modules.invitation.models import InvitationStatus
 class InvitationCreateRequest(BaseModel):
     email: EmailStr
     role: Role = Field(default=Role.EMPLOYEE)
+    employee_id: UUID | None = None
 
     @validator('email')
     def normalize_email(cls, v: str) -> str:

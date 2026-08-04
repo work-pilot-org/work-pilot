@@ -42,8 +42,8 @@ export default function MFAPage() {
       setError(null);
       const data = await executeSetupMfa();
       setSetupData(data);
-    } catch (err: any) {
-      setError(err.message || "Failed to setup MFA");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to setup MFA");
     } finally {
       setIsLoading(false);
     }
@@ -59,8 +59,8 @@ export default function MFAPage() {
       setSetupData(null);
       setSuccessMsg("MFA successfully enabled!");
       setCode("");
-    } catch (err: any) {
-      setError(err.message || "Invalid MFA code");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Invalid MFA code");
     } finally {
       setIsLoading(false);
     }
@@ -76,8 +76,8 @@ export default function MFAPage() {
       setSuccessMsg("MFA successfully disabled!");
       setPassword("");
       setCode("");
-    } catch (err: any) {
-      setError(err.message || "Failed to disable MFA. Check your password and code.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to disable MFA. Check your password and code.");
     } finally {
       setIsLoading(false);
     }

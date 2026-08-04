@@ -108,6 +108,36 @@ def get_all_attendance(
 
 
 # ----------------------------------------------------
+# Today's Attendance
+# ----------------------------------------------------
+
+@router.get(
+    "/today",
+    response_model=list[AttendanceResponse],
+    dependencies=[Depends(require_permissions([Permission.ATTENDANCE_MANAGE]))],
+)
+def get_today_attendance(
+    service: AttendanceUseCases = Depends(get_service),
+):
+    return service.get_today_attendance()
+
+
+# ----------------------------------------------------
+# Active Attendance
+# ----------------------------------------------------
+
+@router.get(
+    "/active",
+    response_model=list[AttendanceResponse],
+    dependencies=[Depends(require_permissions([Permission.ATTENDANCE_MANAGE]))],
+)
+def get_active_attendance(
+    service: AttendanceUseCases = Depends(get_service),
+):
+    return service.get_active_attendance()
+
+
+# ----------------------------------------------------
 # Get Attendance By ID
 # ----------------------------------------------------
 
@@ -208,34 +238,7 @@ def get_attendance_by_date(
     return service.get_attendance_by_date(attendance_date)
 
 
-# ----------------------------------------------------
-# Today's Attendance
-# ----------------------------------------------------
 
-@router.get(
-    "/today",
-    response_model=list[AttendanceResponse],
-    dependencies=[Depends(require_permissions([Permission.ATTENDANCE_MANAGE]))],
-)
-def get_today_attendance(
-    service: AttendanceUseCases = Depends(get_service),
-):
-    return service.get_today_attendance()
-
-
-# ----------------------------------------------------
-# Active Attendance
-# ----------------------------------------------------
-
-@router.get(
-    "/active",
-    response_model=list[AttendanceResponse],
-    dependencies=[Depends(require_permissions([Permission.ATTENDANCE_MANAGE]))],
-)
-def get_active_attendance(
-    service: AttendanceUseCases = Depends(get_service),
-):
-    return service.get_active_attendance()
 
 
 # ----------------------------------------------------

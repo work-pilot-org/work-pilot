@@ -38,6 +38,7 @@ export function PendingInvitationsTab() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchInvitations();
   }, []);
 
@@ -46,8 +47,8 @@ export function PendingInvitationsTab() {
       await invitationRepository.resendInvitation(id);
       toast.success("Invitation resent successfully");
       fetchInvitations();
-    } catch (error: any) {
-      toast.error(error.message || "Failed to resend invitation");
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message :  "Failed to resend invitation");
     }
   };
 
@@ -57,8 +58,8 @@ export function PendingInvitationsTab() {
       await invitationRepository.revokeInvitation(id);
       toast.success("Invitation revoked successfully");
       fetchInvitations();
-    } catch (error: any) {
-      toast.error(error.message || "Failed to revoke invitation");
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message :  "Failed to revoke invitation");
     }
   };
 

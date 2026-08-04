@@ -66,3 +66,20 @@ def verify_employee_ownership(employee_id, current_user: dict, db: Session, bypa
     if not result or str(result[0]) != str(user_id):
         raise HTTPException(status_code=403, detail="Forbidden: Not the owner of this record")
     return True
+
+def verify_ticket_ownership(ticket_id, current_user: dict, db: Session, bypass_permissions: list[Permission] = None):
+    if bypass_permissions:
+        roles = current_user.get("roles", [])
+        user_perms = get_permissions_for_roles(roles)
+        if Permission.ADMIN_ALL in user_perms or any(p in user_perms for p in bypass_permissions):
+            return True
+            
+    user_id = current_user.get("sub")
+    
+    from sqlalchemy import text
+    query = text("SELECT requester_id FROM tickets WHERE id = :ticket_id")
+    result = db.execute(query, {"ticket_id": str(ticket_id)}).fetchone()
+    
+    if not result or str(result[0]) != str(user_id):
+        raise HTTPException(status_code=403, detail="Forbidden: Not the owner of this record")
+    return True

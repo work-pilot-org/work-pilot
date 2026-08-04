@@ -110,6 +110,11 @@ class Invitation(PublicBase):
         nullable=True,
     )
 
+    employee_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        nullable=True,
+    )
+
     # Composite Index to prevent duplicates and fast lookups
     __table_args__ = (
         Index("ix_invitations_tenant_email", "tenant_id", "email"),

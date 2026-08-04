@@ -20,7 +20,6 @@ from src.modules.auth.schemas import (
     MFALoginRequest,
     PreAuthResponse,
 )
-from src.modules.employee.repository import EmployeeRepository
 from src.modules.tenant.repository import TenantRepository
 from src.modules.user.repository import UserRepository
 
@@ -48,10 +47,7 @@ from shared_infrastructure.database.tenant_session import (
     set_public_schema,
 )
 
-from src.modules.employee.models import (
-    Employee,
-    Role,
-)
+from src.modules.employee.models import Role
 
 from src.modules.password_reset.service import PasswordResetService
 
@@ -65,8 +61,23 @@ class AuthService:
 
         self.tenant_repository = TenantRepository()
         self.user_repository = UserRepository()
-        self.employee_repository = EmployeeRepository()
         self.password_reset_service = PasswordResetService()
+
+    # --------------------------------------------------
+    # Role Helper
+    # --------------------------------------------------
+
+    def _get_or_seed_user_roles(self, db: Session, user_id, schema_name: str) -> list[str]:
+        """
+        Returns the list of role names for a user.
+        No self-healing; missing roles fail loudly without escalation.
+        """
+        from shared_infrastructure.database.tenant_session import set_tenant_schema
+        set_tenant_schema(db, schema_name)
+
+        user_roles_db = db.query(UserRole).filter(UserRole.user_id == user_id).all()
+        return [r.role.name for r in user_roles_db] if user_roles_db else []
+
     # --------------------------------------------------
     # Validation Helpers
     # --------------------------------------------------
@@ -317,10 +328,37 @@ class AuthService:
                 db,
                 schema_name,
             )
+            
+            db.commit()
+
+            # ------------------------------------------
+            # Initialize HR-Service Tables
+            # ------------------------------------------
+            import httpx
+            from shared_infrastructure.core.config import settings
+            
+            if settings.HR_SERVICE_URL:
+                hr_init_url = f"{settings.HR_SERVICE_URL}/internal/employees/tenants/init"
+                try:
+                    init_res = httpx.post(
+                        hr_init_url,
+                        json={"schema_name": schema_name},
+                        headers={"X-Internal-Token": settings.SECRET_KEY},
+                        timeout=30.0
+                    )
+                    if init_res.status_code not in (200, 201):
+                        db.rollback()
+                        raise Exception(f"Failed to initialize hr-service tables: {init_res.text}")
+                except Exception as e:
+                    db.rollback()
+                    raise Exception(f"Failed to communicate with HR service for init: {str(e)}")
 
             # ------------------------------------------
             # Seed Roles
             # ------------------------------------------
+            
+            # Ensure the connection's search_path is correctly set to the tenant schema
+            set_tenant_schema(db, schema_name)
             
             db_roles = []
             for rbac_role in RBACRole:
@@ -335,22 +373,36 @@ class AuthService:
             tenant_admin_role = next(r for r in db_roles if r.name == RBACRole.TENANT_ADMIN.value)
             user_role = UserRole(user_id=user.id, role_id=tenant_admin_role.id)
             db.add(user_role)
+            db.flush()
             
             # ------------------------------------------
-            # Create Organization Admin Employee
+            # Create Organization Admin Employee via HR-Service
             # ------------------------------------------
+            import httpx
+            from shared_infrastructure.core.config import settings
 
-            employee = Employee(
-                user_id=user.id,
-                full_name=request.full_name,
-                email=request.email,
-                role=Role.ORG_ADMIN,
-            )
-
-            self.employee_repository.create_employee(
-                db,
-                employee,
-            )
+            hr_url = f"{settings.HR_SERVICE_URL}/internal/employees/admin"
+            try:
+                response = httpx.post(
+                    hr_url,
+                    json={
+                        "auth_user_id": str(user.id),
+                        "first_name": request.full_name.split(" ")[0],
+                        "last_name": " ".join(request.full_name.split(" ")[1:]) if " " in request.full_name else "",
+                        "email": request.email,
+                        "role": Role.ORG_ADMIN.value,
+                        "schema_name": schema_name
+                    },
+                    headers={"X-Internal-Token": settings.SECRET_KEY, "X-Tenant-Id": str(tenant.id)},
+                    timeout=5.0
+                )
+                if response.status_code not in (200, 201):
+                    raise Exception(f"Failed to create ORG_ADMIN in hr-service: {response.text}")
+            except Exception as e:
+                db.rollback()
+                raise Exception(f"Failed to communicate with HR service for admin creation: {str(e)}")
+            
+            db.commit()
 
             # ------------------------------------------
             # Switch Back to Public Schema
@@ -419,11 +471,8 @@ class AuthService:
         # 5. Extract Primary Domain
         primary_domain = next((d.domain for d in tenant.domains if d.is_primary), tenant.domains[0].domain if tenant.domains else "localhost")
         
-        # 5.5 Extract User Roles
-        from shared_infrastructure.database.tenant_session import set_tenant_schema
-        set_tenant_schema(db, tenant.schema_name)
-        user_roles_db = db.query(UserRole).filter(UserRole.user_id == user.id).all()
-        roles_list = [r.role.name for r in user_roles_db] if user_roles_db else []
+        # 5.5 Extract User Roles (with auto-heal for legacy users with no roles)
+        roles_list = self._get_or_seed_user_roles(db, user.id, tenant.schema_name)
         
         # 6. Create JWT payload
         token_data = {
@@ -488,10 +537,8 @@ class AuthService:
             tenant = self.tenant_repository.get_tenant_by_id(db, profile.tenant_id)
             primary_domain = next((d.domain for d in tenant.domains if d.is_primary), tenant.domains[0].domain if tenant.domains else "localhost")
             
-            from shared_infrastructure.database.tenant_session import set_tenant_schema
-            set_tenant_schema(db, tenant.schema_name)
-            user_roles_db = db.query(UserRole).filter(UserRole.user_id == user.id).all()
-            roles_list = [r.role.name for r in user_roles_db] if user_roles_db else []
+            # Extract roles (with auto-heal for legacy users with no roles)
+            roles_list = self._get_or_seed_user_roles(db, user.id, tenant.schema_name)
             
             token_data = {
                 "sub": str(user.id),
@@ -514,6 +561,12 @@ class AuthService:
     ) -> LoginResponse:
         from jose import jwt, JWTError
         from shared_infrastructure.core.config import settings
+        from src.modules.user.models import RevokedToken
+        
+        # Check if token is blacklisted
+        revoked = db.query(RevokedToken).filter(RevokedToken.token == refresh_token).first()
+        if revoked:
+            raise InvalidCredentialsException("Refresh token has been revoked.")
         
         try:
             payload = jwt.decode(
@@ -537,10 +590,8 @@ class AuthService:
             
             primary_domain = next((d.domain for d in tenant.domains if d.is_primary), tenant.domains[0].domain if tenant.domains else "localhost")
             
-            from shared_infrastructure.database.tenant_session import set_tenant_schema
-            set_tenant_schema(db, tenant.schema_name)
-            user_roles_db = db.query(UserRole).filter(UserRole.user_id == user.id).all()
-            roles_list = [r.role.name for r in user_roles_db] if user_roles_db else []
+            # Extract roles (with auto-heal for legacy users with no roles)
+            roles_list = self._get_or_seed_user_roles(db, user.id, tenant.schema_name)
             
             token_data = {
                 "sub": str(user.id),

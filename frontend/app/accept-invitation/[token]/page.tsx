@@ -48,8 +48,8 @@ export default function AcceptInvitationPage() {
             router.push(`/login?returnUrl=/accept-invitation/${token}`);
           }
         }
-      } catch (err: any) {
-        setError(err.message || "Failed to validate invitation token.");
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message :  "Failed to validate invitation token.");
       } finally {
         setIsValidating(false);
       }
@@ -89,8 +89,8 @@ export default function AcceptInvitationPage() {
       } else {
         router.push("/login?message=Account created. Please log in.");
       }
-    } catch (err: any) {
-      toast.error(err.message || "Failed to accept invitation.");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message :  "Failed to accept invitation.");
     } finally {
       setIsSubmitting(false);
     }

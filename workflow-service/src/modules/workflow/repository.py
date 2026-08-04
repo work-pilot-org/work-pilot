@@ -99,6 +99,19 @@ class WorkflowRepository:
             .first()
         )
 
+    def get_all_executions(
+        self,
+        skip: int = 0,
+        limit: int = 100
+    ):
+
+        return (
+            self.db.query(WorkflowExecution)
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
+
     def update_execution(
         self,
         execution,

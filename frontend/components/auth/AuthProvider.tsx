@@ -14,6 +14,16 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         const url = new URL(window.location.href);
         const ssoToken = url.searchParams.get("sso_token");
         
+        // If we are on a logout redirect, skip refresh entirely.
+        // The middleware already cleared the cookie; just mark as initialized+unauthenticated.
+        if (url.searchParams.get("logout") === "true") {
+          // Clean the URL so the param doesn't persist on reload
+          url.searchParams.delete("logout");
+          window.history.replaceState({}, document.title, url.pathname + url.search);
+          setInitialized(true);
+          return;
+        }
+        
         if (ssoToken) {
           // Exchange the SSO token for a secure HttpOnly cookie on this domain
           await authRepository.exchangeSsoToken(ssoToken);

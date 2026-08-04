@@ -20,7 +20,7 @@ export interface NavItem {
   name: string;
   href: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  icon: any;
+  icon: React.ElementType;
   allowedRoles?: string[];
   children?: Omit<NavItem, 'children'>[];
 }

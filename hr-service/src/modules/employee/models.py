@@ -25,7 +25,7 @@ class Employee(TenantBase):
             "uq_employees_auth_user_id_active",
             "auth_user_id",
             unique=True,
-            postgresql_where=text("is_active = true"),
+            postgresql_where=text("is_active = true AND auth_user_id IS NOT NULL"),
         ),
         Index(
             "uq_employees_employee_code_active",
@@ -41,10 +41,16 @@ class Employee(TenantBase):
         default=uuid.uuid4,
     )
 
-    # User ID from Auth Service
+    # User ID from Auth Service (Null before invite acceptance)
     auth_user_id = Column(
         UUID(as_uuid=True),
-        nullable=False,
+        nullable=True,
+    )
+
+    invitation_status = Column(
+        String(20),
+        nullable=True,
+        default="PENDING",
     )
 
     employee_code = Column(

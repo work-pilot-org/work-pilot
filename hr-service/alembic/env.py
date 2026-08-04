@@ -3,8 +3,8 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-from src.core.config import settings
-from src.infrastructure.database.base import TenantBase
+from shared_infrastructure.core.config import settings
+from shared_infrastructure.database.base import TenantBase
 from src.modules.attendance.models import *
 
 # Import all models here

@@ -135,11 +135,39 @@ def refresh_token_endpoint(
         raise HTTPException(status_code=401, detail=str(e))
 
 @router.post("/logout")
-def logout(response: Response):
+def logout(
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db),
+):
     """
-    Clear the refresh token cookie.
+    Clear the refresh token cookie and invalidate it in the database.
     """
-    response.delete_cookie(key="refresh_token", httponly=True, secure=True, samesite="none")
+    refresh_token = request.cookies.get("refresh_token")
+    if refresh_token:
+        from src.modules.user.models import RevokedToken
+        # Ignore if it's already revoked
+        existing = db.query(RevokedToken).filter(RevokedToken.token == refresh_token).first()
+        if not existing:
+            revoked = RevokedToken(token=refresh_token)
+            db.add(revoked)
+            try:
+                db.commit()
+            except Exception:
+                db.rollback()
+
+    # Must use the same attributes as when the cookie was set.
+    # The cookie is always set with samesite="none" and secure=True,
+    # so we must delete it with the exact same attributes.
+    response.set_cookie(
+        key="refresh_token",
+        value="",
+        httponly=True,
+        secure=True,
+        samesite="none",
+        max_age=0,
+        path="/",
+    )
     return {"message": "Logged out successfully"}
 
 @router.get(

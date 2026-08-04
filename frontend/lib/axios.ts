@@ -36,7 +36,7 @@ hrApi.interceptors.request.use((config) => {
   return config;
 });
 
-const IT_SERVICE_URL = process.env.NEXT_PUBLIC_IT_SERVICE_URL || "http://localhost:8003";
+const IT_SERVICE_URL = process.env.NEXT_PUBLIC_IT_SERVICE_URL || "http://localhost:8004";
 export const itApi = axios.create({
   baseURL: IT_SERVICE_URL,
   withCredentials: true,
@@ -53,7 +53,7 @@ itApi.interceptors.request.use((config) => {
   return config;
 });
 
-const WORKFLOW_SERVICE_URL = process.env.NEXT_PUBLIC_WORKFLOW_SERVICE_URL || "http://localhost:8004";
+const WORKFLOW_SERVICE_URL = process.env.NEXT_PUBLIC_WORKFLOW_SERVICE_URL || "http://localhost:8005";
 export const workflowApi = axios.create({
   baseURL: WORKFLOW_SERVICE_URL,
   withCredentials: true,
@@ -69,4 +69,42 @@ workflowApi.interceptors.request.use((config) => {
   }
   return config;
 });
+
+// --- Response Interceptor Setup ---
+import toast from "react-hot-toast";
+
+const responseInterceptor = (response: any) => response;
+
+const errorInterceptor = async (error: any) => {
+  if (error.response) {
+    const status = error.response.status;
+    
+    // Auto-logout on 401 (Unauthorized), unless it's the login endpoint itself
+    if (status === 401 && !error.config.url?.includes("/login")) {
+      toast.error("Session expired. Please log in again.");
+      useAuthStore.getState().logout();
+      window.location.href = "/login";
+    }
+    
+    // Toast on 403 (Forbidden)
+    if (status === 403) {
+      toast.error("You do not have permission to perform this action.");
+    }
+    
+    // Toast on 500+ (Server errors)
+    if (status >= 500) {
+      toast.error("An unexpected server error occurred. Please try again later.");
+    }
+  } else if (error.request) {
+    // Network errors (no response)
+    toast.error("Network error. Please check your connection.");
+  }
+
+  return Promise.reject(error);
+};
+
+api.interceptors.response.use(responseInterceptor, errorInterceptor);
+hrApi.interceptors.response.use(responseInterceptor, errorInterceptor);
+itApi.interceptors.response.use(responseInterceptor, errorInterceptor);
+workflowApi.interceptors.response.use(responseInterceptor, errorInterceptor);
 

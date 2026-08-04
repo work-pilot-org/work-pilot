@@ -134,3 +134,26 @@ class UserProfile(PublicBase):
     )
 
     tenant = relationship("Tenant")
+
+
+class RevokedToken(PublicBase):
+    __tablename__ = "revoked_tokens"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+    )
+
+    token: Mapped[str] = mapped_column(
+        String(1024),
+        unique=True,
+        nullable=False,
+        index=True,
+    )
+
+    revoked_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        nullable=False,
+    )
