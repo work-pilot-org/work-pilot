@@ -4,21 +4,26 @@ import type { NextRequest } from "next/server";
 export function middleware(request: NextRequest) {
   const url = request.nextUrl;
   
-  // Get hostname of request (e.g. apple.localhost:3000 -> apple.localhost:3000)
+  // Get host header (may include port), e.g. apple.localhost:3000
   const host = request.headers.get("host") || "";
+  const [hostnameRaw, ...portParts] = host.split(":");
+  const hostname = (hostnameRaw || "").toLowerCase();
+  const port = portParts.length > 0 ? `:${portParts.join(":")}` : "";
   
   // Extract the subdomain and base domain
   let subdomain = "";
   let baseDomain = host;
   
-  if (host.includes(".localhost")) {
-    const parts = host.split(".localhost");
-    subdomain = parts[0];
-    baseDomain = `localhost${parts[1]}`; // e.g. localhost:3000
-  } else if (host.includes(".workpilot.com")) {
-    const parts = host.split(".workpilot.com");
-    subdomain = parts[0];
-    baseDomain = `workpilot.com${parts[1] || ""}`;
+  if (hostname === "localhost" || hostname.endsWith(".localhost")) {
+    if (hostname !== "localhost") {
+      subdomain = hostname.slice(0, -".".concat("localhost").length);
+    }
+    baseDomain = `localhost${port}`; // e.g. localhost:3000
+  } else if (hostname === "workpilot.com" || hostname.endsWith(".workpilot.com")) {
+    if (hostname !== "workpilot.com") {
+      subdomain = hostname.slice(0, -".".concat("workpilot.com").length);
+    }
+    baseDomain = `workpilot.com${port}`;
   }
 
   const isLogout = url.searchParams.get("logout") === "true";
