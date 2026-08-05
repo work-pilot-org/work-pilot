@@ -28,19 +28,16 @@ export function middleware(request: NextRequest) {
 
   const isLogout = url.searchParams.get("logout") === "true";
   if (isLogout) {
-    // Keep the logout param and redirect to login URL so AuthProvider skips silent refresh
-    const cleanUrl = new URL("/login?logout=true", request.url);
-    const response = NextResponse.redirect(cleanUrl);
-    // Must match exact attributes used when setting the cookie:
-    // secure=true, samesite="none", httpOnly=true, path="/"
-    response.cookies.set("refresh_token", "", {
-      maxAge: 0,
-      path: "/",
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-    });
-    return response;
+    if (url.pathname !== "/login") {
+      const cleanUrl = new URL("/login?logout=true", request.url);
+      const response = NextResponse.redirect(cleanUrl);
+      response.cookies.delete("refresh_token");
+      return response;
+    } else {
+      const response = NextResponse.next();
+      response.cookies.delete("refresh_token");
+      return response;
+    }
   }
 
   const isAuthPage = url.pathname === '/login' || url.pathname === '/register';

@@ -77,6 +77,7 @@ def login(
         httponly=True,
         secure=True, 
         samesite="none",
+        path="/",
         max_age=7 * 24 * 60 * 60, # 7 days
     )
     
@@ -99,6 +100,7 @@ def sso_exchange(
         httponly=True,
         secure=True,
         samesite="none",
+        path="/",
         max_age=7 * 24 * 60 * 60,
     )
     

@@ -549,6 +549,17 @@ class AuthService:
                 "roles": roles_list,
             }
             
+            # Check if token is already revoked
+            from src.modules.user.models import RevokedToken
+            revoked = db.query(RevokedToken).filter(RevokedToken.token == sso_token).first()
+            if revoked:
+                raise InvalidCredentialsException("SSO token has already been used.")
+            
+            # Revoke SSO token so it can only be used once
+            new_revoked = RevokedToken(token=sso_token)
+            db.add(new_revoked)
+            db.commit()
+            
             return create_refresh_token(token_data)
             
         except JWTError:
@@ -563,17 +574,18 @@ class AuthService:
         from shared_infrastructure.core.config import settings
         from src.modules.user.models import RevokedToken
         
-        # Check if token is blacklisted
-        revoked = db.query(RevokedToken).filter(RevokedToken.token == refresh_token).first()
-        if revoked:
-            raise InvalidCredentialsException("Refresh token has been revoked.")
-        
         try:
             payload = jwt.decode(
                 refresh_token,
                 settings.SECRET_KEY,
                 algorithms=[settings.ALGORITHM]
             )
+            
+            # Check if token is blacklisted (must happen after signature/expiration validation)
+            revoked = db.query(RevokedToken).filter(RevokedToken.token == refresh_token).first()
+            if revoked:
+                raise InvalidCredentialsException("Refresh token has been revoked.")
+            
             if payload.get("type") != "refresh":
                 raise InvalidCredentialsException("Invalid token type.")
             
