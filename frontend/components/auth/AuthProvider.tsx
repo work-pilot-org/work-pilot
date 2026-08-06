@@ -61,6 +61,18 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     };
 
     initializeAuth();
+
+    const channel = new BroadcastChannel("auth_channel");
+    channel.onmessage = (event) => {
+      if (event.data === "logout") {
+        setInitialized(true);
+        window.location.href = getBaseDomainUrl("/login?logout=true");
+      }
+    };
+
+    return () => {
+      channel.close();
+    };
   }, [setInitialized, setUser]);
 
   // Optionally, you can return a loading spinner here while `!isInitialized`,

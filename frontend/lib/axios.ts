@@ -79,8 +79,8 @@ const errorInterceptor = async (error: any) => {
   if (error.response) {
     const status = error.response.status;
     
-    // Auto-logout on 401 (Unauthorized), unless it's the login endpoint itself
-    if (status === 401 && !error.config.url?.includes("/login")) {
+    // Auto-logout on 401 (Unauthorized), unless it's the login, logout, or refresh endpoint
+    if (status === 401 && !error.config.url?.includes("/login") && !error.config.url?.includes("/logout") && !error.config.url?.includes("/refresh")) {
       toast.error("Session expired. Please log in again.");
       useAuthStore.getState().logout();
       window.location.href = "/login";

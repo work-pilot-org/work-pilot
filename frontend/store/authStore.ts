@@ -34,6 +34,13 @@ export const useAuthStore = create<AuthState>((set) => ({
       console.error("Failed to logout backend", e);
     } finally {
       set({ user: null, token: null, isAuthenticated: false, error: null });
+      if (typeof window !== "undefined") {
+        localStorage.clear();
+        sessionStorage.clear();
+        const channel = new BroadcastChannel("auth_channel");
+        channel.postMessage("logout");
+        channel.close();
+      }
     }
   },
 }));
