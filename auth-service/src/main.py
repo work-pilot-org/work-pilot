@@ -32,8 +32,23 @@ origins = [
     "http://localhost:3000",
 ]
 
-# Include Middleware
+from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 
+class CatchAllExceptionsMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        try:
+            return await call_next(request)
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return JSONResponse(
+                status_code=500,
+                content={"detail": "An internal server error occurred (middleware level)."},
+            )
+
+app.add_middleware(CatchAllExceptionsMiddleware)
 app.add_middleware(TenantMiddleware)
 
 app.add_middleware(
