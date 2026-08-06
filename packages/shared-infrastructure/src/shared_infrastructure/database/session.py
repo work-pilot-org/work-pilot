@@ -5,7 +5,11 @@ from shared_infrastructure.core.config import settings
 
 engine = create_engine(
     settings.DATABASE_URL,
-    echo=True
+    echo=True,
+    pool_pre_ping=True,       # Verifies connection is alive before checking out of pool
+    pool_recycle=300,         # Recycles connections every 5 minutes
+    pool_size=10,             # Sets base pool size
+    max_overflow=20           # Allows 20 extra connections during spikes
 )
 
 SessionLocal = sessionmaker(

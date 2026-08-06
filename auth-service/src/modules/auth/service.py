@@ -569,42 +569,52 @@ class AuthService:
         self,
         db: Session,
         refresh_token: str,
-    ) -> LoginResponse:
+    ) -> tuple:
+        """
+        Validate the current refresh token, revoke it (rotation), and issue a
+        brand-new refresh token along with a fresh access token.
+
+        Returns: (LoginResponse, new_refresh_token: str)
+        """
         from jose import jwt, JWTError
         from shared_infrastructure.core.config import settings
         from src.modules.user.models import RevokedToken
-        
+        from shared_infrastructure.core.security import create_sso_token, create_refresh_token
+
         try:
             payload = jwt.decode(
                 refresh_token,
                 settings.SECRET_KEY,
                 algorithms=[settings.ALGORITHM]
             )
-            
-            # Check if token is blacklisted (must happen after signature/expiration validation)
+
+            # Reject if token type is wrong
+            if payload.get("type") != "refresh":
+                raise InvalidCredentialsException("Invalid token type.")
+
+            # Reject if token is already revoked (replayed after rotation or logout)
             revoked = db.query(RevokedToken).filter(RevokedToken.token == refresh_token).first()
             if revoked:
                 raise InvalidCredentialsException("Refresh token has been revoked.")
-            
-            if payload.get("type") != "refresh":
-                raise InvalidCredentialsException("Invalid token type.")
-            
+
             user_id = payload.get("sub")
             if not user_id:
                 raise InvalidCredentialsException("Invalid token payload.")
-                
+
             user = self.user_repository.get_user_by_id(db, user_id)
             if not user:
                 raise InvalidCredentialsException("User not found.")
-                
+
             profile = self.user_repository.get_user_profile(db, user.id)
             tenant = self.tenant_repository.get_tenant_by_id(db, profile.tenant_id)
-            
-            primary_domain = next((d.domain for d in tenant.domains if d.is_primary), tenant.domains[0].domain if tenant.domains else "localhost")
-            
-            # Extract roles (with auto-heal for legacy users with no roles)
+
+            primary_domain = next(
+                (d.domain for d in tenant.domains if d.is_primary),
+                tenant.domains[0].domain if tenant.domains else "localhost"
+            )
+
             roles_list = self._get_or_seed_user_roles(db, user.id, tenant.schema_name)
-            
+
             token_data = {
                 "sub": str(user.id),
                 "email": user.email,
@@ -613,12 +623,21 @@ class AuthService:
                 "domain": primary_domain,
                 "roles": roles_list,
             }
-            
+
+            # --- Token Rotation ---
+            # Revoke the current refresh token so it cannot be reused.
+            revoked_entry = RevokedToken(token=refresh_token)
+            db.add(revoked_entry)
+            try:
+                db.commit()
+            except Exception:
+                db.rollback()
+
             new_access_token = create_access_token(token_data)
-            from shared_infrastructure.core.security import create_sso_token
+            new_refresh_token = create_refresh_token(token_data)
             sso_token = create_sso_token(token_data)
-            
-            return LoginResponse(
+
+            login_response = LoginResponse(
                 access_token=new_access_token,
                 user_id=str(user.id),
                 email=user.email,
@@ -630,7 +649,9 @@ class AuthService:
                 sso_token=sso_token,
                 roles=roles_list,
             )
-            
+
+            return login_response, new_refresh_token
+
         except JWTError:
             raise InvalidCredentialsException("Invalid or expired refresh token.")
 
