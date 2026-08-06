@@ -15,8 +15,17 @@ app = FastAPI(
 @app.exception_handler(WorkPilotException)
 async def workpilot_exception_handler(request: Request, exc: WorkPilotException):
     return JSONResponse(
-        status_code=400,
-        content={"detail": str(exc)},
+        status_code=exc.status_code,
+        content={"detail": str(exc.detail)},
+    )
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    import traceback
+    traceback.print_exc()
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "An internal server error occurred. Please check the logs."},
     )
 
 origins = [

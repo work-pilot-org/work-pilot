@@ -1,8 +1,7 @@
-import re
-
-from sqlalchemy import text
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 
+from shared_infrastructure.database.schema_utils import validate_schema_name
 
 def set_tenant_schema(
     db: Session,
@@ -12,16 +11,8 @@ def set_tenant_schema(
     Switch the current database session
     to the specified tenant schema.
     """
-
-    if not re.fullmatch(
-        r"[a-z][a-z0-9_]*",
-        schema_name,
-    ):
-        raise ValueError("Invalid schema name.")
-
-    db.execute(
-        text(f'SET search_path TO "{schema_name}", public')
-    )
+    schema_name = validate_schema_name(schema_name)
+    db.connection().exec_driver_sql(f'SET search_path TO "{schema_name}", public')
 
 
 def set_public_schema(
@@ -31,7 +22,4 @@ def set_public_schema(
     Switch the current database session
     back to the public schema.
     """
-
-    db.execute(
-        text('SET search_path TO "public"')
-    )
+    db.connection().exec_driver_sql('SET search_path TO "public"')

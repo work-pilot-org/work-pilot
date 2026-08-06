@@ -50,6 +50,20 @@ async def workpilot_exception_handler(
         },
     )
 
+@app.exception_handler(Exception)
+async def global_exception_handler(
+    request: Request,
+    exc: Exception,
+):
+    import traceback
+    traceback.print_exc()
+    return JSONResponse(
+        status_code=500,
+        content={
+            "detail": "An internal server error occurred. Please check the logs.",
+        },
+    )
+
 
 # =====================================================
 # CORS

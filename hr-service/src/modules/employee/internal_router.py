@@ -46,11 +46,14 @@ def init_tenant_tables(
     import src.modules.policies.models
     import src.modules.organization.models
     
+    from shared_infrastructure.database.schema_utils import validate_schema_name
+    schema_name = validate_schema_name(req.schema_name)
+    
     connection = db.connection()
-    connection.execute(text("SET search_path TO :schema"), {"schema": req.schema_name})
+    connection.exec_driver_sql(f'SET search_path TO "{schema_name}"')
     TenantBase.metadata.create_all(bind=connection)
     db.commit()
-    db.execute(text("SET search_path TO :schema, public"), {"schema": req.schema_name})
+    db.connection().exec_driver_sql(f'SET search_path TO "{schema_name}", public')
     return {"status": "ok"}
 
 

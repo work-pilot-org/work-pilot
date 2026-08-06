@@ -32,6 +32,29 @@ router = APIRouter(
 auth_service = AuthService()
 
 
+def _cookie_params() -> dict:
+    """
+    Returns the unified cookie security parameters.
+
+    Development (DEBUG=True):
+        SameSite=Lax, Secure=False — works on plain HTTP localhost subdomains.
+    Production (DEBUG=False):
+        SameSite=None, Secure=True — required for cross-site cookie delivery.
+
+    Using the SAME helper for every Set-Cookie operation (login, sso-exchange,
+    refresh, logout) guarantees that the deletion attributes always match the
+    creation attributes — which is required for cookie deletion to work.
+    """
+    from shared_infrastructure.core.config import settings
+    is_production = not settings.DEBUG
+    return {
+        "httponly": True,
+        "secure": is_production,
+        "samesite": "none" if is_production else "lax",
+        "path": "/",
+    }
+
+
 @router.post(
     "/register",
     response_model=RegisterResponse,
@@ -74,11 +97,8 @@ def login(
     response.set_cookie(
         key="refresh_token",
         value=refresh_token,
-        httponly=True,
-        secure=True, 
-        samesite="none",
-        path="/",
-        max_age=7 * 24 * 60 * 60, # 7 days
+        max_age=7 * 24 * 60 * 60,  # 7 days
+        **_cookie_params(),
     )
     
     return login_response
@@ -90,18 +110,16 @@ def sso_exchange(
     db: Session = Depends(get_db),
 ) -> dict:
     """
-    Exchange a short-lived SSO token for an HttpOnly refresh token cookie on the current domain.
+    Exchange a short-lived single-use SSO token for an HttpOnly refresh token cookie
+    on the current domain. The SSO token is permanently revoked after this call.
     """
     refresh_token = auth_service.exchange_sso_token(db=db, sso_token=request.sso_token)
     
     response.set_cookie(
         key="refresh_token",
         value=refresh_token,
-        httponly=True,
-        secure=True,
-        samesite="none",
-        path="/",
         max_age=7 * 24 * 60 * 60,
+        **_cookie_params(),
     )
     
     return {"message": "SSO exchange successful"}
@@ -122,17 +140,33 @@ def swagger_login(
 @router.post("/refresh", response_model=LoginResponse)
 def refresh_token_endpoint(
     request: Request,
+    response: Response,
     db: Session = Depends(get_db),
 ) -> LoginResponse:
     """
     Refresh the access token using the HttpOnly refresh token cookie.
+    Implements token rotation: the old refresh token is permanently revoked and
+    a new one is issued and set as a cookie. Replayed tokens are rejected.
     """
     refresh_token = request.cookies.get("refresh_token")
     if not refresh_token:
         raise HTTPException(status_code=401, detail="Refresh token missing.")
         
     try:
-        return auth_service.refresh_access_token(db=db, refresh_token=refresh_token)
+        login_response, new_refresh_token = auth_service.refresh_access_token(
+            db=db,
+            refresh_token=refresh_token,
+        )
+
+        # Set the rotated refresh token cookie with identical attributes to the original.
+        response.set_cookie(
+            key="refresh_token",
+            value=new_refresh_token,
+            max_age=7 * 24 * 60 * 60,
+            **_cookie_params(),
+        )
+
+        return login_response
     except Exception as e:
         raise HTTPException(status_code=401, detail=str(e))
 
@@ -143,12 +177,14 @@ def logout(
     db: Session = Depends(get_db),
 ):
     """
-    Clear the refresh token cookie and invalidate it in the database.
+    Revoke the refresh token server-side and delete the cookie.
+    Cookie deletion uses the EXACT same attributes as creation (via _cookie_params())
+    to guarantee the browser removes it.
     """
     refresh_token = request.cookies.get("refresh_token")
     if refresh_token:
         from src.modules.user.models import RevokedToken
-        # Ignore if it's already revoked
+        # Idempotent: ignore if already revoked
         existing = db.query(RevokedToken).filter(RevokedToken.token == refresh_token).first()
         if not existing:
             revoked = RevokedToken(token=refresh_token)
@@ -158,17 +194,13 @@ def logout(
             except Exception:
                 db.rollback()
 
-    # Must use the same attributes as when the cookie was set.
-    # The cookie is always set with samesite="none" and secure=True,
-    # so we must delete it with the exact same attributes.
+    # Delete with identical attributes to creation — this is required for the browser
+    # to match and remove the cookie.
     response.set_cookie(
         key="refresh_token",
         value="",
-        httponly=True,
-        secure=True,
-        samesite="none",
         max_age=0,
-        path="/",
+        **_cookie_params(),
     )
     return {"message": "Logged out successfully"}
 
@@ -299,10 +331,8 @@ def login_mfa(
         response.set_cookie(
             key="refresh_token",
             value=refresh_token,
-            httponly=True,
-            secure=True, 
-            samesite="none",
             max_age=7 * 24 * 60 * 60,
+            **_cookie_params(),
         )
         return login_response
     except Exception as e:
