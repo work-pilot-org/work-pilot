@@ -16,6 +16,7 @@ from src.modules.employee.schemas import (
     EmployeeDocumentCreate,
     EmployeeProfileUpdate,
     EmployeeUpdate,
+    EmployeeResponse,
 )
 
 
@@ -72,7 +73,7 @@ class EmployeeService:
         self.db.commit()
         return employee
 
-    def onboard_employee(self, employee_data: EmployeeCreate, current_user: dict) -> Employee:
+    def onboard_employee(self, employee_data: EmployeeCreate, current_user: dict) -> EmployeeResponse:
         if employee_data.auth_user_id is not None:
             existing_employee = self.repository.get_employee_by_auth_user_id(
                 employee_data.auth_user_id
@@ -114,7 +115,7 @@ class EmployeeService:
         )
 
         employee = self.repository.create_employee(employee)
-        self.db.commit()
+        self.db.flush()
 
         # Generate Invitation via auth-service
         import httpx
@@ -150,15 +151,17 @@ class EmployeeService:
                 timeout=5.0
             )
             if response.status_code not in (200, 201):
-                self.db.delete(employee)
-                self.db.commit()
+                self.db.rollback()
                 raise HTTPException(status_code=500, detail="Failed to create invitation in auth service.")
+        except HTTPException:
+            raise
         except Exception as e:
-            self.db.delete(employee)
-            self.db.commit()
+            self.db.rollback()
             raise HTTPException(status_code=500, detail="Failed to communicate with Auth service.")
             
-        return employee
+        dto = EmployeeResponse.model_validate(employee)
+        self.db.commit()
+        return dto
 
     # =====================================================
     # Get Employee By Id

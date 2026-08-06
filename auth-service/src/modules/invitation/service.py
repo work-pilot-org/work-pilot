@@ -208,11 +208,11 @@ class InvitationService:
         self.repository.update_invitation(db, invitation)
 
         # 5. Assign Role
-        from src.modules.rbac.models import DBRole, UserRole
+        from src.modules.rbac.models import Role, UserRole
         from shared_infrastructure.database.tenant_session import set_tenant_schema
         set_tenant_schema(db, tenant.schema_name)
         
-        target_role = db.query(DBRole).filter(DBRole.name == invitation.role.value).first()
+        target_role = db.query(Role).filter(Role.name == invitation.role.value).first()
         if target_role:
             user_role = UserRole(user_id=target_user.id, role_id=target_role.id)
             db.add(user_role)
