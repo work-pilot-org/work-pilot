@@ -58,8 +58,8 @@ ROLE_PERMISSIONS: dict[Role, list[Permission]] = {
         Permission.WORKFLOW_APPROVE
     ],
     Role.EMPLOYEE: [
-        # Employees primarily rely on ownership checks (e.g. can view their OWN attendance),
-        # so they have minimal global permissions.
+        # Employees can read their own attendance and leave data via ownership-scoped endpoints.
+        Permission.ATTENDANCE_READ,
     ]
 }
 

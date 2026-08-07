@@ -73,6 +73,25 @@ def get_all_employees(
 
 
 @router.get(
+    "/me",
+    response_model=EmployeeResponse,
+)
+def get_my_employee_profile(
+    current_user: dict = Depends(get_current_user_and_set_schema),
+    db: Session = Depends(get_db),
+):
+    """
+    Returns the employee record for the currently authenticated user.
+    Accessible by the EMPLOYEE role — no EMPLOYEE_MANAGE permission required.
+    """
+    from uuid import UUID as UUIDType
+    auth_user_id = UUIDType(current_user["sub"])
+    service = EmployeeService(db)
+    return service.get_employee_by_auth_user(auth_user_id)
+
+
+
+@router.get(
     "/{employee_id}",
     response_model=EmployeeResponse,
 )
