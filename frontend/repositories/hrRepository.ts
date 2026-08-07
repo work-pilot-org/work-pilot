@@ -17,6 +17,33 @@ export const hrRepository = {
     }
   },
 
+  async getMyProfile(): Promise<EmployeeResponse> {
+    try {
+      const response = await hrApi.get<EmployeeResponse>("/employees/me");
+      return response.data;
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err) && err.response?.data) {
+        const detail = (err.response.data as ApiError).detail;
+        throw new Error(typeof detail === "string" ? detail : "Failed to fetch your profile.");
+      }
+      throw new Error(err instanceof Error ? err.message : "An unexpected error occurred.");
+    }
+  },
+
+  async getMyTodayAttendance(): Promise<import("@/types/hr").AttendanceResponse | null> {
+    try {
+      const response = await hrApi.get<import("@/types/hr").AttendanceResponse | null>("/attendance/me/today");
+      return response.data;
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err) && err.response?.data) {
+        const detail = (err.response.data as ApiError).detail;
+        throw new Error(typeof detail === "string" ? detail : "Failed to fetch your attendance.");
+      }
+      throw new Error(err instanceof Error ? err.message : "An unexpected error occurred.");
+    }
+  },
+
+
   async searchEmployees(keyword: string, page: number = 1, size: number = 10): Promise<EmployeeResponse[]> {
     try {
       const response = await hrApi.get<EmployeeResponse[]>("/employees/search/", {

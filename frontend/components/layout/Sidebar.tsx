@@ -29,35 +29,44 @@ const navConfig: NavItem[] = [
   { 
     name: "Dashboard", 
     href: "/dashboard", 
-    icon: LayoutDashboard 
-    // globally accessible
+    icon: LayoutDashboard
+    // globally accessible — TENANT_ADMIN, MANAGER land here
+  },
+  { 
+    name: "My Workspace",
+    href: "/dashboard/employee",
+    icon: LayoutDashboard,
+    allowedRoles: ["EMPLOYEE"],
   },
   { 
     name: "HR", 
     href: "/dashboard/hr", 
     icon: Users,
-    // Accessible by everyone since employees can check their own profile and attendance
+    allowedRoles: ["TENANT_ADMIN", "HR_ADMIN", "MANAGER"],
     children: [
-      { name: "Employees", href: "/dashboard/hr", icon: Users }, 
-      { name: "Attendance", href: "/dashboard/hr/attendance", icon: UserCheck },
-      { name: "Leave", href: "/dashboard/hr/leave", icon: Calendar },
-      { name: "Organization", href: "/dashboard/hr/organization", icon: Building2, allowedRoles: ["TENANT_ADMIN", "HR_ADMIN"] },
+      { name: "Employees",    href: "/dashboard/hr",              icon: Users,      allowedRoles: ["TENANT_ADMIN", "HR_ADMIN"] },
+      { name: "Attendance",   href: "/dashboard/hr/attendance",   icon: UserCheck,  allowedRoles: ["TENANT_ADMIN", "HR_ADMIN", "MANAGER"] },
+      { name: "Leave",        href: "/dashboard/hr/leave",        icon: Calendar,   allowedRoles: ["TENANT_ADMIN", "HR_ADMIN"] },
+      { name: "Organization", href: "/dashboard/hr/organization", icon: Building2,  allowedRoles: ["TENANT_ADMIN", "HR_ADMIN"] },
     ]
   },
   {
     name: "IT Service",
     href: "/dashboard/it/tickets",
     icon: LayoutDashboard,
+    allowedRoles: ["TENANT_ADMIN", "IT_ADMIN"],
     children: [
-      { name: "Helpdesk", href: "/dashboard/it/tickets", icon: LayoutDashboard }
+      { name: "Helpdesk", href: "/dashboard/it/tickets", icon: LayoutDashboard, allowedRoles: ["TENANT_ADMIN", "IT_ADMIN"] }
     ]
   },
   {
     name: "Workflows",
     href: "/dashboard/workflows",
     icon: Briefcase,
+    allowedRoles: ["TENANT_ADMIN", "MANAGER"],
   }
 ];
+
 
 export default function Sidebar() {
   const pathname = usePathname();

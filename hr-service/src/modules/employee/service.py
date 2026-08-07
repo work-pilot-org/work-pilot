@@ -181,6 +181,17 @@ class EmployeeService:
         return self.repository.get_all_employees()
 
     # =====================================================
+    # Get My Employee Record (self-service)
+    # =====================================================
+
+    def get_employee_by_auth_user(self, auth_user_id: UUID) -> Employee:
+        employee = self.repository.get_employee_by_auth_user_id(auth_user_id)
+        if not employee:
+            raise EmployeeNotFoundException()
+        return employee
+
+
+    # =====================================================
     # Update Employee
     # =====================================================
 

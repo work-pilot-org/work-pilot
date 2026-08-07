@@ -123,6 +123,37 @@ def get_today_attendance(
 
 
 # ----------------------------------------------------
+# My Today's Attendance (self-service for EMPLOYEE role)
+# ----------------------------------------------------
+
+@router.get(
+    "/me/today",
+    response_model=AttendanceResponse | None,
+    dependencies=[Depends(require_permissions([Permission.ATTENDANCE_READ]))],
+)
+def get_my_today_attendance(
+    current_user: dict = Depends(get_current_user_and_set_schema),
+    db: Session = Depends(get_db),
+    service: AttendanceUseCases = Depends(get_service),
+):
+    """
+    Returns the authenticated employee's attendance record for today.
+    Accessible by the EMPLOYEE role via ATTENDANCE_READ permission.
+    """
+    from uuid import UUID as UUIDType
+    from datetime import date as date_type
+    from src.modules.employee.repository import EmployeeRepository
+
+    auth_user_id = UUIDType(current_user["sub"])
+    emp_repo = EmployeeRepository(db)
+    employee = emp_repo.get_employee_by_auth_user_id(auth_user_id)
+    if not employee:
+        return None
+    return service.repository.get_by_employee_and_date(employee.id, date_type.today())
+
+
+
+# ----------------------------------------------------
 # Active Attendance
 # ----------------------------------------------------
 
