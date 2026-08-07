@@ -1,0 +1,1330 @@
+{
+  "backend_endpoints": [
+    {
+      "service": "auth-service",
+      "file": "main.py",
+      "method": "GET",
+      "route": "/",
+      "roles": []
+    },
+    {
+      "service": "auth-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/register",
+      "roles": []
+    },
+    {
+      "service": "auth-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/login",
+      "roles": []
+    },
+    {
+      "service": "auth-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/sso-exchange",
+      "roles": []
+    },
+    {
+      "service": "auth-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/swagger-login",
+      "roles": []
+    },
+    {
+      "service": "auth-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/refresh",
+      "roles": []
+    },
+    {
+      "service": "auth-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/logout",
+      "roles": []
+    },
+    {
+      "service": "auth-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/me",
+      "roles": []
+    },
+    {
+      "service": "auth-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/forgot-password",
+      "roles": []
+    },
+    {
+      "service": "auth-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/reset-password",
+      "roles": []
+    },
+    {
+      "service": "auth-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/mfa/setup",
+      "roles": []
+    },
+    {
+      "service": "auth-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/mfa/enable",
+      "roles": []
+    },
+    {
+      "service": "auth-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/mfa/disable",
+      "roles": []
+    },
+    {
+      "service": "auth-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/login/mfa",
+      "roles": []
+    },
+    {
+      "service": "auth-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/{invitation_id}/resend",
+      "roles": []
+    },
+    {
+      "service": "auth-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/{invitation_id}/revoke",
+      "roles": []
+    },
+    {
+      "service": "auth-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/validate/{token}",
+      "roles": []
+    },
+    {
+      "service": "auth-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/accept",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "main.py",
+      "method": "GET",
+      "route": "/",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "main.py",
+      "method": "GET",
+      "route": "/health",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/check-in",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/check-out",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/today",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/me/today",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/active",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/{attendance_id}",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "PUT",
+      "route": "/{attendance_id}",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "DELETE",
+      "route": "/{attendance_id}",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/employee/{employee_id}",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/employee/{employee_id}/summary",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/date/{attendance_date}",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "PATCH",
+      "route": "/{attendance_id}/status",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/report/monthly",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/export",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/onboard",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/me",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/{employee_id}",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "PUT",
+      "route": "/{employee_id}",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "DELETE",
+      "route": "/{employee_id}",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/search/",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/{employee_id}/profile",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "PUT",
+      "route": "/{employee_id}/profile",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/{employee_id}/documents",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/{employee_id}/documents",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "DELETE",
+      "route": "/{employee_id}/documents/{document_id}",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/departments",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/departments",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "PUT",
+      "route": "/departments/{department_id}",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "DELETE",
+      "route": "/departments/{department_id}",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/designations",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/designations",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "PUT",
+      "route": "/designations/{designation_id}",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "DELETE",
+      "route": "/designations/{designation_id}",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/branches",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/branches",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "PUT",
+      "route": "/branches/{branch_id}",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "DELETE",
+      "route": "/branches/{branch_id}",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/shifts",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/shifts",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "PUT",
+      "route": "/shifts/{shift_id}",
+      "roles": []
+    },
+    {
+      "service": "hr-service",
+      "file": "router.py",
+      "method": "DELETE",
+      "route": "/shifts/{shift_id}",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "main.py",
+      "method": "GET",
+      "route": "/",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "main.py",
+      "method": "GET",
+      "route": "/health",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/{request_id}",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "PUT",
+      "route": "/{request_id}",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "PATCH",
+      "route": "/{request_id}/status",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "DELETE",
+      "route": "/{request_id}",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/{asset_id}",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "PUT",
+      "route": "/{asset_id}",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/{asset_id}/assign",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/{asset_id}/return",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "DELETE",
+      "route": "/{asset_id}",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/{device_id}",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "PUT",
+      "route": "/{device_id}",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/{device_id}/assign",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/{device_id}/return",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "DELETE",
+      "route": "/{device_id}",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/{device_id}/maintenance",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/{device_id}/maintenance",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/{ticket_id}",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "PATCH",
+      "route": "/{ticket_id}",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "PATCH",
+      "route": "/{ticket_id}/status",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "PATCH",
+      "route": "/{ticket_id}/assign",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "DELETE",
+      "route": "/{ticket_id}",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/{ticket_id}/comments",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/{ticket_id}/comments",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/comments/{comment_id}",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "PATCH",
+      "route": "/comments/{comment_id}",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "DELETE",
+      "route": "/comments/{comment_id}",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/{license_id}",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "PUT",
+      "route": "/{license_id}",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "DELETE",
+      "route": "/{license_id}",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/{license_id}/assign",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "DELETE",
+      "route": "/assignments/{assignment_id}",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/assignments/user/{user_id}",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/{record_id}",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "PUT",
+      "route": "/{record_id}",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/{record_id}/start",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/{record_id}/complete",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/{record_id}/cancel",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "DELETE",
+      "route": "/{record_id}",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/{software_id}",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "PUT",
+      "route": "/{software_id}",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "DELETE",
+      "route": "/{software_id}",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/{software_id}/install",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "DELETE",
+      "route": "/installations/{install_id}",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/installations/device/{device_id}",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/installations/user/{user_id}",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/requests",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/requests",
+      "roles": []
+    },
+    {
+      "service": "it-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/requests/{request_id}",
+      "roles": []
+    },
+    {
+      "service": "workflow-service",
+      "file": "main.py",
+      "method": "GET",
+      "route": "/",
+      "roles": []
+    },
+    {
+      "service": "workflow-service",
+      "file": "main.py",
+      "method": "GET",
+      "route": "/health",
+      "roles": []
+    },
+    {
+      "service": "workflow-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/workflows",
+      "roles": []
+    },
+    {
+      "service": "workflow-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/workflows",
+      "roles": []
+    },
+    {
+      "service": "workflow-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/workflows/{workflow_id}",
+      "roles": []
+    },
+    {
+      "service": "workflow-service",
+      "file": "router.py",
+      "method": "PUT",
+      "route": "/workflows/{workflow_id}",
+      "roles": []
+    },
+    {
+      "service": "workflow-service",
+      "file": "router.py",
+      "method": "DELETE",
+      "route": "/workflows/{workflow_id}",
+      "roles": []
+    },
+    {
+      "service": "workflow-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/workflow-executions",
+      "roles": []
+    },
+    {
+      "service": "workflow-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/workflow-executions",
+      "roles": []
+    },
+    {
+      "service": "workflow-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/workflow-executions/{execution_id}",
+      "roles": []
+    },
+    {
+      "service": "workflow-service",
+      "file": "router.py",
+      "method": "PATCH",
+      "route": "/tasks/{task_id}/approve",
+      "roles": []
+    },
+    {
+      "service": "workflow-service",
+      "file": "router.py",
+      "method": "PATCH",
+      "route": "/workflow-executions/{execution_id}/cancel",
+      "roles": []
+    },
+    {
+      "service": "workflow-service",
+      "file": "router.py",
+      "method": "PATCH",
+      "route": "/workflow-executions/{execution_id}/restart",
+      "roles": []
+    },
+    {
+      "service": "workflow-service",
+      "file": "router.py",
+      "method": "GET",
+      "route": "/workflow-executions/{execution_id}/history",
+      "roles": []
+    },
+    {
+      "service": "ai-service",
+      "file": "main.py",
+      "method": "GET",
+      "route": "/health",
+      "roles": []
+    },
+    {
+      "service": "ai-service",
+      "file": "main.py",
+      "method": "GET",
+      "route": "/",
+      "roles": []
+    },
+    {
+      "service": "ai-service",
+      "file": "router.py",
+      "method": "POST",
+      "route": "/chat",
+      "roles": []
+    }
+  ],
+  "frontend_api_calls": [
+    {
+      "repo": "authRepository.ts",
+      "method": "POST",
+      "route": "/auth/mfa/enable"
+    },
+    {
+      "repo": "authRepository.ts",
+      "method": "POST",
+      "route": "/auth/mfa/disable"
+    },
+    {
+      "repo": "hrRepository.ts",
+      "method": "POST",
+      "route": "/organization/departments"
+    },
+    {
+      "repo": "hrRepository.ts",
+      "method": "PUT",
+      "route": "/organization/departments/${id}"
+    },
+    {
+      "repo": "hrRepository.ts",
+      "method": "DELETE",
+      "route": "/organization/departments/${id}"
+    },
+    {
+      "repo": "hrRepository.ts",
+      "method": "GET",
+      "route": "/organization/designations"
+    },
+    {
+      "repo": "hrRepository.ts",
+      "method": "POST",
+      "route": "/organization/designations"
+    },
+    {
+      "repo": "hrRepository.ts",
+      "method": "PUT",
+      "route": "/organization/designations/${id}"
+    },
+    {
+      "repo": "hrRepository.ts",
+      "method": "DELETE",
+      "route": "/organization/designations/${id}"
+    },
+    {
+      "repo": "hrRepository.ts",
+      "method": "GET",
+      "route": "/organization/branches"
+    },
+    {
+      "repo": "hrRepository.ts",
+      "method": "GET",
+      "route": "/organization/shifts"
+    },
+    {
+      "repo": "workflowRepository.ts",
+      "method": "POST",
+      "route": "/workflow-executions"
+    },
+    {
+      "repo": "workflowRepository.ts",
+      "method": "GET",
+      "route": "/workflow-executions/${id}"
+    },
+    {
+      "repo": "workflowRepository.ts",
+      "method": "PATCH",
+      "route": "/tasks/${taskId}/approve"
+    },
+    {
+      "repo": "workflowRepository.ts",
+      "method": "PATCH",
+      "route": "/workflow-executions/${id}/cancel"
+    },
+    {
+      "repo": "workflowRepository.ts",
+      "method": "GET",
+      "route": "/workflow-executions/${id}/history"
+    }
+  ],
+  "frontend_routes": [
+    "/",
+    "/(auth)\\forgot-password",
+    "/(auth)\\login",
+    "/(auth)\\register",
+    "/(auth)\\reset-password",
+    "/accept-invitation\\[token]",
+    "/contact",
+    "/dashboard",
+    "/dashboard\\hr",
+    "/dashboard\\hr\\attendance",
+    "/dashboard\\hr\\create",
+    "/dashboard\\hr\\leave",
+    "/dashboard\\hr\\organization",
+    "/dashboard\\hr\\[id]",
+    "/dashboard\\hr\\[id]\\edit",
+    "/dashboard\\it\\assets",
+    "/dashboard\\it\\tickets",
+    "/dashboard\\workflows",
+    "/dashboard\\workflows\\[id]",
+    "/dashboard\\workflows\\[id]\\execute",
+    "/help",
+    "/mfa",
+    "/privacy",
+    "/terms"
+  ],
+  "dummy_data": [
+    {
+      "file": "app\\accept-invitation\\[token]\\page.tsx",
+      "line": 179,
+      "keyword": "john doe",
+      "content": "placeholder=\"John Doe\""
+    },
+    {
+      "file": "app\\dashboard\\hr\\page.tsx",
+      "line": 118,
+      "keyword": "placeholder",
+      "content": "placeholder=\"Search employees...\""
+    },
+    {
+      "file": "app\\dashboard\\hr\\page.tsx",
+      "line": 119,
+      "keyword": "placeholder",
+      "content": "className=\"flex h-10 w-full max-w-sm rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2\""
+    },
+    {
+      "file": "app\\dashboard\\hr\\create\\page.tsx",
+      "line": 93,
+      "keyword": "placeholder",
+      "content": "<Input required id=\"first_name\" name=\"first_name\" value={formData.first_name} onChange={handleChange} placeholder=\"John\" />"
+    },
+    {
+      "file": "app\\dashboard\\hr\\create\\page.tsx",
+      "line": 98,
+      "keyword": "placeholder",
+      "content": "<Input required id=\"last_name\" name=\"last_name\" value={formData.last_name} onChange={handleChange} placeholder=\"Doe\" />"
+    },
+    {
+      "file": "app\\dashboard\\hr\\create\\page.tsx",
+      "line": 103,
+      "keyword": "placeholder",
+      "content": "<Input required type=\"email\" id=\"email\" name=\"email\" value={formData.email} onChange={handleChange} placeholder=\"john.doe@company.com\" />"
+    },
+    {
+      "file": "app\\dashboard\\hr\\create\\page.tsx",
+      "line": 113,
+      "keyword": "placeholder",
+      "content": "className=\"flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50\""
+    },
+    {
+      "file": "app\\dashboard\\hr\\create\\page.tsx",
+      "line": 124,
+      "keyword": "placeholder",
+      "content": "<Input required id=\"employee_code\" name=\"employee_code\" value={formData.employee_code} onChange={handleChange} placeholder=\"EMP-001\" />"
+    },
+    {
+      "file": "app\\dashboard\\hr\\create\\page.tsx",
+      "line": 129,
+      "keyword": "placeholder",
+      "content": "<Input id=\"phone\" name=\"phone\" value={formData.phone} onChange={handleChange} placeholder=\"+1 234 567 8900\" />"
+    },
+    {
+      "file": "app\\dashboard\\hr\\create\\page.tsx",
+      "line": 149,
+      "keyword": "placeholder",
+      "content": "className=\"flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50\""
+    },
+    {
+      "file": "app\\dashboard\\hr\\create\\page.tsx",
+      "line": 164,
+      "keyword": "placeholder",
+      "content": "className=\"flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50\""
+    },
+    {
+      "file": "app\\dashboard\\hr\\create\\page.tsx",
+      "line": 180,
+      "keyword": "placeholder",
+      "content": "className=\"flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50\""
+    },
+    {
+      "file": "app\\dashboard\\hr\\create\\page.tsx",
+      "line": 190,
+      "keyword": "placeholder",
+      "content": "<Input id=\"work_location\" name=\"work_location\" value={formData.work_location} onChange={handleChange} placeholder=\"e.g. New York, Remote\" />"
+    },
+    {
+      "file": "app\\dashboard\\hr\\[id]\\edit\\page.tsx",
+      "line": 126,
+      "keyword": "placeholder",
+      "content": "<Input required id=\"first_name\" name=\"first_name\" value={formData.first_name} onChange={handleChange} placeholder=\"John\" />"
+    },
+    {
+      "file": "app\\dashboard\\hr\\[id]\\edit\\page.tsx",
+      "line": 131,
+      "keyword": "placeholder",
+      "content": "<Input required id=\"last_name\" name=\"last_name\" value={formData.last_name} onChange={handleChange} placeholder=\"Doe\" />"
+    },
+    {
+      "file": "app\\dashboard\\hr\\[id]\\edit\\page.tsx",
+      "line": 136,
+      "keyword": "placeholder",
+      "content": "<Input required id=\"employee_code\" name=\"employee_code\" value={formData.employee_code} onChange={handleChange} placeholder=\"EMP-001\" />"
+    },
+    {
+      "file": "app\\dashboard\\hr\\[id]\\edit\\page.tsx",
+      "line": 141,
+      "keyword": "placeholder",
+      "content": "<Input id=\"phone\" name=\"phone\" value={formData.phone} onChange={handleChange} placeholder=\"+1 234 567 8900\" />"
+    },
+    {
+      "file": "app\\dashboard\\hr\\[id]\\edit\\page.tsx",
+      "line": 161,
+      "keyword": "placeholder",
+      "content": "className=\"flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50\""
+    },
+    {
+      "file": "app\\dashboard\\hr\\[id]\\edit\\page.tsx",
+      "line": 176,
+      "keyword": "placeholder",
+      "content": "className=\"flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50\""
+    },
+    {
+      "file": "app\\dashboard\\hr\\[id]\\edit\\page.tsx",
+      "line": 192,
+      "keyword": "placeholder",
+      "content": "className=\"flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50\""
+    },
+    {
+      "file": "app\\dashboard\\hr\\[id]\\edit\\page.tsx",
+      "line": 202,
+      "keyword": "placeholder",
+      "content": "<Input id=\"work_location\" name=\"work_location\" value={formData.work_location} onChange={handleChange} placeholder=\"e.g. New York, Remote\" />"
+    },
+    {
+      "file": "app\\mfa\\page.tsx",
+      "line": 198,
+      "keyword": "placeholder",
+      "content": "placeholder=\"000000\""
+    },
+    {
+      "file": "components\\auth\\ForgotPasswordForm.tsx",
+      "line": 55,
+      "keyword": "placeholder",
+      "content": "placeholder=\"name@company.com\""
+    },
+    {
+      "file": "components\\auth\\LoginForm.tsx",
+      "line": 92,
+      "keyword": "placeholder",
+      "content": "placeholder=\"name@company.com\""
+    },
+    {
+      "file": "components\\auth\\LoginForm.tsx",
+      "line": 150,
+      "keyword": "placeholder",
+      "content": "placeholder=\"000000\""
+    },
+    {
+      "file": "components\\auth\\RegisterForm.tsx",
+      "line": 99,
+      "keyword": "placeholder",
+      "content": "placeholder=\"Workpilot Inc.\""
+    },
+    {
+      "file": "components\\auth\\RegisterForm.tsx",
+      "line": 111,
+      "keyword": "john doe",
+      "content": "placeholder=\"John Doe\""
+    },
+    {
+      "file": "components\\auth\\RegisterForm.tsx",
+      "line": 123,
+      "keyword": "placeholder",
+      "content": "placeholder=\"name@company.com\""
+    },
+    {
+      "file": "components\\auth\\RegisterForm.tsx",
+      "line": 143,
+      "keyword": "placeholder",
+      "content": "placeholder=\"\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\""
+    },
+    {
+      "file": "components\\auth\\RegisterForm.tsx",
+      "line": 165,
+      "keyword": "placeholder",
+      "content": "placeholder=\"\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\""
+    },
+    {
+      "file": "components\\auth\\ResetPasswordForm.tsx",
+      "line": 90,
+      "keyword": "placeholder",
+      "content": "placeholder=\"\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\""
+    },
+    {
+      "file": "components\\auth\\ResetPasswordForm.tsx",
+      "line": 114,
+      "keyword": "placeholder",
+      "content": "placeholder=\"\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\""
+    },
+    {
+      "file": "components\\chat\\ChatInput.tsx",
+      "line": 29,
+      "keyword": "placeholder",
+      "content": "placeholder=\"Ask WorkPilot...\""
+    },
+    {
+      "file": "components\\chat\\ChatPanel.tsx",
+      "line": 37,
+      "keyword": "placeholder",
+      "content": "{ id: (Date.now() + 1).toString(), role: \"ai\", content: \"I'm currently a UI placeholder. My brain will be connected soon!\" }"
+    },
+    {
+      "file": "components\\hr\\InviteEmployeeModal.tsx",
+      "line": 65,
+      "keyword": "placeholder",
+      "content": "placeholder=\"employee@company.com\""
+    },
+    {
+      "file": "components\\hr\\InviteEmployeeModal.tsx",
+      "line": 76,
+      "keyword": "placeholder",
+      "content": "className=\"flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-50\""
+    },
+    {
+      "file": "components\\layout\\Header.tsx",
+      "line": 52,
+      "keyword": "placeholder",
+      "content": "placeholder=\"Search...\""
+    },
+    {
+      "file": "components\\ui\\Input.tsx",
+      "line": 12,
+      "keyword": "placeholder",
+      "content": "className={`flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 disabled:cursor-not-allowed disabled:opacity-50 ${"
+    }
+  ],
+  "todos": [
+    {
+      "file": "app\\dashboard\\hr\\page.tsx",
+      "line": 25,
+      "keyword": "temp",
+      "content": "const [employees, setEmployees] = useState<EmployeeResponse[]>([]);"
+    },
+    {
+      "file": "app\\dashboard\\hr\\page.tsx",
+      "line": 41,
+      "keyword": "temp",
+      "content": "setEmployees(data);"
+    },
+    {
+      "file": "app\\dashboard\\hr\\page.tsx",
+      "line": 43,
+      "keyword": "temp",
+      "content": "const data = await hrRepository.getEmployees(); // We can also use searchEmployees(\"\", currentPage) if the backend supports empty keyword. But backend requires min_length=1."
+    },
+    {
+      "file": "app\\dashboard\\hr\\page.tsx",
+      "line": 44,
+      "keyword": "temp",
+      "content": "setEmployees(data);"
+    },
+    {
+      "file": "app\\dashboard\\hr\\[id]\\page.tsx",
+      "line": 19,
+      "keyword": "temp",
+      "content": "const [employee, setEmployee] = useState<EmployeeResponse | null>(null);"
+    },
+    {
+      "file": "app\\dashboard\\hr\\[id]\\page.tsx",
+      "line": 28,
+      "keyword": "temp",
+      "content": "const data = await hrRepository.getEmployeeById(employeeId);"
+    },
+    {
+      "file": "app\\dashboard\\hr\\[id]\\page.tsx",
+      "line": 29,
+      "keyword": "temp",
+      "content": "setEmployee(data);"
+    },
+    {
+      "file": "app\\dashboard\\hr\\[id]\\edit\\page.tsx",
+      "line": 13,
+      "keyword": "temp",
+      "content": "export default function EditEmployeePage() {"
+    },
+    {
+      "file": "app\\dashboard\\hr\\[id]\\edit\\page.tsx",
+      "line": 39,
+      "keyword": "temp",
+      "content": "const data = await hrRepository.getEmployeeById(employeeId);"
+    },
+    {
+      "file": "app\\terms\\page.tsx",
+      "line": 28,
+      "keyword": "temp",
+      "content": "<p>Permission is granted to temporarily access the materials on WorkPilot AI&apos;s platform for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title.</p>"
+    },
+    {
+      "file": "components\\auth\\AuthProvider.tsx",
+      "line": 10,
+      "keyword": "temp",
+      "content": "* Routes where session restoration must NOT be attempted automatically."
+    },
+    {
+      "file": "components\\auth\\AuthProvider.tsx",
+      "line": 80,
+      "keyword": "temp",
+      "content": "// Attempt session restoration via the HttpOnly refresh cookie."
+    },
+    {
+      "file": "repositories\\hrRepository.ts",
+      "line": 7,
+      "keyword": "temp",
+      "content": "async getEmployees(): Promise<EmployeeResponse[]> {"
+    },
+    {
+      "file": "repositories\\hrRepository.ts",
+      "line": 42,
+      "keyword": "temp",
+      "content": "if (err.response.status >= 500) throw new Error(\"Server error. Service might be temporarily unavailable.\");"
+    },
+    {
+      "file": "repositories\\hrRepository.ts",
+      "line": 70,
+      "keyword": "temp",
+      "content": "async getEmployeeById(id: string): Promise<EmployeeResponse> {"
+    }
+  ]
+}

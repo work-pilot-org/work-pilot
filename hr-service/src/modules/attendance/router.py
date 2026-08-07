@@ -149,7 +149,7 @@ def get_my_today_attendance(
     employee = emp_repo.get_employee_by_auth_user_id(auth_user_id)
     if not employee:
         return None
-    return service.repository.get_by_employee_and_date(employee.id, date_type.today())
+    return service.get_employee_attendance_by_date(employee.id, date_type.today())
 
 
 

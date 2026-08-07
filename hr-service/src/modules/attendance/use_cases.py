@@ -44,6 +44,9 @@ class AttendanceUseCases:
     def get_employee_attendance(self, employee_id: UUID) -> list[Attendance]:
         return self.service.get_employee_attendance(employee_id)
         
+    def get_employee_attendance_by_date(self, employee_id: UUID, query_date: date) -> Attendance | None:
+        return self.service.get_employee_attendance_by_date(employee_id, query_date)
+        
     def get_employee_summary(self, employee_id: UUID) -> dict[str, object]:
         return self.service.get_employee_summary(employee_id)
         

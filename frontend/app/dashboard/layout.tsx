@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import Sidebar from "@/components/layout/Sidebar";
 
 import Header from "@/components/layout/Header";
+import { ChatLauncher } from "@/components/chat/ChatLauncher";
 
 export default function DashboardLayout({
   children,
@@ -38,13 +39,16 @@ export default function DashboardLayout({
     <div className="flex h-screen bg-gray-50 overflow-hidden">
       <Sidebar />
 
-      <div className="flex flex-col flex-1 min-w-0">
+      <div className="flex flex-col flex-1 min-w-0 relative">
         <Header />
 
         {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6">
           {children}
         </main>
+        
+        {/* Chat UI accessible across all authorized dashboard pages */}
+        <ChatLauncher />
       </div>
     </div>
   );

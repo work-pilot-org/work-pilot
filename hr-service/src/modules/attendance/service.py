@@ -219,12 +219,15 @@ class AttendanceService:
             raise
 
     # --------------------------------------------------
-    # Get Employee Attendance
+    # Employee Attendance
     # GET /attendance/employee/{employee_id}
     # --------------------------------------------------
 
     def get_employee_attendance(self, employee_id: UUID) -> list[Attendance]:
         return self.repository.get_by_employee(employee_id)
+
+    def get_employee_attendance_by_date(self, employee_id: UUID, query_date: date) -> Attendance | None:
+        return self.repository.get_by_employee_and_date(employee_id, query_date)
 
     # --------------------------------------------------
     # Employee Attendance Summary
