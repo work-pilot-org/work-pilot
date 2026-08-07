@@ -70,6 +70,23 @@ workflowApi.interceptors.request.use((config) => {
   return config;
 });
 
+const AI_SERVICE_URL = process.env.NEXT_PUBLIC_AI_SERVICE_URL || "http://localhost:8003";
+export const aiApi = axios.create({
+  baseURL: AI_SERVICE_URL,
+  withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+aiApi.interceptors.request.use((config) => {
+  const token = useAuthStore.getState().token;
+  if (token && config.headers) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 // --- Response Interceptor Setup ---
 import toast from "react-hot-toast";
 
@@ -107,4 +124,4 @@ api.interceptors.response.use(responseInterceptor, errorInterceptor);
 hrApi.interceptors.response.use(responseInterceptor, errorInterceptor);
 itApi.interceptors.response.use(responseInterceptor, errorInterceptor);
 workflowApi.interceptors.response.use(responseInterceptor, errorInterceptor);
-
+aiApi.interceptors.response.use(responseInterceptor, errorInterceptor);

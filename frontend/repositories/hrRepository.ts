@@ -35,9 +35,17 @@ export const hrRepository = {
       const response = await hrApi.get<import("@/types/hr").AttendanceResponse | null>("/attendance/me/today");
       return response.data;
     } catch (err: unknown) {
-      if (axios.isAxiosError(err) && err.response?.data) {
-        const detail = (err.response.data as ApiError).detail;
-        throw new Error(typeof detail === "string" ? detail : "Failed to fetch your attendance.");
+      if (axios.isAxiosError(err)) {
+        if (err.response) {
+          if (err.response.status === 401) throw new Error("Authentication failed.");
+          if (err.response.status === 403) throw new Error("Authorization failed.");
+          if (err.response.status >= 500) throw new Error("Server error. Service might be temporarily unavailable.");
+          
+          const detail = (err.response.data as ApiError)?.detail;
+          throw new Error(typeof detail === "string" ? detail : "Failed to fetch your attendance.");
+        } else {
+          throw new Error("Network connection error.");
+        }
       }
       throw new Error(err instanceof Error ? err.message : "An unexpected error occurred.");
     }

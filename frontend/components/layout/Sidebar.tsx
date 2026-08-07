@@ -30,13 +30,6 @@ const navConfig: NavItem[] = [
     name: "Dashboard", 
     href: "/dashboard", 
     icon: LayoutDashboard
-    // globally accessible — TENANT_ADMIN, MANAGER land here
-  },
-  { 
-    name: "My Workspace",
-    href: "/dashboard/employee",
-    icon: LayoutDashboard,
-    allowedRoles: ["EMPLOYEE"],
   },
   { 
     name: "HR", 

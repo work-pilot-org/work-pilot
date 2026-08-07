@@ -28,25 +28,30 @@ function formatMinutes(mins: number): string {
   return `${h}h ${m}m`;
 }
 
-export default function EmployeeDashboardPage() {
+export function EmployeeDashboard() {
   const { user } = useAuthStore();
   const [profile, setProfile] = useState<EmployeeResponse | null>(null);
   const [attendance, setAttendance] = useState<AttendanceResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [attendanceError, setAttendanceError] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
       try {
         setIsLoading(true);
         setError(null);
+        setAttendanceError(null);
         const [emp, att] = await Promise.allSettled([
           hrRepository.getMyProfile(),
           hrRepository.getMyTodayAttendance(),
         ]);
+        
         if (emp.status === "fulfilled") setProfile(emp.value);
+        else throw new Error(emp.reason?.message || "Failed to load profile.");
+        
         if (att.status === "fulfilled") setAttendance(att.value);
-        if (emp.status === "rejected") throw new Error(emp.reason?.message || "Failed to load profile.");
+        else setAttendanceError(att.reason?.message || "Failed to load attendance.");
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : "Failed to load your workspace.");
       } finally {
@@ -133,7 +138,14 @@ export default function EmployeeDashboardPage() {
               <p className="text-xs text-gray-500">Live status</p>
             </div>
           </div>
-          {attendance ? (
+          {attendanceError ? (
+            <div className="text-sm text-red-600 bg-red-50 p-4 rounded-lg border border-red-100 flex flex-col gap-1">
+              <span className="font-semibold flex items-center gap-2">
+                <XCircle className="w-4 h-4" /> Attendance Service Error
+              </span>
+              <span>{attendanceError}</span>
+            </div>
+          ) : attendance ? (
             <dl className="space-y-3 text-sm">
               <div className="flex justify-between items-center">
                 <dt className="text-gray-500">Status</dt>
