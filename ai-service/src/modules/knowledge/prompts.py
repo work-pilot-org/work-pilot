@@ -1,86 +1,69 @@
 """
-Prompt builders for the Knowledge Agent.
+Prompts used by the Knowledge Agent.
+
+All LLM prompts are kept in this module so that prompt
+logic remains separate from the agent and retrieval logic.
 """
 
 from __future__ import annotations
 
 
-def build_document_search_prompt(
+def build_knowledge_answer_prompt(
+    *,
     user_query: str,
     context: str,
 ) -> str:
     """
-    Prompt for answering questions using retrieved documents.
+    Build the prompt used to generate an answer from
+    retrieved knowledge-base context.
     """
 
     return f"""
 You are the WorkPilot Knowledge Agent.
 
-Answer the user's question ONLY using the provided context.
+Your job is to answer the user's question using ONLY
+the information provided in the knowledge-base context.
 
-If the answer is not available in the context, reply exactly:
+Rules:
+1. Use the provided context as the source of truth.
+2. Do not invent facts that are not present in the context.
+3. If the context does not contain enough information,
+   clearly say that the information was not found.
+4. Give a concise and useful answer.
+5. Do not mention internal retrieval, embeddings,
+   vector databases, or implementation details.
+6. If multiple pieces of context are relevant, combine
+   them into one clear answer.
 
-"I couldn't find that information in the knowledge base."
-
-Be concise, accurate, and professional.
-
-------------------------
-Context:
-{context}
-------------------------
-
-User Question:
+User question:
 {user_query}
 
+Knowledge-base context:
+{context}
+
 Answer:
-"""
+""".strip()
 
 
-def build_faq_prompt(
+def build_no_context_prompt(
+    *,
     user_query: str,
-    context: str,
 ) -> str:
     """
-    Prompt for FAQ retrieval.
+    Build a response prompt when no relevant knowledge
+    was retrieved.
     """
 
     return f"""
-You are answering a frequently asked question.
+You are the WorkPilot Knowledge Agent.
 
-Use only the FAQ information below.
+The knowledge base does not contain enough relevant
+information to answer the user's question.
 
-FAQ:
-
-{context}
-
-Question:
-
+User question:
 {user_query}
 
-Answer:
-"""
-
-
-def build_policy_prompt(
-    user_query: str,
-    context: str,
-) -> str:
-    """
-    Prompt for company policy questions.
-    """
-
-    return f"""
-You are a company policy assistant.
-
-Only answer using the policy documents below.
-
-Policy Documents:
-
-{context}
-
-Question:
-
-{user_query}
-
-Answer:
-"""
+Respond clearly that the required information could
+not be found in the organization's knowledge base.
+Do not invent an answer.
+""".strip()
