@@ -46,12 +46,14 @@ async def chat(
     body: ChatRequest,
     request: Request,
     coordinator: CoordinatorAgent = Depends(get_coordinator),
+    current_user: dict = Depends(get_current_user),
 ):
     headers = _extract_trusted_headers(request)
 
     result = await coordinator.process(
         user_message=body.message,
         headers=headers,
+        user_context=current_user,
     )
 
     return {

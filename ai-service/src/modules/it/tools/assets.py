@@ -27,8 +27,7 @@ async def create_asset(
     """
     return await it_client.create_asset(
         payload=payload,
-        headers=headers,
-    )
+        )
 
 
 async def list_assets(
@@ -51,8 +50,7 @@ async def list_assets(
         search=search,
         skip=skip,
         limit=limit,
-        headers=headers,
-    )
+        )
 
 
 async def get_asset(
@@ -64,8 +62,7 @@ async def get_asset(
     """
     return await it_client.get_asset(
         asset_id=asset_id,
-        headers=headers,
-    )
+        )
 
 
 async def update_asset(
@@ -79,8 +76,7 @@ async def update_asset(
     return await it_client.update_asset(
         asset_id=asset_id,
         payload=payload,
-        headers=headers,
-    )
+        )
 
 
 async def delete_asset(
@@ -92,8 +88,7 @@ async def delete_asset(
     """
     return await it_client.delete_asset(
         asset_id=asset_id,
-        headers=headers,
-    )
+        )
 
 
 async def assign_asset(
@@ -107,8 +102,7 @@ async def assign_asset(
     return await it_client.assign_asset(
         asset_id=asset_id,
         payload=payload,
-        headers=headers,
-    )
+        )
 
 
 async def return_asset(
@@ -120,8 +114,7 @@ async def return_asset(
     """
     return await it_client.return_asset(
         asset_id=asset_id,
-        headers=headers,
-    )
+        )
 
 
 # ==========================================================

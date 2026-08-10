@@ -232,6 +232,61 @@ export const hrRepository = {
   async getShifts(): Promise<any[]> {
     const response = await hrApi.get("/organization/shifts");
     return response.data;
+  },
+
+  async getLeaveTypes(): Promise<import("@/types/hr").LeaveTypeResponse[]> {
+    const response = await hrApi.get("/leave-types");
+    return response.data;
+  },
+
+  async createLeaveType(data: any): Promise<import("@/types/hr").LeaveTypeResponse> {
+    const response = await hrApi.post("/leave-types", data);
+    return response.data;
+  },
+
+  async updateLeaveRequestStatus(id: string, status: import("@/types/hr").LeaveStatus, review_comments: string = ""): Promise<import("@/types/hr").LeaveRequestResponse> {
+    const response = await hrApi.patch(`/leave-requests/${id}/status`, { status, review_comments });
+    return response.data;
+  },
+
+  async getLeaveBalances(): Promise<import("@/types/hr").LeaveBalanceResponse[]> {
+    const response = await hrApi.get("/leave-balances");
+    return response.data;
+  },
+
+  async getHolidays(): Promise<import("@/types/hr").HolidayResponse[]> {
+    const response = await hrApi.get("/holidays");
+    return response.data;
+  },
+
+  async getOrganizationLeaveReport(): Promise<import("@/types/hr").OrganizationLeaveReportResponse> {
+    const response = await hrApi.get("/leave/reports");
+    return response.data;
+  },
+
+  async getLeavePolicies(): Promise<import("@/types/hr").LeavePolicyResponse[]> {
+    const response = await hrApi.get("/leave-policies");
+    return response.data;
+  },
+
+  async getAttendancePolicies(): Promise<import("@/types/hr").AttendancePolicyResponse[]> {
+    const response = await hrApi.get("/attendance-policies");
+    return response.data;
+  },
+
+  async getShiftPolicies(): Promise<import("@/types/hr").ShiftPolicyResponse[]> {
+    const response = await hrApi.get("/shift-policies");
+    return response.data;
+  },
+
+  async getHolidayPolicies(): Promise<import("@/types/hr").HolidayPolicyResponse[]> {
+    const response = await hrApi.get("/holiday-policies");
+    return response.data;
+  },
+
+  async getProbationPolicies(): Promise<import("@/types/hr").ProbationPolicyResponse[]> {
+    const response = await hrApi.get("/probation-policies");
+    return response.data;
   }
 };
 

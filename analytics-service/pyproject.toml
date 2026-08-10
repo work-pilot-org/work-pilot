@@ -1,0 +1,26 @@
+[project]
+name = "analytics-service"
+version = "0.1.0"
+description = "Analytics Service for WorkPilot"
+readme = "README.md"
+requires-python = ">=3.13"
+
+dependencies = [
+    "alembic>=1.18.5",
+    "fastapi>=0.139.2",
+    "psycopg[binary]>=3.3.4",
+    "pydantic>=2.13.4",
+    "pydantic-settings>=2.14.2",
+    "uvicorn>=0.51.0",
+    "httpx>=0.28.1",
+    "python-jose[cryptography]>=3.3.0",
+    "shared-infrastructure",
+    "celery>=5.4.0",
+    "redis>=5.2.1",
+]
+
+[tool.ruff.lint]
+ignore = ['B008', 'E402', 'DTZ003', 'BLE001']
+
+[tool.uv.sources]
+shared-infrastructure = { workspace = true }

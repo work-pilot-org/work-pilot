@@ -35,14 +35,14 @@ async def create_leave_policy(
 async def get_leave_policies(
     headers: dict[str, str] | None = None,
 ):
-    return await hr_client.get_leave_policies()
+    return await hr_client.get_leave_policies(headers=headers)
 
 
 async def get_leave_policy(
     policy_id: str,
     headers: dict[str, str] | None = None,
 ):
-    return await hr_client.get_leave_policy(policy_id)
+    return await hr_client.get_leave_policy(policy_id, headers=headers)
 
 
 async def update_leave_policy(
@@ -60,7 +60,7 @@ async def delete_leave_policy(
     policy_id: str,
     headers: dict[str, str] | None = None,
 ):
-    return await hr_client.delete_leave_policy(policy_id)
+    return await hr_client.delete_leave_policy(policy_id, headers=headers)
 
 
 # ==========================================================
@@ -79,14 +79,14 @@ async def create_attendance_policy(
 async def get_attendance_policies(
     headers: dict[str, str] | None = None,
 ):
-    return await hr_client.get_attendance_policies()
+    return await hr_client.get_attendance_policies(headers=headers)
 
 
 async def get_attendance_policy(
     policy_id: str,
     headers: dict[str, str] | None = None,
 ):
-    return await hr_client.get_attendance_policy(policy_id)
+    return await hr_client.get_attendance_policy(policy_id, headers=headers)
 
 
 async def update_attendance_policy(
@@ -104,7 +104,7 @@ async def delete_attendance_policy(
     policy_id: str,
     headers: dict[str, str] | None = None,
 ):
-    return await hr_client.delete_attendance_policy(policy_id)
+    return await hr_client.delete_attendance_policy(policy_id, headers=headers)
 
 
 # ==========================================================
@@ -123,14 +123,14 @@ async def create_shift_policy(
 async def get_shift_policies(
     headers: dict[str, str] | None = None,
 ):
-    return await hr_client.get_shift_policies()
+    return await hr_client.get_shift_policies(headers=headers)
 
 
 async def get_shift_policy(
     policy_id: str,
     headers: dict[str, str] | None = None,
 ):
-    return await hr_client.get_shift_policy(policy_id)
+    return await hr_client.get_shift_policy(policy_id, headers=headers)
 
 
 async def update_shift_policy(
@@ -148,7 +148,7 @@ async def delete_shift_policy(
     policy_id: str,
     headers: dict[str, str] | None = None,
 ):
-    return await hr_client.delete_shift_policy(policy_id)
+    return await hr_client.delete_shift_policy(policy_id, headers=headers)
 
 
 # ==========================================================
@@ -167,14 +167,14 @@ async def create_holiday_policy(
 async def get_holiday_policies(
     headers: dict[str, str] | None = None,
 ):
-    return await hr_client.get_holiday_policies()
+    return await hr_client.get_holiday_policies(headers=headers)
 
 
 async def get_holiday_policy(
     policy_id: str,
     headers: dict[str, str] | None = None,
 ):
-    return await hr_client.get_holiday_policy(policy_id)
+    return await hr_client.get_holiday_policy(policy_id, headers=headers)
 
 
 async def update_holiday_policy(
@@ -192,7 +192,7 @@ async def delete_holiday_policy(
     policy_id: str,
     headers: dict[str, str] | None = None,
 ):
-    return await hr_client.delete_holiday_policy(policy_id)
+    return await hr_client.delete_holiday_policy(policy_id, headers=headers)
 
 
 # ==========================================================
@@ -211,14 +211,14 @@ async def create_probation_policy(
 async def get_probation_policies(
     headers: dict[str, str] | None = None,
 ):
-    return await hr_client.get_probation_policies()
+    return await hr_client.get_probation_policies(headers=headers)
 
 
 async def get_probation_policy(
     policy_id: str,
     headers: dict[str, str] | None = None,
 ):
-    return await hr_client.get_probation_policy(policy_id)
+    return await hr_client.get_probation_policy(policy_id, headers=headers)
 
 
 async def update_probation_policy(
@@ -236,7 +236,7 @@ async def delete_probation_policy(
     policy_id: str,
     headers: dict[str, str] | None = None,
 ):
-    return await hr_client.delete_probation_policy(policy_id)
+    return await hr_client.delete_probation_policy(policy_id, headers=headers)
 
 
 # ==========================================================

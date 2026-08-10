@@ -8,6 +8,7 @@ they are passed to the HR Service.
 from __future__ import annotations
 
 from datetime import date
+from enum import Enum
 from typing import Optional
 from uuid import UUID
 
@@ -120,11 +121,23 @@ class MonthlyAttendanceReportToolInput(BaseModel):
 # Leave
 # =====================================================
 
+class LeaveType(str, Enum):
+    CASUAL = "CASUAL"
+    SICK = "SICK"
+    EARNED = "EARNED"
+    MATERNITY = "MATERNITY"
+    PATERNITY = "PATERNITY"
+    COMP_OFF = "COMP_OFF"
+    UNPAID = "UNPAID"
+    OTHER = "OTHER"
+
+
+
 class CreateLeaveRequestToolInput(BaseModel):
 
     employee_id: UUID
 
-    leave_type: str
+    leave_type: LeaveType
 
     start_date: date
 
@@ -240,101 +253,166 @@ class CreateProbationPolicyToolInput(BaseModel):
     description: Optional[str] = None
 
 # =====================================================
-# Auto-generated Missing Schemas
+# Replaced Missing Schemas
 # =====================================================
 
-class AttendanceCheckInToolInput(BaseModel):
-    # TODO: Add specific fields
-    name: str = ""
+from datetime import time
+from decimal import Decimal
+from pydantic import BaseModel
 
-class AttendanceCheckOutToolInput(BaseModel):
-    # TODO: Add specific fields
-    name: str = ""
-
+# -- Attendance --
 class CreateAttendanceToolInput(BaseModel):
-    # TODO: Add specific fields
-    name: str = ""
-
-class CreateHolidayToolInput(BaseModel):
-    # TODO: Add specific fields
-    name: str = ""
-
-class CreateLeaveBalanceToolInput(BaseModel):
-    # TODO: Add specific fields
-    name: str = ""
-
-class CreateLeaveToolInput(BaseModel):
-    # TODO: Add specific fields
-    name: str = ""
-
-class CreateLeaveTypeToolInput(BaseModel):
-    # TODO: Add specific fields
-    name: str = ""
-
-class UpdateAttendancePolicyToolInput(BaseModel):
-    # TODO: Add specific fields
-    payload: dict
-
-class UpdateAttendanceStatusToolInput(BaseModel):
-    # TODO: Add specific fields
-    status: str
+    employee_id: UUID
+    attendance_date: date
+    check_in: time | None = None
+    check_out: time | None = None
+    status: str = "PRESENT"
+    remarks: str | None = None
 
 class UpdateAttendanceToolInput(BaseModel):
-    # TODO: Add specific fields
-    payload: dict
+    attendance_date: date | None = None
+    check_in: time | None = None
+    check_out: time | None = None
+    status: str | None = None
+    remarks: str | None = None
 
-class UpdateBranchToolInput(BaseModel):
-    # TODO: Add specific fields
-    payload: dict
-
-class UpdateDepartmentToolInput(BaseModel):
-    # TODO: Add specific fields
-    payload: dict
-
-class UpdateDesignationToolInput(BaseModel):
-    # TODO: Add specific fields
-    payload: dict
-
-class UpdateEmployeeProfileToolInput(BaseModel):
-    # TODO: Add specific fields
-    payload: dict
-
-class UpdateHolidayPolicyToolInput(BaseModel):
-    # TODO: Add specific fields
-    payload: dict
-
-class UpdateLeaveBalanceToolInput(BaseModel):
-    # TODO: Add specific fields
-    payload: dict
-
-class UpdateLeavePolicyToolInput(BaseModel):
-    # TODO: Add specific fields
-    payload: dict
-
-class UpdateLeaveToolInput(BaseModel):
-    # TODO: Add specific fields
-    payload: dict
-
-class UpdateLeaveToolInputStatus(BaseModel):
-    # TODO: Add specific fields
+class UpdateAttendanceStatusToolInput(BaseModel):
     status: str
 
+# -- Leave --
+class CreateLeaveTypeToolInput(BaseModel):
+    name: str
+    description: str | None = None
+    days_per_year: int
+    is_paid: bool = True
+    carry_forward: bool = False
+
 class UpdateLeaveTypeToolInput(BaseModel):
-    # TODO: Add specific fields
-    payload: dict
+    name: str | None = None
+    description: str | None = None
+    days_per_year: int | None = None
+    is_paid: bool | None = None
+    carry_forward: bool | None = None
+    is_active: bool | None = None
 
-class UpdateProbationPolicyToolInput(BaseModel):
-    # TODO: Add specific fields
-    payload: dict
+class CreateLeaveBalanceToolInput(BaseModel):
+    employee_id: UUID
+    leave_type: LeaveType
+    year: int
+    allocated_days: Decimal
+    carried_forward_days: Decimal = Decimal("0.0")
+    notes: str | None = None
 
-class UpdateShiftPolicyToolInput(BaseModel):
-    # TODO: Add specific fields
-    payload: dict
+class UpdateLeaveBalanceToolInput(BaseModel):
+    allocated_days: Decimal | None = None
+    used_days: Decimal | None = None
+    carried_forward_days: Decimal | None = None
+    notes: str | None = None
+
+class CreateHolidayToolInput(BaseModel):
+    name: str
+    date: date
+    is_optional: bool = False
+
+class UpdateLeaveToolInput(BaseModel):
+    leave_type: LeaveType | None = None
+    start_date: date | None = None
+    end_date: date | None = None
+    reason: str | None = None
+    is_half_day: bool | None = None
+    emergency_contact: str | None = None
+
+# -- Employee --
+class UploadEmployeeDocumentToolInput(BaseModel):
+    document_name: str
+    document_type: str
+    file_url: str
+
+class UpdateEmployeeProfileToolInput(BaseModel):
+    address: str | None = None
+    city: str | None = None
+    state: str | None = None
+    country: str | None = None
+    postal_code: str | None = None
+    emergency_contact_name: str | None = None
+    emergency_contact_phone: str | None = None
+    emergency_contact_relation: str | None = None
+    blood_group: str | None = None
+    marital_status: str | None = None
+
+# -- Organization --
+class UpdateDepartmentToolInput(BaseModel):
+    name: str | None = None
+    description: str | None = None
+    is_active: bool | None = None
+
+class UpdateDesignationToolInput(BaseModel):
+    name: str | None = None
+    description: str | None = None
+    department_id: int | None = None
+    is_active: bool | None = None
+
+class UpdateBranchToolInput(BaseModel):
+    name: str | None = None
+    code: str | None = None
+    address: str | None = None
+    city: str | None = None
+    state: str | None = None
+    country: str | None = None
+    postal_code: str | None = None
+    phone: str | None = None
+    email: str | None = None
+    is_active: bool | None = None
 
 class UpdateShiftToolInput(BaseModel):
-    # TODO: Add specific fields
-    payload: dict
+    name: str | None = None
+    start_time: time | None = None
+    end_time: time | None = None
+    grace_time: int | None = None
+    is_night_shift: bool | None = None
+    is_active: bool | None = None
 
-class UploadEmployeeDocumentToolInput(BaseModel):
-    # TODO: Add specific fields
-    name: str = ""
+# -- Policies --
+class UpdateLeavePolicyToolInput(BaseModel):
+    name: str | None = None
+    casual_leave_days: Decimal | None = None
+    sick_leave_days: Decimal | None = None
+    earned_leave_days: Decimal | None = None
+    maternity_leave_days: Decimal | None = None
+    paternity_leave_days: Decimal | None = None
+    carry_forward_enabled: bool | None = None
+    max_carry_forward: Decimal | None = None
+    half_day_allowed: bool | None = None
+    minimum_notice_days: int | None = None
+    requires_attachment: bool | None = None
+
+class UpdateAttendancePolicyToolInput(BaseModel):
+    name: str | None = None
+    working_hours: Decimal | None = None
+    grace_period: int | None = None
+    late_mark_limit: int | None = None
+    half_day_after_hours: Decimal | None = None
+    auto_checkout: bool | None = None
+    weekend_policy: str | None = None
+
+class UpdateShiftPolicyToolInput(BaseModel):
+    name: str | None = None
+    shift_start: time | None = None
+    shift_end: time | None = None
+    break_duration: int | None = None
+    weekly_off: str | None = None
+    night_shift: bool | None = None
+
+class UpdateHolidayPolicyToolInput(BaseModel):
+    name: str | None = None
+    calendar_name: str | None = None
+    country: str | None = None
+    state: str | None = None
+    floating_holidays: int | None = None
+
+class UpdateProbationPolicyToolInput(BaseModel):
+    name: str | None = None
+    duration_months: int | None = None
+    review_after_months: int | None = None
+    confirmation_required: bool | None = None
+    notice_period: int | None = None

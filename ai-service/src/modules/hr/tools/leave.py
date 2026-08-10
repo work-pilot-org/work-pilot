@@ -11,9 +11,9 @@ from modules.hr.registry import hr_tool_registry
 from modules.hr.schemas import (
     CreateLeaveTypeToolInput,
     UpdateLeaveTypeToolInput,
-    CreateLeaveToolInput,
+    CreateLeaveRequestToolInput,
     UpdateLeaveToolInput,
-    UpdateLeaveToolInputStatus,
+    UpdateLeaveStatusToolInput,
     CreateLeaveBalanceToolInput,
     UpdateLeaveBalanceToolInput,
     CreateHolidayToolInput,
@@ -36,7 +36,7 @@ async def create_leave_type(
 async def get_leave_types(
     headers: dict[str, str] | None = None,
 ):
-    return await hr_client.get_leave_types()
+    return await hr_client.get_leave_types(headers=headers)
 
 
 async def get_leave_type(
@@ -73,7 +73,7 @@ async def delete_leave_type(
 # ==========================================================
 
 async def create_leave_request(
-    payload: CreateLeaveToolInput,
+    payload: CreateLeaveRequestToolInput,
     headers: dict[str, str] | None = None,
 ):
     return await hr_client.create_leave_request(
@@ -84,7 +84,7 @@ async def create_leave_request(
 async def get_all_leave_requests(
     headers: dict[str, str] | None = None,
 ):
-    return await hr_client.get_all_leave_requests()
+    return await hr_client.get_all_leave_requests(headers=headers)
 
 
 async def get_leave_request(
@@ -109,7 +109,7 @@ async def update_leave_request(
 
 async def update_leave_request_status(
     leave_request_id: UUID,
-    payload: UpdateLeaveToolInputStatus,
+    payload: UpdateLeaveStatusToolInput,
     headers: dict[str, str] | None = None,
 ):
     return await hr_client.update_leave_request_status(
@@ -144,9 +144,12 @@ async def get_employee_leave_balance(
     employee_id: UUID,
     headers: dict[str, str] | None = None,
 ):
-    return await hr_client.get_employee_leave_balance(
+    result = await hr_client.get_employee_leave_balance(
         employee_id=str(employee_id),
     )
+    if result is not None and not result.get("balances"):
+        return {"error": "leave balance not initialized"}
+    return result
 
 
 async def get_employee_leave_summary(
@@ -174,7 +177,7 @@ async def create_leave_balance(
 async def get_all_leave_balances(
     headers: dict[str, str] | None = None,
 ):
-    return await hr_client.get_all_leave_balances()
+    return await hr_client.get_all_leave_balances(headers=headers)
 
 
 async def get_leave_balance(
@@ -213,7 +216,7 @@ async def delete_leave_balance(
 async def organization_leave_report(
     headers: dict[str, str] | None = None,
 ):
-    return await hr_client.organization_leave_report()
+    return await hr_client.organization_leave_report(headers=headers)
 
 
 async def monthly_leave_report(
@@ -237,9 +240,26 @@ async def department_leave_report(
 
 
 async def leave_calendar(
+    start_date: str | None = None,
+    end_date: str | None = None,
     headers: dict[str, str] | None = None,
 ):
-    return await hr_client.leave_calendar()
+    events = await hr_client.leave_calendar(
+        start_date=start_date,
+        end_date=end_date,
+        )
+    
+    if not isinstance(events, list):
+        return events
+        
+    holidays = [e for e in events if e.get("title", "").lower().endswith("holiday")]
+    conflicts = [e for e in events if not e.get("title", "").lower().endswith("holiday")]
+    
+    return {
+        "has_conflict": len(conflicts) > 0,
+        "conflicts": conflicts,
+        "holidays": holidays
+    }
 
 
 # ==========================================================
@@ -258,7 +278,7 @@ async def create_holiday(
 async def get_holidays(
     headers: dict[str, str] | None = None,
 ):
-    return await hr_client.get_holidays()
+    return await hr_client.get_holidays(headers=headers)
 
 
 async def delete_holiday(

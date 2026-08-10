@@ -28,8 +28,7 @@ async def create_device(
     """
     return await it_client.create_device(
         payload=payload,
-        headers=headers,
-    )
+        )
 
 
 async def list_devices(
@@ -39,8 +38,7 @@ async def list_devices(
     List all devices.
     """
     return await it_client.list_devices(
-        headers=headers,
-    )
+        )
 
 
 async def get_device(
@@ -52,8 +50,7 @@ async def get_device(
     """
     return await it_client.get_device(
         device_id=device_id,
-        headers=headers,
-    )
+        )
 
 
 async def update_device(
@@ -67,8 +64,7 @@ async def update_device(
     return await it_client.update_device(
         device_id=device_id,
         payload=payload,
-        headers=headers,
-    )
+        )
 
 
 async def delete_device(
@@ -80,8 +76,7 @@ async def delete_device(
     """
     return await it_client.delete_device(
         device_id=device_id,
-        headers=headers,
-    )
+        )
 
 
 async def assign_device(
@@ -95,8 +90,7 @@ async def assign_device(
     return await it_client.assign_device(
         device_id=device_id,
         payload=payload,
-        headers=headers,
-    )
+        )
 
 
 async def return_device(
@@ -108,8 +102,7 @@ async def return_device(
     """
     return await it_client.return_device(
         device_id=device_id,
-        headers=headers,
-    )
+        )
 
 
 async def add_maintenance_log(
@@ -123,8 +116,7 @@ async def add_maintenance_log(
     return await it_client.add_maintenance_log(
         device_id=device_id,
         payload=payload,
-        headers=headers,
-    )
+        )
 
 
 async def get_maintenance_history(
@@ -136,8 +128,7 @@ async def get_maintenance_history(
     """
     return await it_client.get_maintenance_history(
         device_id=device_id,
-        headers=headers,
-    )
+        )
 
 
 # ==========================================================

@@ -23,9 +23,8 @@ async def create_ticket(
     Create a new help desk ticket.
     """
     return await it_client.create_ticket(
-        payload=request.model_dump(),
-        headers=headers,
-    )
+        payload=request,
+        )
 
 
 async def list_tickets(
@@ -46,8 +45,7 @@ async def get_ticket(
     """
     return await it_client.get_ticket(
         ticket_id=ticket_id,
-        headers=headers,
-    )
+        )
 
 
 async def update_ticket(
@@ -60,9 +58,8 @@ async def update_ticket(
     """
     return await it_client.update_ticket(
         ticket_id=ticket_id,
-        payload=request.model_dump(exclude_none=True),
-        headers=headers,
-    )
+        payload=request,
+        )
 
 
 async def assign_ticket(
@@ -75,9 +72,8 @@ async def assign_ticket(
     """
     return await it_client.assign_ticket(
         ticket_id=ticket_id,
-        payload=request.model_dump(),
-        headers=headers,
-    )
+        payload=request,
+        )
 
 
 # Register tools

@@ -11,5 +11,6 @@ members = [
     "hr-service",
     "it-service",
     "workflow-service",
-    "ai-service"
+    "ai-service",
+    "analytics-service"
 ]

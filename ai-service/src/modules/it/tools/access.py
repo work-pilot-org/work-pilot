@@ -14,15 +14,15 @@ from modules.it.schemas import (
 
 
 async def create_access_request(payload: CreateAccessRequest, headers=None):
-    return await it_client.create_access_request(payload, headers)
+    return await it_client.create_access_request(payload, headers, headers=headers)
 
 
 async def list_access_requests(headers=None):
-    return await it_client.list_access_requests(headers)
+    return await it_client.list_access_requests(headers, headers=headers)
 
 
 async def get_access_request(request_id: UUID, headers=None):
-    return await it_client.get_access_request(request_id, headers)
+    return await it_client.get_access_request(request_id, headers, headers=headers)
 
 
 async def update_access_request(

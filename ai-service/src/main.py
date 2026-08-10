@@ -8,6 +8,7 @@ from __future__ import annotations
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from shared_infrastructure.core.config import settings
 from infrastructure.providers.http_client import http_client_provider
@@ -34,6 +35,19 @@ app = FastAPI(
     title=settings.app_name,
     version="1.0.0",
     lifespan=lifespan,
+)
+
+origins = [
+    "http://localhost:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_origin_regex=r"http://.*\.localhost:3000",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(ai_router)

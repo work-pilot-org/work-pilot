@@ -15,7 +15,8 @@ import { Badge } from "@/components/ui/Badge";
 import { LoadingState } from "@/components/common/LoadingState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { EmptyState } from "@/components/common/EmptyState";
-import { Calendar } from "lucide-react";
+import { Calendar, CheckCircle, XCircle } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 
 export default function LeaveRequestsPage() {
   const [leaveRequests, setLeaveRequests] = useState<LeaveRequestResponse[]>([]);
@@ -42,6 +43,15 @@ export default function LeaveRequestsPage() {
   if (isLoading) return <LoadingState message="Loading leave requests..." className="py-12" />;
   if (error) return <ErrorState message={error} onRetry={fetchLeaveRequests} />;
 
+  const handleStatusUpdate = async (id: string, status: "APPROVED" | "REJECTED") => {
+    try {
+      await hrRepository.updateLeaveRequestStatus(id, status);
+      fetchLeaveRequests();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : `Failed to ${status.toLowerCase()} request`);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -63,6 +73,7 @@ export default function LeaveRequestsPage() {
               <TableHead>Dates</TableHead>
               <TableHead>Total Days</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -90,6 +101,30 @@ export default function LeaveRequestsPage() {
                   >
                     {request.status}
                   </Badge>
+                </TableCell>
+                <TableCell className="text-right">
+                  {request.status === "PENDING" && (
+                    <div className="flex justify-end gap-2">
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="text-green-600 border-green-200 hover:bg-green-50"
+                        onClick={() => handleStatusUpdate(request.id, "APPROVED")}
+                      >
+                        <CheckCircle className="w-4 h-4 mr-1" />
+                        Approve
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="text-red-600 border-red-200 hover:bg-red-50"
+                        onClick={() => handleStatusUpdate(request.id, "REJECTED")}
+                      >
+                        <XCircle className="w-4 h-4 mr-1" />
+                        Reject
+                      </Button>
+                    </div>
+                  )}
                 </TableCell>
               </TableRow>
             ))}
