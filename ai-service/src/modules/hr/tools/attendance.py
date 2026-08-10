@@ -10,8 +10,8 @@ from uuid import UUID
 from modules.hr.client import hr_client
 from modules.hr.registry import hr_tool_registry
 from modules.hr.schemas import (
-    AttendanceCheckInToolInput,
-    AttendanceCheckOutToolInput,
+    CheckInToolInput,
+    CheckOutToolInput,
     CreateAttendanceToolInput,
     UpdateAttendanceToolInput,
     UpdateAttendanceStatusToolInput,
@@ -23,7 +23,7 @@ from modules.hr.schemas import (
 # ==========================================================
 
 async def check_in(
-    payload: AttendanceCheckInToolInput,
+    payload: CheckInToolInput,
     headers: dict[str, str] | None = None,
 ):
     return await hr_client.check_in(
@@ -32,7 +32,7 @@ async def check_in(
 
 
 async def check_out(
-    payload: AttendanceCheckOutToolInput,
+    payload: CheckOutToolInput,
     headers: dict[str, str] | None = None,
 ):
     return await hr_client.check_out(
@@ -131,13 +131,13 @@ async def get_attendance_by_date(
 async def today_attendance(
     headers: dict[str, str] | None = None,
 ):
-    return await hr_client.today_attendance()
+    return await hr_client.today_attendance(headers=headers)
 
 
 async def get_active_attendance(
     headers: dict[str, str] | None = None,
 ):
-    return await hr_client.get_active_attendance()
+    return await hr_client.get_active_attendance(headers=headers)
 
 
 # ==========================================================

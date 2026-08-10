@@ -14,15 +14,15 @@ from modules.it.schemas import (
 
 
 async def create_maintenance_record(payload: CreateMaintenanceRecord, headers=None):
-    return await it_client.create_maintenance_record(payload, headers)
+    return await it_client.create_maintenance_record(payload, headers, headers=headers)
 
 
 async def list_maintenance_records(headers=None):
-    return await it_client.list_maintenance_records(headers)
+    return await it_client.list_maintenance_records(headers, headers=headers)
 
 
 async def get_maintenance_record(maintenance_id: UUID, headers=None):
-    return await it_client.get_maintenance_record(maintenance_id, headers)
+    return await it_client.get_maintenance_record(maintenance_id, headers, headers=headers)
 
 
 async def update_maintenance_record(

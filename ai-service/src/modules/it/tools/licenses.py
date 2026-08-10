@@ -14,15 +14,15 @@ from modules.it.schemas import (
 
 
 async def create_license(payload: CreateLicenseRequest, headers=None):
-    return await it_client.create_license(payload, headers)
+    return await it_client.create_license(payload, headers, headers=headers)
 
 
 async def list_licenses(headers=None):
-    return await it_client.list_licenses(headers)
+    return await it_client.list_licenses(headers, headers=headers)
 
 
 async def get_license(license_id: UUID, headers=None):
-    return await it_client.get_license(license_id, headers)
+    return await it_client.get_license(license_id, headers, headers=headers)
 
 
 async def update_license(

@@ -28,8 +28,7 @@ async def create_software(
     """
     return await it_client.create_software(
         payload=payload,
-        headers=headers,
-    )
+        )
 
 
 async def list_software(
@@ -39,8 +38,7 @@ async def list_software(
     List all software.
     """
     return await it_client.list_software(
-        headers=headers,
-    )
+        )
 
 
 async def get_software(
@@ -52,8 +50,7 @@ async def get_software(
     """
     return await it_client.get_software(
         software_id=software_id,
-        headers=headers,
-    )
+        )
 
 
 async def update_software(
@@ -67,8 +64,7 @@ async def update_software(
     return await it_client.update_software(
         software_id=software_id,
         payload=payload,
-        headers=headers,
-    )
+        )
 
 
 async def delete_software(
@@ -80,8 +76,7 @@ async def delete_software(
     """
     return await it_client.delete_software(
         software_id=software_id,
-        headers=headers,
-    )
+        )
 
 
 # ==========================================================
@@ -99,8 +94,7 @@ async def install_software(
     return await it_client.install_software(
         software_id=software_id,
         payload=payload,
-        headers=headers,
-    )
+        )
 
 
 async def uninstall_software(
@@ -112,8 +106,7 @@ async def uninstall_software(
     """
     return await it_client.uninstall_software(
         install_id=install_id,
-        headers=headers,
-    )
+        )
 
 
 async def list_device_installations(
@@ -125,8 +118,7 @@ async def list_device_installations(
     """
     return await it_client.list_device_installations(
         device_id=device_id,
-        headers=headers,
-    )
+        )
 
 
 async def list_user_installations(
@@ -138,8 +130,7 @@ async def list_user_installations(
     """
     return await it_client.list_user_installations(
         user_id=user_id,
-        headers=headers,
-    )
+        )
 
 
 # ==========================================================
@@ -155,8 +146,7 @@ async def create_installation_request(
     """
     return await it_client.create_installation_request(
         payload=payload,
-        headers=headers,
-    )
+        )
 
 
 async def list_installation_requests(
@@ -166,8 +156,7 @@ async def list_installation_requests(
     List all installation requests.
     """
     return await it_client.list_installation_requests(
-        headers=headers,
-    )
+        )
 
 
 async def get_installation_request(
@@ -179,8 +168,7 @@ async def get_installation_request(
     """
     return await it_client.get_installation_request(
         request_id=request_id,
-        headers=headers,
-    )
+        )
 
 
 # ==========================================================

@@ -33,7 +33,7 @@ async def create_department(
 async def get_departments(
     headers: dict[str, str] | None = None,
 ):
-    return await hr_client.get_departments()
+    return await hr_client.get_departments(headers=headers)
 
 
 async def update_department(
@@ -72,7 +72,7 @@ async def create_designation(
 async def get_designations(
     headers: dict[str, str] | None = None,
 ):
-    return await hr_client.get_designations()
+    return await hr_client.get_designations(headers=headers)
 
 
 async def update_designation(
@@ -111,7 +111,7 @@ async def create_branch(
 async def get_branches(
     headers: dict[str, str] | None = None,
 ):
-    return await hr_client.get_branches()
+    return await hr_client.get_branches(headers=headers)
 
 
 async def update_branch(
@@ -150,7 +150,7 @@ async def create_shift(
 async def get_shifts(
     headers: dict[str, str] | None = None,
 ):
-    return await hr_client.get_shifts()
+    return await hr_client.get_shifts(headers=headers)
 
 
 async def update_shift(

@@ -32,7 +32,7 @@ async def create_employee(
 async def get_all_employees(
     headers: dict[str, str] | None = None,
 ):
-    return await hr_client.get_all_employees()
+    return await hr_client.get_all_employees(headers=headers)
 
 
 async def get_employee(

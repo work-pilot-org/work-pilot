@@ -33,6 +33,11 @@ Rules:
 2. If any step failed, explain what failed and why in a helpful manner.
 3. Do not invent or hallucinate details; rely entirely on the provided execution results.
 4. Keep the response concise but complete.
+5. Begin your response with an exact status word on its own line: [STATUS: SUCCESS], [STATUS: PARTIAL_SUCCESS], or [STATUS: FAILED].
+   - Use [STATUS: SUCCESS] if all tasks were completed successfully.
+   - Use [STATUS: PARTIAL_SUCCESS] if some tasks were completed but others failed.
+   - Use [STATUS: FAILED] if the primary request (e.g. creating a leave) failed or was not completed.
+6. Special Rule: If the failure is due to a missing or uninitialized leave balance, do NOT provide a long explanation of all the other steps. Simply output your status badge and exactly: "You don't have available leave, please contact HR."
 """
 
 
@@ -79,6 +84,7 @@ class ResponseBuilder:
             logger.error("LLM failed to build summary, falling back to raw output", error=str(e))
             # Fallback gracefully so the user still gets their data if the LLM hiccups
             return (
+                f"[STATUS: FAILED]\n"
                 f"Your request was processed, but the final summary generation failed. "
                 f"Raw execution results: {execution_results}"
             )

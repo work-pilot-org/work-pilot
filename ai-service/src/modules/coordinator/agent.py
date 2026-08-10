@@ -28,7 +28,8 @@ class CoordinatorAgent:
     async def process(
         self, 
         user_message: str, 
-        headers: dict[str, str] | None = None
+        headers: dict[str, str] | None = None,
+        user_context: dict | None = None
     ) -> Any:
         """
         Executes the full AI orchestration pipeline.
@@ -46,24 +47,28 @@ class CoordinatorAgent:
             message=user_message,
         )
 
-        # Ask Gemini to determine which tool should be used.
-        tool_name = await gemini_client.generate(user_message)
+        # # Ask Gemini to determine which tool should be used.
+        # tool_name = await gemini_client.generate(user_message)
 
-        tool_name = tool_name.strip()
+        # tool_name = tool_name.strip()
 
-        logger.info(
-            "Gemini selected tool",
-            tool_name=tool_name,
-        )
+        # logger.info(
+        #     "Gemini selected tool",
+        #     tool_name=tool_name,
+        # )
 
-        # Temporary implementation:
-        # Route everything to the IT Agent.
-        return await get_it_agent().run(
-            message=user_message,
-            headers=headers,
-        )
+        # # Temporary implementation:
+        # # Route everything to the IT Agent.
+        # return await get_it_agent().run(
+        #     message=user_message,
+        #     headers=headers,
+        # )
         logger.info("Coordinator Agent pipeline started")
         
+        if user_context:
+            user_id = user_context.get("sub") or user_context.get("employee_id", "Unknown")
+            system_note = f"\n\n[SYSTEM NOTE: You are currently talking to user ID: {user_id}. If a tool requires an employee_id or user_id, automatically use this ID unless specified otherwise.]"
+            user_message += system_note
         try:
             # 1. Intent Detection (Figures out Domain and Intent)
             intent_classification = await intent_detector.detect_intent(user_message)
@@ -78,6 +83,7 @@ class CoordinatorAgent:
             execution_results = await tool_executor.execute_plan(
                 domain=intent_classification.domain,
                 plan=execution_plan,
+                user_message=user_message,
                 headers=headers
             )
             

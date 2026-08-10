@@ -27,6 +27,7 @@ class ToolExecutor:
         self, 
         domain: str, 
         plan: ExecutionPlan, 
+        user_message: str,
         headers: dict[str, str] | None = None
     ) -> List[Dict[str, Any]]:
         """
@@ -35,6 +36,7 @@ class ToolExecutor:
         Args:
             domain (str): The domain string used to fetch the specialist agent.
             plan (ExecutionPlan): The ordered execution plan from the Planner.
+            user_message (str): The original natural language request.
             headers (dict | None): Trusted headers to safely forward downstream.
             
         Returns:
@@ -63,9 +65,13 @@ class ToolExecutor:
             # Provide the agent with context of what has already happened
             # so it can correlate entities (like passing a newly generated Employee ID to the next step).
             step_message = (
+                f"Original User Request:\n{user_message}\n\n"
                 f"Context from previous steps:\n{accumulated_context}\n\n"
                 f"Current Task to Execute:\n{step.description}"
-            ) if accumulated_context else step.description
+            ) if accumulated_context else (
+                f"Original User Request:\n{user_message}\n\n"
+                f"Current Task to Execute:\n{step.description}"
+            )
 
             # 3. Handle failures gracefully via retries
             step_result = await self._execute_with_retries(

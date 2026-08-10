@@ -147,6 +147,25 @@ def _inline_schema_refs(schema: dict[str, Any]) -> dict[str, Any]:
 
     def resolve(value: Any) -> Any:
         if isinstance(value, dict):
+            if "anyOf" in value:
+                non_null_types = [
+                    item for item in value["anyOf"]
+                    if item.get("type") != "null"
+                ]
+                if non_null_types:
+                    primary_type = resolve(non_null_types[0])
+                    siblings = {}
+                    for k, v in value.items():
+                        if k in ("anyOf", "additionalProperties", "additional_properties", "title", "default"):
+                            continue
+                        if k == "properties":
+                            siblings[k] = {prop_name: resolve(prop_schema) for prop_name, prop_schema in v.items()}
+                        else:
+                            siblings[k] = resolve(v)
+                    if isinstance(primary_type, dict):
+                        return {**primary_type, **siblings}
+                    return primary_type
+
             if "$ref" in value:
                 ref = value["$ref"]
 
@@ -168,23 +187,29 @@ def _inline_schema_refs(schema: dict[str, Any]) -> dict[str, Any]:
                     definitions[definition_name]
                 )
 
-                # Preserve any sibling fields beside $ref.
-                siblings = {
-                    key: resolve(item)
-                    for key, item in value.items()
-                    if key not in ("$ref", "additionalProperties", "additional_properties", "title")
-                }
+                siblings = {}
+                for k, v in value.items():
+                    if k in ("$ref", "additionalProperties", "additional_properties", "title", "default"):
+                        continue
+                    if k == "properties":
+                        siblings[k] = {prop_name: resolve(prop_schema) for prop_name, prop_schema in v.items()}
+                    else:
+                        siblings[k] = resolve(v)
 
                 return {
                     **resolved_definition,
                     **siblings,
                 }
 
-            return {
-                key: resolve(item)
-                for key, item in value.items()
-                if key not in ("$defs", "additionalProperties", "additional_properties", "title")
-            }
+            result = {}
+            for k, v in value.items():
+                if k in ("$defs", "additionalProperties", "additional_properties", "title", "default"):
+                    continue
+                if k == "properties":
+                    result[k] = {prop_name: resolve(prop_schema) for prop_name, prop_schema in v.items()}
+                else:
+                    result[k] = resolve(v)
+            return result
 
         if isinstance(value, list):
             return [

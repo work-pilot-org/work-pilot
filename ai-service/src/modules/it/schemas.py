@@ -297,13 +297,16 @@ class LicenseResponse(BaseModel):
 # ==========================================================
 
 class AccessRequestType(str, Enum):
-    # Copy the exact values from the IT Service enum
-    ...
+    VPN = "VPN"
+    APPLICATION = "APPLICATION"
+    DATABASE = "DATABASE"
 
 
 class AccessRequestStatus(str, Enum):
-    # Copy the exact values from the IT Service enum
-    ...
+    PENDING = "PENDING"
+    APPROVED = "APPROVED"
+    REJECTED = "REJECTED"
+    REVOKED = "REVOKED"
 
 
 # ==========================================================
@@ -344,13 +347,15 @@ class AccessRequestResponse(BaseModel):
 # ==========================================================
 
 class MaintenanceType(str, Enum):
-    # Copy the exact enum values from the IT Service
-    ...
+    PREVENTIVE = "PREVENTIVE"
+    CORRECTIVE = "CORRECTIVE"
 
 
 class MaintenanceStatus(str, Enum):
-    # Copy the exact enum values from the IT Service
-    ...
+    PENDING = "PENDING"
+    IN_PROGRESS = "IN_PROGRESS"
+    COMPLETED = "COMPLETED"
+    CANCELLED = "CANCELLED"
 
 
 # ==========================================================
