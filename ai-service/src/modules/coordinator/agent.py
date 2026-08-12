@@ -12,9 +12,11 @@ from typing import Any
 from shared_infrastructure.core.config import settings
 from core.logger import get_logger
 from modules.coordinator.intent_detector import intent_detector
-from modules.coordinator.planner import orchestration_planner
-from modules.coordinator.tool_executor import tool_executor
+from modules.coordinator.registry import agent_registry
 from modules.coordinator.response_builder import response_builder
+from modules.coordinator.exceptions import CoordinatorError, UnknownDomainError
+from modules.coordinator.constants import AgentDomain
+from infrastructure.providers.exceptions import GeminiRateLimitError, GeminiQuotaExhaustedError
 
 
 logger = get_logger(__name__)
@@ -73,33 +75,46 @@ class CoordinatorAgent:
             # 1. Intent Detection (Figures out Domain and Intent)
             intent_classification = await intent_detector.detect_intent(user_message)
             
-            # 2. Planning (Breaks the intent down into logical steps)
-            execution_plan = await orchestration_planner.generate_plan(
-                user_message=user_message, 
-                intent_classification=intent_classification
-            )
+            # Short-circuit conversational intents
+            if intent_classification.domain == AgentDomain.GENERAL.value:
+                intent_upper = intent_classification.intent.upper()
+                if intent_upper in ["GREETING", "HI", "HELLO"]:
+                    return "Hello! I'm your WorkPilot AI assistant. How can I help you today?"
+                elif intent_upper in ["THANKS", "THANK_YOU", "GRATITUDE", "THANKYOU"]:
+                    return "You're welcome! Let me know if you need anything else."
+                
+                # Fallback for other general conversation
+                from infrastructure.llm.gemini_client import gemini_client
+                fallback_response = await gemini_client.generate(f"You are a helpful AI assistant for the WorkPilot HR and IT platform. The user just said: {user_message}\n\nPlease respond nicely and concisely.")
+                return fallback_response
+
+            # Early fail for truly unknown/unsupported actionable domains
+            if intent_classification.domain == AgentDomain.UNKNOWN.value:
+                raise UnknownDomainError(intent_classification.domain)
             
-            # 3. Tool Execution (Routes to and invokes Specialist Agents)
-            execution_results = await tool_executor.execute_plan(
-                domain=intent_classification.domain,
-                plan=execution_plan,
-                user_message=user_message,
+            # 2. Direct Specialist Agent Routing
+            # Skip the Orchestration Planner and Tool Executor loop to save 2 Gemini API calls per request
+            # Specialist agents (e.g. HR, IT) natively return a final natural language response.
+            specialist_agent = agent_registry.get_agent(intent_classification.domain)
+            
+            logger.info("Routing request directly to specialist agent", domain=intent_classification.domain)
+            
+            final_response = await specialist_agent.run(
+                message=user_message,
                 headers=headers
-            )
-            
-            # 4. Response Building (Summarizes the outcome)
-            final_response = await response_builder.build_success_response(
-                user_message=user_message,
-                execution_results=execution_results
             )
             
             logger.info("Coordinator Agent pipeline finished successfully")
             return final_response
             
+        except (GeminiRateLimitError, GeminiQuotaExhaustedError) as e:
+            logger.error("Coordinator Agent hit quota limits", error=str(e))
+            raise e
         except Exception as e:
             logger.error("Coordinator Agent pipeline failed", error=str(e), exc_info=True)
             # 5. Handle Failures Gracefully
-            return response_builder.build_error_response(error=e)
+            error_msg = response_builder.build_error_response(error=e)
+            raise CoordinatorError(error_msg) from e
 
 
 # Singleton instance of the agent to be consumed by the API/Service layers

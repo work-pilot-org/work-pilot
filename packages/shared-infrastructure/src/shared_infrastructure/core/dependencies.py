@@ -60,7 +60,7 @@ def verify_employee_ownership(employee_id, current_user: dict, db: Session, bypa
     user_id = current_user.get("sub")
     
     from sqlalchemy import text
-    query = text("SELECT user_id FROM employee WHERE id = :employee_id")
+    query = text("SELECT auth_user_id FROM employees WHERE id = :employee_id")
     result = db.execute(query, {"employee_id": str(employee_id)}).fetchone()
     
     if not result or str(result[0]) != str(user_id):

@@ -15,6 +15,7 @@ from src.modules.leave.schemas import (
     HolidayCreate,
     HolidayResponse,
     LeaveBalanceCreate,
+    BulkLeaveBalanceCreate,
     LeaveBalanceResponse,
     LeaveBalanceUpdate,
     LeaveRequestCreate,
@@ -336,6 +337,20 @@ def allocate_leave_balance(
     """Allocate leave balance to an employee."""
     service = LeaveBalanceService(db)
     return service.allocate_leave_balance(balance)
+
+@leave_balance_router.post(
+    "/bulk",
+    response_model=list[LeaveBalanceResponse],
+    status_code=status.HTTP_201_CREATED,
+    summary="Bulk Allocate Leave Balance",
+)
+def bulk_allocate_leave_balance(
+    payload: BulkLeaveBalanceCreate,
+    db: Session = Depends(get_db),
+):
+    """Bulk allocate leave balance to multiple employees."""
+    service = LeaveBalanceService(db)
+    return service.bulk_allocate_leave_balance(payload)
 
 
 # -------------------------------------------------------------------

@@ -15,6 +15,7 @@ from modules.hr.schemas import (
     UpdateLeaveToolInput,
     UpdateLeaveStatusToolInput,
     CreateLeaveBalanceToolInput,
+    BulkCreateLeaveBalanceToolInput,
     UpdateLeaveBalanceToolInput,
     CreateHolidayToolInput,
 )
@@ -173,6 +174,15 @@ async def create_leave_balance(
         payload=payload.model_dump(mode="json"),
     )
 
+async def bulk_create_leave_balance(
+    payload: BulkCreateLeaveBalanceToolInput,
+    headers: dict[str, str] | None = None,
+):
+    return await hr_client.bulk_create_leave_balance(
+        payload=payload.model_dump(mode="json"),
+        headers=headers,
+    )
+
 
 async def get_all_leave_balances(
     headers: dict[str, str] | None = None,
@@ -312,6 +322,7 @@ hr_tool_registry.register("get_employee_leave_balance", get_employee_leave_balan
 hr_tool_registry.register("get_employee_leave_summary", get_employee_leave_summary)
 
 hr_tool_registry.register("create_leave_balance", create_leave_balance)
+hr_tool_registry.register("bulk_create_leave_balance", bulk_create_leave_balance)
 hr_tool_registry.register("get_all_leave_balances", get_all_leave_balances)
 hr_tool_registry.register("get_leave_balance", get_leave_balance)
 hr_tool_registry.register("update_leave_balance", update_leave_balance)

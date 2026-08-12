@@ -82,7 +82,7 @@ export function InviteEmployeeModal({ isOpen, onClose, onSuccess }: InviteEmploy
               <option value="MANAGER">Manager</option>
               <option value="HR_ADMIN">HR Admin</option>
               <option value="IT_ADMIN">IT Admin</option>
-              <option value="ORG_ADMIN">Org Admin</option>
+              <option value="TENANT_ADMIN">Tenant Admin</option>
             </select>
           </div>
           

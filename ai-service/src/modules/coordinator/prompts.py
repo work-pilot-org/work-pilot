@@ -21,9 +21,10 @@ Supported Domains:
 
 Rules:
 1. You must classify the user's request into EXACTLY ONE of the supported domains.
-2. If the request does not clearly belong to any supported domain, return "unknown" as the domain.
-3. Extract a concise, uppercase string representing the core intent (e.g., "CREATE_EMPLOYEE", "RESET_PASSWORD").
-4. Do NOT attempt to solve the user's problem or answer their question.
+2. If the request is purely conversational (e.g., greetings, pleasantries, thank yous), use "general" as the domain.
+3. If the request is actionable but does not clearly belong to any supported domain (excluding "general"), return "unknown" as the domain.
+4. Extract a concise, uppercase string representing the core intent (e.g., "CREATE_EMPLOYEE", "RESET_PASSWORD", "GREETING").
+5. Do NOT attempt to solve the user's problem or answer their question.
 5. You MUST return your response as a valid JSON object matching this schema:
 {{
     "domain": "<domain_name>",

@@ -127,16 +127,59 @@ export function EmployeeDashboard() {
           )}
         </div>
 
-        {/* Today's Attendance Card */}
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-              <Clock className="w-5 h-5 text-green-600" />
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 flex flex-col h-full">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                <Clock className="w-5 h-5 text-green-600" />
+              </div>
+              <div>
+                <h2 className="font-semibold text-gray-900">Today&apos;s Attendance</h2>
+                <p className="text-xs text-gray-500">Live status</p>
+              </div>
             </div>
-            <div>
-              <h2 className="font-semibold text-gray-900">Today&apos;s Attendance</h2>
-              <p className="text-xs text-gray-500">Live status</p>
-            </div>
+            {profile && (
+              <div className="flex gap-2">
+                {!checkedIn && (
+                  <button
+                    className="px-3 py-1.5 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-md shadow-sm"
+                    onClick={async () => {
+                      try {
+                        setIsLoading(true);
+                        await hrRepository.checkIn(profile.id);
+                        const newAtt = await hrRepository.getMyTodayAttendance();
+                        setAttendance(newAtt);
+                      } catch (err: any) {
+                        alert(err.message || "Failed to check in");
+                      } finally {
+                        setIsLoading(false);
+                      }
+                    }}
+                  >
+                    Check In
+                  </button>
+                )}
+                {checkedIn && !checkedOut && (
+                  <button
+                    className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-md shadow-sm"
+                    onClick={async () => {
+                      try {
+                        setIsLoading(true);
+                        await hrRepository.checkOut(profile.id);
+                        const newAtt = await hrRepository.getMyTodayAttendance();
+                        setAttendance(newAtt);
+                      } catch (err: any) {
+                        alert(err.message || "Failed to check out");
+                      } finally {
+                        setIsLoading(false);
+                      }
+                    }}
+                  >
+                    Check Out
+                  </button>
+                )}
+              </div>
+            )}
           </div>
           {attendanceError ? (
             <div className="text-sm text-red-600 bg-red-50 p-4 rounded-lg border border-red-100 flex flex-col gap-1">

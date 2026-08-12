@@ -33,6 +33,7 @@ from src.modules.leave.schemas import (
     HolidayCreate,
     HolidayResponse,
     LeaveBalanceCreate,
+    BulkLeaveBalanceCreate,
     LeaveBalanceResponse,
     LeaveBalanceSummaryItem,
     LeaveBalanceUpdate,
@@ -499,6 +500,38 @@ class LeaveBalanceService:
             db_balance = self.repository.create(balance_data)
             self.db.commit()
             return _balance_to_response(db_balance)
+
+        except Exception:
+            self.db.rollback()
+            raise
+
+    # ---------------------------------------------------------
+    # POST /leave-balances/bulk  — Bulk Allocate
+    # ---------------------------------------------------------
+
+    def bulk_allocate_leave_balance(
+        self,
+        payload: BulkLeaveBalanceCreate,
+    ) -> list[LeaveBalanceResponse]:
+        """Bulk allocate leave balance to multiple employees."""
+
+        try:
+            # Convert bulk payload into individual Create models
+            balances_data = [
+                LeaveBalanceCreate(
+                    employee_id=emp_id,
+                    leave_type=payload.leave_type,
+                    year=payload.year,
+                    allocated_days=payload.allocated_days,
+                    carried_forward_days=payload.carried_forward_days,
+                    notes=payload.notes
+                )
+                for emp_id in payload.employee_ids
+            ]
+            
+            db_balances = self.repository.bulk_create(balances_data)
+            self.db.commit()
+            return [_balance_to_response(b) for b in db_balances]
 
         except Exception:
             self.db.rollback()

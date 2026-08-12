@@ -11,6 +11,7 @@ from core.logger import get_logger
 from modules.coordinator.client import coordinator_llm_client
 from modules.coordinator.constants import SUPPORTED_DOMAINS
 from modules.coordinator.exceptions import IntentDetectionError, UnknownDomainError
+from infrastructure.providers.exceptions import GeminiRateLimitError, GeminiQuotaExhaustedError
 from modules.coordinator.prompts import build_intent_detection_prompt
 
 
@@ -58,6 +59,8 @@ class IntentDetector:
             raw_result = await coordinator_llm_client.generate_structured_json(prompt)
             classification = IntentClassification(**raw_result)
             
+        except (GeminiRateLimitError, GeminiQuotaExhaustedError) as e:
+            raise e
         except Exception as e:
             logger.error("Intent detection parsing failed", error=str(e))
             raise IntentDetectionError(f"Failed to classify intent: {str(e)}") from e

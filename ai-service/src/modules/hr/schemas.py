@@ -257,7 +257,6 @@ class CreateProbationPolicyToolInput(BaseModel):
 # =====================================================
 
 from datetime import time
-from decimal import Decimal
 from pydantic import BaseModel
 
 # -- Attendance --
@@ -299,14 +298,22 @@ class CreateLeaveBalanceToolInput(BaseModel):
     employee_id: UUID
     leave_type: LeaveType
     year: int
-    allocated_days: Decimal
-    carried_forward_days: Decimal = Decimal("0.0")
+    allocated_days: float
+    carried_forward_days: float = 0.0
+    notes: str | None = None
+
+class BulkCreateLeaveBalanceToolInput(BaseModel):
+    employee_ids: list[UUID]
+    leave_type: LeaveType
+    year: int
+    allocated_days: float
+    carried_forward_days: float = 0.0
     notes: str | None = None
 
 class UpdateLeaveBalanceToolInput(BaseModel):
-    allocated_days: Decimal | None = None
-    used_days: Decimal | None = None
-    carried_forward_days: Decimal | None = None
+    allocated_days: float | None = None
+    used_days: float | None = None
+    carried_forward_days: float | None = None
     notes: str | None = None
 
 class CreateHolidayToolInput(BaseModel):
@@ -375,23 +382,23 @@ class UpdateShiftToolInput(BaseModel):
 # -- Policies --
 class UpdateLeavePolicyToolInput(BaseModel):
     name: str | None = None
-    casual_leave_days: Decimal | None = None
-    sick_leave_days: Decimal | None = None
-    earned_leave_days: Decimal | None = None
-    maternity_leave_days: Decimal | None = None
-    paternity_leave_days: Decimal | None = None
+    casual_leave_days: float | None = None
+    sick_leave_days: float | None = None
+    earned_leave_days: float | None = None
+    maternity_leave_days: float | None = None
+    paternity_leave_days: float | None = None
     carry_forward_enabled: bool | None = None
-    max_carry_forward: Decimal | None = None
+    max_carry_forward: float | None = None
     half_day_allowed: bool | None = None
     minimum_notice_days: int | None = None
     requires_attachment: bool | None = None
 
 class UpdateAttendancePolicyToolInput(BaseModel):
     name: str | None = None
-    working_hours: Decimal | None = None
+    working_hours: float | None = None
     grace_period: int | None = None
     late_mark_limit: int | None = None
-    half_day_after_hours: Decimal | None = None
+    half_day_after_hours: float | None = None
     auto_checkout: bool | None = None
     weekend_policy: str | None = None
 

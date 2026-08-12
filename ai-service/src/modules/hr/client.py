@@ -529,6 +529,18 @@ class HRClient:
             headers=headers
         )
 
+    async def bulk_create_leave_balance(
+        self,
+        payload: dict,
+        headers: dict[str, str] | None = None,
+    ):
+        return await self._request(
+            "POST",
+            "/leave-balances/bulk",
+            json=payload,
+            headers=headers
+        )
+
     async def get_all_leave_balances(
         self,
         headers: dict[str, str] | None = None,

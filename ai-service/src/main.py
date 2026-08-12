@@ -31,12 +31,17 @@ async def lifespan(app: FastAPI):
     await http_client_provider.shutdown()
 
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI(
     title=settings.app_name,
     version="1.0.0",
     lifespan=lifespan,
 )
 
+# =====================================================
+# CORS
+# =====================================================
 origins = [
     "http://localhost:3000",
 ]
