@@ -66,7 +66,7 @@ const navConfig: NavItem[] = [
 export default function Sidebar() {
   const pathname = usePathname();
   const { user } = useAuthStore();
-  const [expandedNav, setExpandedNav] = useState<string[]>(["HR"]);
+  const [expandedNav, setExpandedNav] = useState<string[]>(["HR", "IT Service"]);
 
   const visibleNavItems = navConfig;
 
@@ -77,20 +77,23 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-64 bg-[#f8f9fa] border-r border-border hidden md:flex flex-col h-full z-20">
-      <div className="p-4 border-b border-border flex items-center gap-3 bg-white">
-        <div className="w-8 h-8 bg-primary rounded flex items-center justify-center shadow-sm">
+    <aside className="w-64 bg-surface border-r border-border hidden md:flex flex-col h-full z-20 shadow-sm transition-all duration-300">
+      <div className="h-16 px-6 border-b border-border flex items-center gap-3">
+        <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-sm">
           <Briefcase className="w-4 h-4 text-white" />
         </div>
-        <div>
-          <h2 className="font-semibold text-foreground tracking-tight leading-tight">WorkPilot</h2>
-          <p className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">
+        <div className="flex flex-col">
+          <h2 className="font-semibold text-foreground tracking-tight leading-none text-lg">WorkPilot</h2>
+          <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-widest mt-1">
             {user?.domain ? user.domain : "WORKSPACE"}
           </p>
         </div>
       </div>
 
-      <nav className="flex-1 overflow-y-auto py-4">
+      <nav className="flex-1 overflow-y-auto py-6">
+        <div className="px-4 mb-2">
+          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Main Menu</p>
+        </div>
         <ul className="space-y-1 px-3">
           {visibleNavItems.map((item) => {
             const isExactActive = pathname === item.href;
@@ -111,51 +114,53 @@ export default function Sidebar() {
                         toggleExpand(item.name);
                       }
                     }}
-                    className={`flex-1 flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium transition-all ${
+                    className={`flex-1 flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all group ${
                       isActive && !hasChildren
-                        ? "bg-primary/10 text-primary"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "text-muted-foreground hover:bg-surface-hover hover:text-foreground"
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <Icon className={`w-4 h-4 ${isActive && !hasChildren ? "text-primary" : "text-muted-foreground"}`} />
+                      <Icon className={`w-4 h-4 transition-colors ${isActive && !hasChildren ? "text-primary-foreground" : "text-muted-foreground group-hover:text-foreground"}`} />
                       {item.name}
                     </div>
                     {hasChildren && (
-                      isExpanded ? <ChevronDown className="w-4 h-4 opacity-50" /> : <ChevronRight className="w-4 h-4 opacity-50" />
+                      isExpanded ? <ChevronDown className="w-4 h-4 opacity-50 transition-transform" /> : <ChevronRight className="w-4 h-4 opacity-50 transition-transform" />
                     )}
                   </Link>
                 </div>
 
-                {hasChildren && isExpanded && (
-                  <ul className="mt-1 mb-2 ml-6 space-y-1 border-l border-border pl-2">
-                    {item.children!.map((child) => {
-                      const isChildLinkActive = pathname === child.href;
-                      const childNode = (
-                        <li key={child.name}>
-                          <Link
-                            href={child.href}
-                            className={`flex items-center gap-3 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
-                              isChildLinkActive
-                                ? "bg-primary/10 text-primary"
-                                : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                            }`}
-                          >
-                            {child.name}
-                          </Link>
-                        </li>
-                      );
-                      
-                      if (child.allowedRoles && child.allowedRoles.length > 0) {
-                        return (
-                          <RequireRole key={child.name} allowedRoles={child.allowedRoles}>
-                            {childNode}
-                          </RequireRole>
+                {hasChildren && (
+                  <div className={`overflow-hidden transition-all duration-200 ease-in-out ${isExpanded ? 'max-h-96 opacity-100 mt-1' : 'max-h-0 opacity-0'}`}>
+                    <ul className="mb-2 ml-4 space-y-1 border-l-2 border-border pl-3">
+                      {item.children!.map((child) => {
+                        const isChildLinkActive = pathname === child.href;
+                        const childNode = (
+                          <li key={child.name}>
+                            <Link
+                              href={child.href}
+                              className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                                isChildLinkActive
+                                  ? "bg-primary/10 text-primary font-semibold"
+                                  : "text-muted-foreground hover:bg-surface-hover hover:text-foreground"
+                              }`}
+                            >
+                              {child.name}
+                            </Link>
+                          </li>
                         );
-                      }
-                      return childNode;
-                    })}
-                  </ul>
+                        
+                        if (child.allowedRoles && child.allowedRoles.length > 0) {
+                          return (
+                            <RequireRole key={child.name} allowedRoles={child.allowedRoles}>
+                              {childNode}
+                            </RequireRole>
+                          );
+                        }
+                        return childNode;
+                      })}
+                    </ul>
+                  </div>
                 )}
               </li>
             );

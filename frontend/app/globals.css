@@ -3,6 +3,8 @@
 @theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
 
   /* Enterprise Colors */
   --color-primary: var(--primary);
@@ -13,30 +15,56 @@
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+
+  /* Radius & Shadows */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  
+  --shadow-subtle: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  --shadow-elevated: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+
   --font-sans: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 @layer base {
   :root {
-    --background: #f9fafb; /* gray-50 for enterprise app feel */
-    --foreground: #111827; /* gray-900 */
+    /* Premium neutral palette */
+    --background: #f8fafc; /* Slate 50 */
+    --foreground: #0f172a; /* Slate 900 */
     
-    --primary: #2563eb; /* blue-600 */
+    --surface: #ffffff;
+    --surface-hover: #f1f5f9; /* Slate 100 */
+    
+    /* Primary (Deep Indigo/Purple for enterprise, Stitch-inspired) */
+    --primary: #4f46e5; /* Indigo 600 */
     --primary-foreground: #ffffff;
     
-    --muted: #f3f4f6; /* gray-100 */
-    --muted-foreground: #6b7280; /* gray-500 */
+    --muted: #f1f5f9; /* Slate 100 */
+    --muted-foreground: #64748b; /* Slate 500 */
     
-    --border: #e5e7eb; /* gray-200 */
+    --border: #e2e8f0; /* Slate 200 */
     
-    --destructive: #dc2626; /* red-600 */
+    --destructive: #ef4444; 
     --destructive-foreground: #ffffff;
+
+    --success: #10b981;
+    --success-foreground: #ffffff;
+
+    --warning: #f59e0b;
+    --warning-foreground: #ffffff;
   }
 
   body {
     background-color: var(--background);
     color: var(--foreground);
     font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
