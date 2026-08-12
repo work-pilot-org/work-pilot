@@ -32,6 +32,12 @@ const navConfig: NavItem[] = [
     href: "/dashboard", 
     icon: LayoutDashboard
   },
+  {
+    name: "WorkPilot AI",
+    href: "/dashboard/chat",
+    icon: Briefcase,
+    allowedRoles: ["TENANT_ADMIN", "HR_ADMIN", "IT_ADMIN", "MANAGER", "EMPLOYEE"],
+  },
   { 
     name: "HR", 
     href: "/dashboard/hr", 
