@@ -20,28 +20,33 @@ import { Button } from "@/components/ui/Button";
 
 export default function AttendancePage() {
   const [attendance, setAttendance] = useState<AttendanceResponse[]>([]);
+  const [employeeId, setEmployeeId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchAttendance = async () => {
+  const fetchData = async () => {
     try {
       setIsLoading(true);
       setError(null);
-      const data = await hrRepository.getTodayAttendance();
-      setAttendance(data);
+      const [attendanceData, profileData] = await Promise.all([
+        hrRepository.getTodayAttendance(),
+        hrRepository.getMyProfile()
+      ]);
+      setAttendance(attendanceData);
+      setEmployeeId(profileData.id);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to load today's attendance.");
+      setError(err instanceof Error ? err.message : "Failed to load data.");
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchAttendance();
+    fetchData();
   }, []);
 
   if (isLoading) return <LoadingState message="Loading attendance data..." className="py-12" />;
-  if (error) return <ErrorState message={error} onRetry={fetchAttendance} />;
+  if (error) return <ErrorState message={error} onRetry={fetchData} />;
 
   return (
     <div className="space-y-6">
@@ -50,10 +55,12 @@ export default function AttendancePage() {
         <div className="flex gap-2">
           <Button 
             variant="primary" 
+            disabled={!employeeId}
             onClick={async () => {
+              if (!employeeId) return;
               try {
-                await hrRepository.checkIn();
-                fetchAttendance();
+                await hrRepository.checkIn(employeeId);
+                fetchData();
               } catch (err: unknown) {
                 alert(err instanceof Error ? err.message : "Check-in failed");
               }
@@ -63,10 +70,12 @@ export default function AttendancePage() {
           </Button>
           <Button 
             variant="outline"
+            disabled={!employeeId}
             onClick={async () => {
+              if (!employeeId) return;
               try {
-                await hrRepository.checkOut();
-                fetchAttendance();
+                await hrRepository.checkOut(employeeId);
+                fetchData();
               } catch (err: unknown) {
                 alert(err instanceof Error ? err.message : "Check-out failed");
               }

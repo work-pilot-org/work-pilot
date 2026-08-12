@@ -24,6 +24,7 @@ class AgentDomain(str, Enum):
     # but the Coordinator will only route to them once their underlying modules exist.
     WORKFLOW = "workflow"
     ANALYTICS = "analytics"
+    GENERAL = "general"
     UNKNOWN = "unknown"
 
 # Allowed domains for quick lookups and validation during intent detection

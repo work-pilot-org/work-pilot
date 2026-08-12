@@ -15,8 +15,42 @@ from google.genai import errors, types
 from shared_infrastructure.core.config import settings
 from core.logger import get_logger
 from infrastructure.providers.base_provider import BaseLLMProvider
+from infrastructure.providers.exceptions import (
+    GeminiRateLimitError,
+    GeminiQuotaExhaustedError,
+)
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_exponential,
+    retry_if_exception_type,
+)
 
 logger = get_logger(__name__)
+
+
+def is_transient_rate_limit(exc: Exception) -> bool:
+    if not isinstance(exc, errors.APIError) or exc.code != 429:
+        return False
+    # Check if there's a retryDelay under 60 seconds (typically RPM limit)
+    # If the delay is missing or large, it's likely a daily quota exhaustion
+    try:
+        details = getattr(exc, "details", []) or []
+        if isinstance(details, dict) and "error" in details:
+            details = details["error"].get("details", [])
+            
+        for d in details:
+            if isinstance(d, dict) and d.get("@type") == "type.googleapis.com/google.rpc.RetryInfo":
+                delay_str = d.get("retryDelay", "0s")
+                delay = int(delay_str.replace("s", ""))
+                if delay <= 60:
+                    return True
+    except Exception:
+        pass
+    
+    # If no explicitly short retryDelay was found, don't blindly retry 
+    # to avoid burning through Tenacity attempts on a hard daily limit.
+    return False
 
 
 class GeminiProvider(BaseLLMProvider):
@@ -28,6 +62,12 @@ class GeminiProvider(BaseLLMProvider):
         )
         self._model = settings.gemini_model
 
+    @retry(
+        stop=stop_after_attempt(4),
+        wait=wait_exponential(multiplier=1, min=2, max=30),
+        retry=retry_if_exception_type((errors.APIError, GeminiRateLimitError)),
+        reraise=True,
+    )
     async def generate(
         self,
         prompt: str,
@@ -53,13 +93,25 @@ class GeminiProvider(BaseLLMProvider):
             )
 
         except errors.APIError as exc:
+            error_details = getattr(exc, "details", None) or str(exc)
+            
+            if exc.code == 429:
+                if is_transient_rate_limit(exc):
+                    # Tenacity should catch this since we added the retry decorator. 
+                    # If we reach here, it means Tenacity exhausted its attempts.
+                    logger.error("Gemini API transient rate limit exhausted after retries", error=str(exc))
+                    raise GeminiRateLimitError(f"Gemini API rate limit exceeded: {error_details}") from exc
+                else:
+                    logger.error("Gemini API daily quota exhausted", error=str(exc))
+                    raise GeminiQuotaExhaustedError(f"Gemini API quota exhausted: {error_details}") from exc
+
             logger.error(
                 "Gemini API request failed",
                 status_code=exc.code,
                 error=str(exc),
             )
             raise RuntimeError(
-                "Gemini API request failed."
+                f"Gemini API request failed: {exc.code} - {error_details}"
             ) from exc
 
         except Exception as exc:
@@ -85,6 +137,12 @@ class GeminiProvider(BaseLLMProvider):
 
         return response.text
 
+    @retry(
+        stop=stop_after_attempt(4),
+        wait=wait_exponential(multiplier=1, min=2, max=30),
+        retry=retry_if_exception_type((errors.APIError, GeminiRateLimitError)),
+        reraise=True,
+    )
     async def generate_with_tools(
         self,
         contents: Any,
@@ -121,13 +179,24 @@ class GeminiProvider(BaseLLMProvider):
             )
 
         except errors.APIError as exc:
+            error_details = getattr(exc, "details", None) or str(exc)
+            
+            if exc.code == 429:
+                if is_transient_rate_limit(exc):
+                    # Tenacity should catch this if it's transient, but if retries exhausted:
+                    logger.error("Gemini API transient rate limit for tools exhausted after retries", error=str(exc))
+                    raise GeminiRateLimitError(f"Gemini API rate limit exceeded: {error_details}") from exc
+                else:
+                    logger.error("Gemini API daily quota for tools exhausted", error=str(exc))
+                    raise GeminiQuotaExhaustedError(f"Gemini API quota exhausted: {error_details}") from exc
+
             logger.error(
                 "Gemini tool request failed",
                 status_code=exc.code,
                 error=str(exc),
             )
             raise RuntimeError(
-                "Gemini API tool request failed."
+                f"Gemini API tool request failed: {exc.code} - {error_details}"
             ) from exc
 
         except Exception as exc:

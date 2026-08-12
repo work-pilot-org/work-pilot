@@ -354,6 +354,57 @@ class LeaveBalanceRepository:
 
         return db_balance
 
+    def bulk_create(self, balances_data: list[LeaveBalanceCreate]) -> list[LeaveBalance]:
+        """Bulk allocate leave balances for multiple employees with upsert logic."""
+        if not balances_data:
+            return []
+            
+        # Extract unique keys
+        year = balances_data[0].year
+        leave_type = balances_data[0].leave_type
+        employee_ids = [bd.employee_id for bd in balances_data]
+        
+        # Fetch existing balances for these employees, year, and leave_type
+        existing_balances = (
+            self.db.query(LeaveBalance)
+            .filter(
+                LeaveBalance.employee_id.in_(employee_ids),
+                LeaveBalance.year == year,
+                LeaveBalance.leave_type == leave_type
+            )
+            .all()
+        )
+        existing_map = {eb.employee_id: eb for eb in existing_balances}
+        
+        result_balances = []
+        for balance_data in balances_data:
+            if balance_data.employee_id in existing_map:
+                # Update existing
+                db_balance = existing_map[balance_data.employee_id]
+                db_balance.allocated_days = balance_data.allocated_days
+                db_balance.carried_forward_days = balance_data.carried_forward_days
+                if balance_data.notes:
+                    db_balance.notes = balance_data.notes
+            else:
+                # Create new
+                db_balance = LeaveBalance(
+                    employee_id=balance_data.employee_id,
+                    leave_type=balance_data.leave_type,
+                    year=balance_data.year,
+                    allocated_days=balance_data.allocated_days,
+                    carried_forward_days=balance_data.carried_forward_days,
+                    used_days=Decimal("0.0"),
+                    notes=balance_data.notes,
+                )
+                self.db.add(db_balance)
+            result_balances.append(db_balance)
+            
+        self.db.flush()
+        for db_balance in result_balances:
+            self.db.refresh(db_balance)
+            
+        return result_balances
+
     # --------------------------------------------------------
     # Get All
     # --------------------------------------------------------

@@ -5,6 +5,7 @@ import { AdminDashboard } from "@/components/dashboard/AdminDashboard";
 import { HRDashboard } from "@/components/dashboard/HRDashboard";
 import { ManagerDashboard } from "@/components/dashboard/ManagerDashboard";
 import { EmployeeDashboard } from "@/components/dashboard/EmployeeDashboard";
+import { ITDashboard } from "@/components/dashboard/ITDashboard";
 import { LoadingState } from "@/components/common/LoadingState";
 import { useEffect, useState } from "react";
 
@@ -27,6 +28,8 @@ export default function DashboardPage() {
       return <AdminDashboard />;
     case "HR_ADMIN":
       return <HRDashboard />;
+    case "IT_ADMIN":
+      return <ITDashboard />;
     case "MANAGER":
       return <ManagerDashboard />;
     case "EMPLOYEE":
@@ -34,3 +37,4 @@ export default function DashboardPage() {
       return <EmployeeDashboard />;
   }
 }
+

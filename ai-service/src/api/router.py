@@ -4,11 +4,12 @@ AI Service API Router.
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, HTTPException
 from pydantic import BaseModel
 
 from modules.coordinator.agent import CoordinatorAgent
 from shared_infrastructure.core.security import get_current_user
+from infrastructure.providers.exceptions import GeminiRateLimitError, GeminiQuotaExhaustedError
 
 from .dependencies import get_coordinator
 
@@ -48,15 +49,32 @@ async def chat(
     coordinator: CoordinatorAgent = Depends(get_coordinator),
     current_user: dict = Depends(get_current_user),
 ):
-    headers = _extract_trusted_headers(request)
+    # Extract authorization header to pass down to internal services
+    auth_header = request.headers.get("authorization")
+    
+    # Securely derive tenant_id from the verified JWT token payload
+    # rather than trusting an arbitrary x-tenant-id header.
+    tenant_id = str(current_user.get("tenant_id")) if current_user.get("tenant_id") else None
 
-    result = await coordinator.process(
-        user_message=body.message,
-        headers=headers,
-        user_context=current_user,
-    )
+    headers = {}
+    if auth_header:
+        headers["authorization"] = auth_header
+    if tenant_id:
+        headers["x-tenant-id"] = tenant_id
 
-    return {
-        "success": True,
-        "data": result,
-    }
+    try:
+        result = await coordinator.process(
+            user_message=body.message,
+            headers=headers,
+            user_context=current_user,
+        )
+
+        return {
+            "success": True,
+            "data": result,
+        }
+    except (GeminiRateLimitError, GeminiQuotaExhaustedError):
+        raise HTTPException(status_code=429, detail="AI Service quota temporarily unavailable. Please try again later.")
+    except Exception as e:
+        # Assuming the CoordinatorAgent raised a CoordinatorError with a nice message
+        raise HTTPException(status_code=500, detail=str(e))

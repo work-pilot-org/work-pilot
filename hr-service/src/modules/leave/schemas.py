@@ -165,6 +165,17 @@ class LeaveBalanceCreate(BaseModel):
     notes: str | None = None
 
 
+class BulkLeaveBalanceCreate(BaseModel):
+    """Payload to bulk allocate a leave balance entry for multiple employees."""
+
+    employee_ids: list[UUID]
+    leave_type: LeaveType
+    year: int = Field(..., ge=2000, le=2100)
+    allocated_days: Decimal = Field(..., ge=0, decimal_places=1)
+    carried_forward_days: Decimal = Field(default=Decimal("0.0"), ge=0, decimal_places=1)
+    notes: str | None = None
+
+
 # ------------------------------------------------------------------
 # Update
 # ------------------------------------------------------------------

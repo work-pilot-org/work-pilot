@@ -40,7 +40,11 @@ export function ChatPanel({ onClose }: ChatPanelProps) {
         { id: (Date.now() + 1).toString(), role: "ai", content: response.data }
       ]);
     } catch (error: any) {
-      toast.error("Failed to communicate with AI.");
+      const errorMessage = error.response?.data?.detail || "Failed to communicate with AI.";
+      setMessages(prev => [
+        ...prev, 
+        { id: (Date.now() + 1).toString(), role: "ai", content: errorMessage }
+      ]);
     } finally {
       setIsTyping(false);
     }

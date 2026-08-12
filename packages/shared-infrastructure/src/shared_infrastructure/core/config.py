@@ -30,7 +30,7 @@ class Settings(BaseSettings):
 
     # AI Service Settings
     gemini_api_key: str | None = None
-    gemini_model: str = "gemini-2.5-flash"
+    gemini_model: str = "gemini-3.5-flash"
     
     # General fields used by some services
     LLM_PROVIDER: str = "gemini"

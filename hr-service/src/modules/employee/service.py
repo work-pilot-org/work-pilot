@@ -1,6 +1,10 @@
 from uuid import UUID
 
 from sqlalchemy.orm import Session
+import httpx
+from fastapi import HTTPException
+
+from shared_infrastructure.core.config import settings
 
 from src.modules.employee.exceptions import (
     EmployeeAlreadyExistsException,
@@ -118,10 +122,6 @@ class EmployeeService:
         self.db.flush()
 
         # Generate Invitation via auth-service
-        import httpx
-        from shared_infrastructure.core.config import settings
-        from fastapi import HTTPException
-        
         auth_url = f"{settings.AUTH_SERVICE_URL}/invitations"
         try:
             # We use the current user's token directly since this endpoint requires admin rights
@@ -152,7 +152,14 @@ class EmployeeService:
             )
             if response.status_code not in (200, 201):
                 self.db.rollback()
-                raise HTTPException(status_code=500, detail="Failed to create invitation in auth service.")
+                error_detail = "Failed to create invitation in auth service."
+                try:
+                    error_data = response.json()
+                    if "detail" in error_data:
+                        error_detail = error_data["detail"]
+                except ValueError:
+                    pass
+                raise HTTPException(status_code=response.status_code, detail=error_detail)
         except HTTPException:
             raise
         except Exception as e:

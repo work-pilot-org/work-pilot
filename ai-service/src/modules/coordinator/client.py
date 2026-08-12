@@ -10,7 +10,8 @@ without duplicating the core SDK initialization.
 import json
 from typing import Any
 
-from infrastructure.llm.gemini_client import gemini_client
+from infrastructure.providers.gemini_provider import GeminiProvider
+from infrastructure.providers.exceptions import GeminiRateLimitError, GeminiQuotaExhaustedError
 from modules.coordinator.exceptions import CoordinatorError
 
 
@@ -18,6 +19,9 @@ class CoordinatorLLMClient:
     """
     Provides orchestration-specific LLM operations by wrapping the global Gemini client.
     """
+
+    def __init__(self):
+        self._provider = GeminiProvider()
 
     async def generate_structured_json(self, prompt: str) -> dict[str, Any]:
         """
@@ -27,7 +31,7 @@ class CoordinatorLLMClient:
         """
         try:
             # Strict Reuse: Calls the existing infrastructure client
-            raw_response = await gemini_client.generate(prompt=prompt)
+            raw_response = await self._provider.generate(prompt=prompt)
             
             # Clean up potential markdown formatting from the LLM output
             cleaned_response = self._strip_markdown_blocks(raw_response)
@@ -37,6 +41,9 @@ class CoordinatorLLMClient:
         except json.JSONDecodeError as e:
             # Raises our custom orchestration exception for graceful handling
             raise CoordinatorError(f"Failed to parse structured JSON from LLM response: {str(e)}")
+        except (GeminiRateLimitError, GeminiQuotaExhaustedError) as e:
+            # Re-raise quota errors directly without wrapping
+            raise e
         except Exception as e:
             raise CoordinatorError(f"LLM generation failed during orchestration: {str(e)}")
 

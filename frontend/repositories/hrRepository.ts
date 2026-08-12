@@ -3,17 +3,30 @@ import { EmployeeResponse } from "@/types/hr";
 import axios from "axios";
 import { ApiError } from "@/types/auth"; // Reusing ApiError
 
+
+const handleApiError = (err: unknown, defaultMessage: string): never => {
+  if (axios.isAxiosError(err) && err.response?.data) {
+    const detail = (err.response.data as import('@/types/auth').ApiError).detail;
+    if (typeof detail === 'string') {
+      throw new Error(detail);
+    } else if (Array.isArray(detail)) {
+      const messages = detail.map(d => {
+        const field = d.loc[d.loc.length - 1];
+        return `${field}: ${d.msg}`;
+      });
+      throw new Error(messages.join(', '));
+    }
+  }
+  throw new Error(err instanceof Error ? err.message : defaultMessage);
+};
+
 export const hrRepository = {
   async getEmployees(): Promise<EmployeeResponse[]> {
     try {
       const response = await hrApi.get<EmployeeResponse[]>("/employees");
       return response.data;
     } catch (err: unknown) {
-      if (axios.isAxiosError(err) && err.response?.data) {
-        const detail = (err.response.data as ApiError).detail;
-        throw new Error(typeof detail === "string" ? detail : "Failed to fetch employees.");
-      }
-      throw new Error(err instanceof Error ? err.message : "An unexpected error occurred.");
+      return handleApiError(err, "Failed to fetch employees.");
     }
   },
 
@@ -22,11 +35,7 @@ export const hrRepository = {
       const response = await hrApi.get<EmployeeResponse>("/employees/me");
       return response.data;
     } catch (err: unknown) {
-      if (axios.isAxiosError(err) && err.response?.data) {
-        const detail = (err.response.data as ApiError).detail;
-        throw new Error(typeof detail === "string" ? detail : "Failed to fetch your profile.");
-      }
-      throw new Error(err instanceof Error ? err.message : "An unexpected error occurred.");
+      return handleApiError(err, "Failed to fetch your profile.");
     }
   },
 
@@ -59,11 +68,7 @@ export const hrRepository = {
       });
       return response.data;
     } catch (err: unknown) {
-      if (axios.isAxiosError(err) && err.response?.data) {
-        const detail = (err.response.data as ApiError).detail;
-        throw new Error(typeof detail === "string" ? detail : "Failed to search employees.");
-      }
-      throw new Error(err instanceof Error ? err.message : "An unexpected error occurred.");
+      return handleApiError(err, "Failed to search employees.");
     }
   },
 
@@ -72,11 +77,7 @@ export const hrRepository = {
       const response = await hrApi.get<EmployeeResponse>(`/employees/${id}`);
       return response.data;
     } catch (err: unknown) {
-      if (axios.isAxiosError(err) && err.response?.data) {
-        const detail = (err.response.data as ApiError).detail;
-        throw new Error(typeof detail === "string" ? detail : "Failed to fetch employee details.");
-      }
-      throw new Error(err instanceof Error ? err.message : "An unexpected error occurred.");
+      return handleApiError(err, "Failed to fetch employee details.");
     }
   },
 
@@ -85,11 +86,7 @@ export const hrRepository = {
       const response = await hrApi.post<EmployeeResponse>("/employees", employee);
       return response.data;
     } catch (err: unknown) {
-      if (axios.isAxiosError(err) && err.response?.data) {
-        const detail = (err.response.data as ApiError).detail;
-        throw new Error(typeof detail === "string" ? detail : "Failed to create employee.");
-      }
-      throw new Error(err instanceof Error ? err.message : "An unexpected error occurred.");
+      return handleApiError(err, "Failed to create employee.");
     }
   },
 
@@ -98,11 +95,7 @@ export const hrRepository = {
       const response = await hrApi.post<EmployeeResponse>("/employees/onboard", employee);
       return response.data;
     } catch (err: unknown) {
-      if (axios.isAxiosError(err) && err.response?.data) {
-        const detail = (err.response.data as ApiError).detail;
-        throw new Error(typeof detail === "string" ? detail : "Failed to onboard employee.");
-      }
-      throw new Error(err instanceof Error ? err.message : "An unexpected error occurred.");
+      return handleApiError(err, "Failed to onboard employee.");
     }
   },
 
@@ -111,11 +104,7 @@ export const hrRepository = {
       const response = await hrApi.put<EmployeeResponse>(`/employees/${id}`, employee);
       return response.data;
     } catch (err: unknown) {
-      if (axios.isAxiosError(err) && err.response?.data) {
-        const detail = (err.response.data as ApiError).detail;
-        throw new Error(typeof detail === "string" ? detail : "Failed to update employee.");
-      }
-      throw new Error(err instanceof Error ? err.message : "An unexpected error occurred.");
+      return handleApiError(err, "Failed to update employee.");
     }
   },
 
@@ -124,11 +113,7 @@ export const hrRepository = {
       const response = await hrApi.delete<EmployeeResponse>(`/employees/${id}`);
       return response.data;
     } catch (err: unknown) {
-      if (axios.isAxiosError(err) && err.response?.data) {
-        const detail = (err.response.data as ApiError).detail;
-        throw new Error(typeof detail === "string" ? detail : "Failed to delete employee.");
-      }
-      throw new Error(err instanceof Error ? err.message : "An unexpected error occurred.");
+      return handleApiError(err, "Failed to delete employee.");
     }
   },
 
@@ -137,37 +122,25 @@ export const hrRepository = {
       const response = await hrApi.get<import("@/types/hr").AttendanceResponse[]>("/attendance/today");
       return response.data;
     } catch (err: unknown) {
-      if (axios.isAxiosError(err) && err.response?.data) {
-        const detail = (err.response.data as ApiError).detail;
-        throw new Error(typeof detail === "string" ? detail : "Failed to fetch today's attendance.");
-      }
-      throw new Error(err instanceof Error ? err.message : "An unexpected error occurred.");
+      return handleApiError(err, "Failed to fetch today's attendance.");
     }
   },
 
-  async checkIn(): Promise<import("@/types/hr").AttendanceResponse> {
+  async checkIn(employeeId: string): Promise<import("@/types/hr").AttendanceResponse> {
     try {
-      const response = await hrApi.post<import("@/types/hr").AttendanceResponse>("/attendance/check-in");
+      const response = await hrApi.post<import("@/types/hr").AttendanceResponse>("/attendance/check-in", { employee_id: employeeId });
       return response.data;
     } catch (err: unknown) {
-      if (axios.isAxiosError(err) && err.response?.data) {
-        const detail = (err.response.data as ApiError).detail;
-        throw new Error(typeof detail === "string" ? detail : "Failed to check in.");
-      }
-      throw new Error(err instanceof Error ? err.message : "An unexpected error occurred.");
+      return handleApiError(err, "Failed to check in.");
     }
   },
 
-  async checkOut(): Promise<import("@/types/hr").AttendanceResponse> {
+  async checkOut(employeeId: string): Promise<import("@/types/hr").AttendanceResponse> {
     try {
-      const response = await hrApi.post<import("@/types/hr").AttendanceResponse>("/attendance/check-out");
+      const response = await hrApi.post<import("@/types/hr").AttendanceResponse>("/attendance/check-out", { employee_id: employeeId });
       return response.data;
     } catch (err: unknown) {
-      if (axios.isAxiosError(err) && err.response?.data) {
-        const detail = (err.response.data as ApiError).detail;
-        throw new Error(typeof detail === "string" ? detail : "Failed to check out.");
-      }
-      throw new Error(err instanceof Error ? err.message : "An unexpected error occurred.");
+      return handleApiError(err, "Failed to check out.");
     }
   },
 
@@ -176,11 +149,7 @@ export const hrRepository = {
       const response = await hrApi.get<import("@/types/hr").LeaveRequestResponse[]>("/leave-requests");
       return response.data;
     } catch (err: unknown) {
-      if (axios.isAxiosError(err) && err.response?.data) {
-        const detail = (err.response.data as ApiError).detail;
-        throw new Error(typeof detail === "string" ? detail : "Failed to fetch leave requests.");
-      }
-      throw new Error(err instanceof Error ? err.message : "An unexpected error occurred.");
+      return handleApiError(err, "Failed to fetch leave requests.");
     }
   },
 
@@ -189,11 +158,7 @@ export const hrRepository = {
       const response = await hrApi.get<import("@/types/hr").DepartmentResponse[]>("/organization/departments");
       return response.data;
     } catch (err: unknown) {
-      if (axios.isAxiosError(err) && err.response?.data) {
-        const detail = (err.response.data as ApiError).detail;
-        throw new Error(typeof detail === "string" ? detail : "Failed to fetch departments.");
-      }
-      throw new Error(err instanceof Error ? err.message : "An unexpected error occurred.");
+      return handleApiError(err, "Failed to fetch departments.");
     }
   },
 
