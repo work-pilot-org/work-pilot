@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
-from core.config import settings
+from shared_infrastructure.core.config import settings
 from modules.knowledge.exceptions import EmbeddingError
 from modules.knowledge.rag.embeddings import EmbeddingProvider
 
