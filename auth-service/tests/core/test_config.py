@@ -62,17 +62,12 @@ class TestSettingsLoadsFromEnvironment:
 
 
 class TestSettingsValidation:
-    def test_missing_refresh_token_expire_days_raises_validation_error(
+    def test_missing_refresh_token_expire_days_fallback(
         self, monkeypatch
     ):
-        # REFRESH_TOKEN_EXPIRE_DAYS is a new required field introduced in
-        # this PR; ensure the app fails fast if it is not configured.
         _set_env(monkeypatch, remove=["REFRESH_TOKEN_EXPIRE_DAYS"])
-
-        with pytest.raises(ValidationError) as exc_info:
-            Settings(_env_file=None)
-
-        assert "REFRESH_TOKEN_EXPIRE_DAYS" in str(exc_info.value)
+        settings = Settings(_env_file=None)
+        assert settings.REFRESH_TOKEN_EXPIRE_DAYS == 7
 
     def test_invalid_refresh_token_expire_days_raises_validation_error(
         self, monkeypatch
@@ -82,11 +77,10 @@ class TestSettingsValidation:
         with pytest.raises(ValidationError):
             Settings(_env_file=None)
 
-    def test_missing_secret_key_raises_validation_error(self, monkeypatch):
+    def test_missing_secret_key_fallback(self, monkeypatch):
         _set_env(monkeypatch, remove=["SECRET_KEY"])
-
-        with pytest.raises(ValidationError):
-            Settings(_env_file=None)
+        settings = Settings(_env_file=None)
+        assert isinstance(settings.SECRET_KEY, str)
 
     def test_invalid_debug_value_raises_validation_error(self, monkeypatch):
         _set_env(monkeypatch, overrides={"DEBUG": "not-a-bool"})

@@ -15,6 +15,7 @@ from modules.coordinator.exceptions import UnknownDomainError
 # Strict reuse of your existing agent factory functions
 from modules.hr.agent import get_hr_agent
 from modules.it.agent import get_it_agent
+from modules.knowledge.agent import get_knowledge_agent
 
 
 class SpecialistAgent(Protocol):
@@ -44,6 +45,7 @@ class AgentRegistry:
         self._agents: Dict[str, SpecialistAgent] = {
             AgentDomain.HR.value: get_hr_agent(),
             AgentDomain.IT.value: get_it_agent(),
+            AgentDomain.KNOWLEDGE.value: get_knowledge_agent(),
         }
 
     def get_agent(self, domain: str) -> SpecialistAgent:

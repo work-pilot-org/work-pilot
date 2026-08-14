@@ -20,6 +20,7 @@ class AgentDomain(str, Enum):
     """
     HR = "hr"
     IT = "it"
+    KNOWLEDGE = "knowledge"
     # Note: Workflow and Analytics are included as per your architectural blueprint,
     # but the Coordinator will only route to them once their underlying modules exist.
     WORKFLOW = "workflow"
