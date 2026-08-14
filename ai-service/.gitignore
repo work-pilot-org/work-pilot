@@ -1,4 +1,762 @@
+# ============================================================
+# WORKPILOT - ROOT GITIGNORE
+# Python Monorepo / FastAPI / AI / Docker / PostgreSQL / uv
+# ============================================================
+
+
+# ============================================================
+# 1. ENVIRONMENT / SECRETS
+# ============================================================
+
+# Environment files
 .env
 .env.*
+!.env.example
+!.env.sample
+!.env.templateclear
+
+# Local configuration
+*.local
+*.secret
+*.secrets
+
+# Certificates / private keys
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+
+# SSH / cloud credentials
+.ssh/
+.aws/
+.azure/
+.gcloud/
+credentials.json
+service-account.json
+*-credentials.json
+
+
+# ============================================================
+# 2. PYTHON
+# ============================================================
+
 __pycache__/
 *.py[cod]
+*$py.class
+
+# Python cache / compiled files
+*.pyo
+*.pyd
+*.so
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+
+# Python virtual environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Virtualenv
+pyvenv.cfg
+
+# Coverage
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+coverage.json
+.pytest_cache/
+.tox/
+.nox/
+
+# Mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Ruff
+.ruff_cache/
+
+# Pyright
+.pyright/
+
+# Pylint
+.pylint.d/
+
+# Hypothesis
+.hypothesis/
+
+# IPython / Jupyter
+.ipynb_checkpoints/
+
+
+# ============================================================
+# 3. UV / PYTHON PACKAGE MANAGERS
+# ============================================================
+
+# uv cache
+.uv/
+
+# NOTE:
+# DO NOT ignore uv.lock.
+# uv.lock should normally be committed for applications.
+
+
+# ============================================================
+# 4. IDE / EDITORS
+# ============================================================
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# JetBrains / PyCharm
+.idea/
+*.iml
+
+# Visual Studio
+.vs/
+
+# Sublime
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*.swn
+
+# Emacs
+*~
+.#*
+
+# OS editors
+*.bak
+*.tmp
+*.temp
+
+
+# ============================================================
+# 5. WINDOWS / MAC / LINUX
+# ============================================================
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+
+# Windows installer/debug files
+*.stackdump
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Linux
+*~
+.directory
+
+
+# ============================================================
+# 6. DATABASES
+# ============================================================
+
+# SQLite
+*.sqlite
+*.sqlite3
+*.db
+*.db3
+
+# SQLite journals
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+
+# PostgreSQL dumps / backups
+*.sql.gz
+*.dump
+*.backup
+*.bak.sql
+
+# Local database directories
+postgres-data/
+postgresql-data/
+database-data/
+db-data/
+pgdata/
+
+# MySQL
+mysql-data/
+
+# Redis
+redis-data/
+
+# MongoDB
+mongodb-data/
+mongo-data/
+
+
+# ============================================================
+# 7. AI / RAG / VECTOR DATABASE DATA
+# ============================================================
+
+# ChromaDB
+chroma/
+chroma_db/
+chroma-data/
+chroma_data/
+
+# Generic vector stores
+vectorstore/
+vectorstores/
+vector-db/
+vector_db/
+
+# AI generated/local indexes
+embeddings/
+embedding_cache/
+embedding_cache/
+indexes/
+index_data/
+
+# FAISS
+*.faiss
+*.index
+
+# LanceDB
+.lancedb/
+lancedb/
+
+# Qdrant local storage
+qdrant_storage/
+
+# Weaviate local data
+weaviate_data/
+
+# Milvus local data
+milvus_data/
+
+# Test / temporary AI data
+*_test/
+test_data/
+test-data/
+tests/data/
+data/test/
+data/tests/
+
+# AI local data directories
+**/data/chroma/
+**/data/chroma_*/
+**/data/vectorstore/
+**/data/vectorstores/
+**/data/embeddings/
+**/data/indexes/
+
+# General generated data
+**/data/tmp/
+**/data/temp/
+**/data/cache/
+**/data/generated/
+
+
+# ============================================================
+# 8. UPLOADED / GENERATED FILES
+# ============================================================
+
+# PDFs / documents generated during testing
+test_*.pdf
+test-*.pdf
+*_test.pdf
+
+# Generated documents
+generated/
+generated_files/
+generated-files/
+
+# Uploaded files
+uploads/
+uploaded/
+uploaded_files/
+uploaded-files/
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+.temp/
+
+# Generic generated output
+output/
+outputs/
+artifacts/
+results/
+
+
+# ============================================================
+# 9. LOGS
+# ============================================================
+
+*.log
+*.log.*
+logs/
+log/
+**/logs/
+
+# Uvicorn / Gunicorn
+uvicorn.log
+gunicorn.log
+
+
+# ============================================================
+# 10. DOCKER
+# ============================================================
+
+# Docker local volumes
+docker-data/
+docker-volumes/
+docker-volumes/
+
+# Docker overrides
+docker-compose.override.yml
+docker-compose.local.yml
+docker-compose.dev.yml
+docker-compose.test.yml
+
+# Docker environment files
+docker/.env
+docker/*/.env
+
+# NOTE:
+# Keep docker-compose.yml tracked.
+# Keep Dockerfiles tracked.
+
+
+# ============================================================
+# 11. NODE / FRONTEND
+# ============================================================
+
+# Node dependencies
+node_modules/
+**/node_modules/
+
+# Next.js
+.next/
+**/.next/
+
+# Next.js output
+out/
+**/out/
+
+# Vite
+.vite/
+**/.vite/
+
+# React build
+build/
+**/build/
+
+# Frontend coverage
+**/coverage/
+
+# npm
+.npm/
+npm-debug.log*
+npm-error.log*
+
+# Yarn
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+.yarn-debug.log*
+.yarn-error.log*
+
+# pnpm
+.pnpm-debug.log*
+
+# Turbo
+.turbo/
+
+# ESLint
+.eslintcache
+
+# TypeScript
+*.tsbuildinfo
+
+
+# ============================================================
+# 12. FRONTEND ENVIRONMENT FILES
+# ============================================================
+
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Keep examples
+!.env.example
+
+
+# ============================================================
+# 13. ALEMBIC
+# ============================================================
+
+# Alembic cache
+**/alembic/__pycache__/
+**/alembic/versions/__pycache__/
+
+# IMPORTANT:
+# Do NOT ignore actual migration files:
+#
+# **/alembic/versions/*.py
+#
+# Those MUST remain tracked.
+
+
+# ============================================================
+# 14. TESTING
+# ============================================================
+
+.pytest_cache/
+**/.pytest_cache/
+
+.coverage
+.coverage.*
+coverage/
+htmlcov/
+
+# Test databases
+test.db
+test.sqlite
+test.sqlite3
+test.db3
+
+# Test outputs
+test-output/
+test-output.json
+test-results/
+test-results.xml
+
+# Temporary test artifacts
+test_artifacts/
+test-artifacts/
+tests/tmp/
+tests/temp/
+
+
+# ============================================================
+# 15. CELERY / TASK QUEUES
+# ============================================================
+
+celerybeat-schedule
+celerybeat.pid
+
+# Redis dumps
+dump.rdb
+
+
+# ============================================================
+# 16. JUPYTER / DATA SCIENCE
+# ============================================================
+
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Generated notebooks
+*.nbconvert.ipynb
+
+# Data science caches
+.cache/
+.cache
+
+
+# ============================================================
+# 17. TEMPORARY API / DEVELOPMENT FILES
+# ============================================================
+
+requests.http
+.http-client/
+.rest-client/
+*.http
+
+# Local scripts
+local/
+scripts/local/
+dev-local/
+
+
+# ============================================================
+# 18. CLOUD / DEPLOYMENT
+# ============================================================
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+
+# Serverless
+.serverless/
+
+# Pulumi
+.pulumi/
+
+# Kubernetes local secrets
+kubeconfig
+kubeconfig.*
+*.kubeconfig
+
+# Helm local files
+helm/.cache/
+
+
+# ============================================================
+# 19. GENERATED API / OPENAPI OUTPUT
+# ============================================================
+
+openapi.json
+openapi.yaml
+swagger.json
+
+# Generated clients
+generated-client/
+generated-clients/
+
+
+# ============================================================
+# 20. SECURITY / AUTH LOCAL DATA
+# ============================================================
+
+# Token files
+*.token
+*.tokens
+
+# Local auth/session data
+sessions/
+session_data/
+
+# Secret stores
+secrets/
+secret/
+.local-secrets/
+
+
+# ============================================================
+# 21. EMAIL / NOTIFICATION DEVELOPMENT DATA
+# ============================================================
+
+mail/
+mailpit/
+mailhog/
+email-preview/
+email_previews/
+
+# Email attachments generated locally
+email_attachments/
+email-attachments/
+
+
+# ============================================================
+# 22. AI SERVICE LOCAL FILES
+# ============================================================
+
+# Local AI databases
+**/ai-service/data/
+**/ai-service/.cache/
+
+# Keep the directory itself if needed
+# but never commit generated AI state.
+
+
+# ============================================================
+# 23. NOTIFICATION SERVICE LOCAL FILES
+# ============================================================
+
+**/notification-service/.pytest_cache/
+**/notification-service/__pycache__/
+**/notification-service/.venv/
+
+
+# ============================================================
+# 24. SERVICE-SPECIFIC PYTHON CACHES
+# ============================================================
+
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+
+
+# ============================================================
+# 25. GENERIC SERVICE DATA
+# ============================================================
+
+**/data/tmp/
+**/data/temp/
+**/data/cache/
+**/data/generated/
+**/data/uploads/
+**/data/output/
+
+# Local runtime state
+**/runtime/
+**/runtime-data/
+**/state/
+**/local-data/
+
+
+# ============================================================
+# 26. BACKUPS
+# ============================================================
+
+*.old
+*.orig
+*.backup
+*.save
+*.swp
+
+backup/
+backups/
+_backup/
+_backup_*
+
+
+# ============================================================
+# 27. GENERATED LOCK / CACHE FILES
+# ============================================================
+
+*.cache
+*.cache.json
+*.cache.db
+
+
+# ============================================================
+# 28. LOCAL DEVELOPMENT CONFIG
+# ============================================================
+
+config.local.*
+settings.local.*
+settings.dev.local.*
+settings.test.local.*
+
+local.settings.json
+
+
+# ============================================================
+# 29. CREDENTIAL / SECRET-LIKE FILE NAMES
+# ============================================================
+
+credentials.*
+credential.*
+secrets.*
+secret.*
+
+# Exception: example files are safe to track
+!credentials.example
+!credential.example
+!secrets.example
+!secret.example
+
+
+# ============================================================
+# 30. COMMON SECRET FORMATS
+# ============================================================
+
+*.pem
+*.key
+*.der
+*.p12
+*.pfx
+*.jks
+*.keystore
+
+# JWT / OAuth local files
+jwt.txt
+token.txt
+access_token.txt
+refresh_token.txt
+
+
+# ============================================================
+# 31. CLOUD SERVICE LOCAL STATE
+# ============================================================
+
+.aws/
+.azure/
+.gcloud/
+.firebase/
+.vercel/
+.netlify/
+
+# Firebase local
+.firebase/
+
+
+# ============================================================
+# 32. GENERAL BUILD / CACHE
+# ============================================================
+
+.cache/
+.cache
+.cache-loader/
+
+.parcel-cache/
+.sass-cache/
+
+release/
+releases/
+
+
+# ============================================================
+# 33. GENERATED REPORTS
+# ============================================================
+
+reports/
+report/
+generated-reports/
+test-reports/
+
+
+# ============================================================
+# 34. LOCAL PROCESS / PID FILES
+# ============================================================
+
+*.pid
+*.pid.lock
+
+
+# ============================================================
+# 35. CORE DUMPS
+# ============================================================
+
+core
+core.*
+*.core
+
+
+# ============================================================
+# 36. DEBUGGING
+# ============================================================
+
+*.debug
+debug/
+debug-output/
+
+
+# ============================================================
+# END
+# ============================================================

@@ -68,13 +68,32 @@ services:
     env_file:
     - ./workflow-service/.env
     ports:
-    - 8005:8000
+    - 8006:8000
     volumes:
     - ./workflow-service:/app/workflow-service
     - ./packages/shared-infrastructure:/app/packages/shared-infrastructure
     - /app/workflow-service/.venv
     working_dir: /app/workflow-service
     command: 'sh -c "uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"
+
+      '
+  notification-service:
+    build:
+      context: .
+      dockerfile: notification-service/Dockerfile
+      target: dev
+    container_name: workpilot_notification_service
+    restart: unless-stopped
+    env_file:
+    - ./notification-service/.env
+    ports:
+    - 8005:8000
+    volumes:
+    - ./notification-service:/app/notification-service
+    - ./packages/shared-infrastructure:/app/packages/shared-infrastructure
+    - /app/notification-service/.venv
+    working_dir: /app/notification-service
+    command: 'sh -c "uv run alembic upgrade head && uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"
 
       '
   frontend:

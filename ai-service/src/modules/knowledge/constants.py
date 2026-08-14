@@ -1,44 +1,32 @@
 """
-Constants used by the Knowledge Agent.
+Constants for the Knowledge Agent.
+
+These values define the default behaviour of document
+processing and knowledge retrieval.
 """
 
-# ==========================================================
-# Retrieval
-# ==========================================================
-
+# Number of document chunks retrieved for a knowledge query.
 DEFAULT_TOP_K = 5
-MIN_TOP_K = 1
-MAX_TOP_K = 20
 
-
-# ==========================================================
-# Document Chunking
-# ==========================================================
-
+# Maximum number of characters in a document chunk.
 DEFAULT_CHUNK_SIZE = 1000
+
+# Number of characters shared between consecutive chunks.
 DEFAULT_CHUNK_OVERLAP = 200
 
+# Minimum similarity score required for a document
+# to be considered relevant.
+DEFAULT_MIN_RELEVANCE_SCORE = 0.50
 
-# ==========================================================
-# Supported Documents
-# ==========================================================
+# Supported document types for the initial Knowledge Agent.
+SUPPORTED_DOCUMENT_TYPES = frozenset(
+    {
+        ".pdf",
+        ".txt",
+        ".md",
+    }
+)
 
-SUPPORTED_FILE_TYPES = {
-    ".pdf",
-    ".docx",
-    ".txt",
-}
-
-
-# ==========================================================
-# Retrieval Threshold
-# ==========================================================
-
-DEFAULT_SIMILARITY_THRESHOLD = 0.70
-
-
-# ==========================================================
-# Knowledge Agent
-# ==========================================================
-
-KNOWLEDGE_DOMAIN = "knowledge"
+# Maximum number of documents that can be processed
+# in a single ingestion operation.
+MAX_DOCUMENTS_PER_INGESTION = 10

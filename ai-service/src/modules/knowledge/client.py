@@ -1,5 +1,8 @@
 """
 Knowledge Agent client.
+
+Handles final answer generation using retrieved
+knowledge-base context.
 """
 
 from __future__ import annotations
@@ -8,7 +11,7 @@ from core.logger import get_logger
 from infrastructure.llm.gemini_client import gemini_client
 
 from modules.knowledge.prompts import (
-    build_document_search_prompt,
+    build_knowledge_answer_prompt,
 )
 
 logger = get_logger(__name__)
@@ -25,10 +28,10 @@ class KnowledgeClient:
         context: str,
     ) -> str:
         """
-        Generate an answer using retrieved context.
+        Generate an answer using retrieved knowledge.
         """
 
-        prompt = build_document_search_prompt(
+        prompt = build_knowledge_answer_prompt(
             user_query=query,
             context=context,
         )

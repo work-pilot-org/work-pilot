@@ -334,76 +334,146 @@ class AuthService:
             # ------------------------------------------
             # Initialize HR-Service Tables
             # ------------------------------------------
+
             import httpx
             from shared_infrastructure.core.config import settings
-            
+
             if settings.HR_SERVICE_URL:
-                hr_init_url = f"{settings.HR_SERVICE_URL}/internal/employees/tenants/init"
+                hr_init_url = (
+                    f"{settings.HR_SERVICE_URL}"
+                    "/internal/employees/tenants/init"
+                )
+
                 try:
                     init_res = httpx.post(
                         hr_init_url,
                         json={"schema_name": schema_name},
                         headers={"X-Internal-Token": settings.SECRET_KEY},
-                        timeout=30.0
+                        timeout=30.0,
                     )
+
                     if init_res.status_code not in (200, 201):
                         db.rollback()
-                        raise Exception(f"Failed to initialize hr-service tables: {init_res.text}")
+                        raise Exception(
+                            "Failed to initialize hr-service tables: "
+                            f"{init_res.text}"
+                        )
+
                 except Exception as e:
                     db.rollback()
-                    raise Exception(f"Failed to communicate with HR service for init: {str(e)}")
+                    raise Exception(
+                        "Failed to communicate with HR service for init: "
+                        f"{str(e)}"
+                    )
+
+
+            # ------------------------------------------
+            # Initialize Notification-Service Tables
+            # ------------------------------------------
+
+            if settings.NOTIFICATION_SERVICE_URL:
+                notification_init_url = (
+                    f"{settings.NOTIFICATION_SERVICE_URL}"
+                    "/internal/notifications/tenants/init"
+                )
+
+                try:
+                    init_res = httpx.post(
+                        notification_init_url,
+                        json={"schema_name": schema_name},
+                        headers={"X-Internal-Token": settings.SECRET_KEY},
+                        timeout=30.0,
+                    )
+
+                    if init_res.status_code not in (200, 201):
+                        db.rollback()
+                        raise Exception(
+                            "Failed to initialize notification-service tables: "
+                            f"{init_res.text}"
+                        )
+
+                except Exception as e:
+                    db.rollback()
+                    raise Exception(
+                        "Failed to communicate with Notification service for init: "
+                        f"{str(e)}"
+                    )
+
 
             # ------------------------------------------
             # Seed Roles
             # ------------------------------------------
-            
-            # Ensure the connection's search_path is correctly set to the tenant schema
+
             set_tenant_schema(db, schema_name)
-            
+
             db_roles = []
+
             for rbac_role in RBACRole:
                 db_role = DBRole(name=rbac_role.value)
                 db.add(db_role)
                 db_roles.append(db_role)
+
             db.flush()
+
 
             # ------------------------------------------
             # Assign TENANT_ADMIN Role to User
             # ------------------------------------------
-            tenant_admin_role = next(r for r in db_roles if r.name == RBACRole.TENANT_ADMIN.value)
-            user_role = UserRole(user_id=user.id, role_id=tenant_admin_role.id)
+
+            tenant_admin_role = next(
+                r for r in db_roles
+                if r.name == RBACRole.TENANT_ADMIN.value
+            )
+
+            user_role = UserRole(
+                user_id=user.id,
+                role_id=tenant_admin_role.id,
+            )
+
             db.add(user_role)
             db.flush()
-            
+
+
             # ------------------------------------------
             # Create Organization Admin Employee via HR-Service
             # ------------------------------------------
-            import httpx
-            from shared_infrastructure.core.config import settings
 
             hr_url = f"{settings.HR_SERVICE_URL}/internal/employees/admin"
+
             try:
                 response = httpx.post(
                     hr_url,
                     json={
                         "auth_user_id": str(user.id),
                         "first_name": request.full_name.split(" ")[0],
-                        "last_name": " ".join(request.full_name.split(" ")[1:]) if " " in request.full_name else "",
+                        "last_name": (
+                            " ".join(request.full_name.split(" ")[1:])
+                            if " " in request.full_name
+                            else ""
+                        ),
                         "email": request.email,
                         "role": Role.ORG_ADMIN.value,
-                        "schema_name": schema_name
+                        "schema_name": schema_name,
                     },
-                    headers={"X-Internal-Token": settings.SECRET_KEY, "X-Tenant-Id": str(tenant.id)},
-                    timeout=5.0
+                    headers={
+                        "X-Internal-Token": settings.SECRET_KEY,
+                        "X-Tenant-Id": str(tenant.id),
+                    },
+                    timeout=5.0,
                 )
+
                 if response.status_code not in (200, 201):
-                    raise Exception(f"Failed to create ORG_ADMIN in hr-service: {response.text}")
+                    raise Exception(
+                        f"Failed to create ORG_ADMIN in hr-service: "
+                        f"{response.text}"
+                    )
+
             except Exception as e:
                 db.rollback()
-                raise Exception(f"Failed to communicate with HR service for admin creation: {str(e)}")
-            
-            db.commit()
-
+                raise Exception(
+                    "Failed to communicate with HR service for admin creation: "
+                    f"{str(e)}"
+                )
             # ------------------------------------------
             # Switch Back to Public Schema
             # ------------------------------------------

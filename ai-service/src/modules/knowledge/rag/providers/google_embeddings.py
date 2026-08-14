@@ -1,18 +1,17 @@
 """
 Google Gemini embedding provider.
 
-This module contains the concrete implementation of the
-Knowledge Agent embedding provider using Google's
-embedding model through LangChain.
+Provides text embeddings for the Knowledge Agent using
+Google's Gemini embedding model through LangChain.
 """
 
 from __future__ import annotations
 
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
+from core.config import settings
 from modules.knowledge.exceptions import EmbeddingError
 from modules.knowledge.rag.embeddings import EmbeddingProvider
-from shared_infrastructure.core.config import settings
 
 
 class GeminiEmbeddingProvider(EmbeddingProvider):
@@ -31,6 +30,7 @@ class GeminiEmbeddingProvider(EmbeddingProvider):
                 model="gemini-embedding-001",
                 google_api_key=settings.gemini_api_key,
             )
+
         except Exception as exc:
             raise EmbeddingError(
                 "Failed to initialize Gemini embedding provider."
@@ -50,7 +50,9 @@ class GeminiEmbeddingProvider(EmbeddingProvider):
             )
 
         try:
-            return await self._embeddings.aembed_query(text)
+            return await self._embeddings.aembed_query(
+                text
+            )
 
         except Exception as exc:
             raise EmbeddingError(
@@ -74,7 +76,9 @@ class GeminiEmbeddingProvider(EmbeddingProvider):
             )
 
         try:
-            return await self._embeddings.aembed_documents(texts)
+            return await self._embeddings.aembed_documents(
+                texts
+            )
 
         except Exception as exc:
             raise EmbeddingError(

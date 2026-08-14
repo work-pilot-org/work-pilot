@@ -1,6 +1,6 @@
 import pytest
 
-from src.core.exceptions import (
+from shared_infrastructure.core.exceptions import (
     CompanyAlreadyExistsException,
     DomainAlreadyExistsException,
     EmailAlreadyExistsException,
@@ -30,12 +30,12 @@ class TestWorkPilotException:
 
     def test_can_be_raised_and_caught(self):
         with pytest.raises(WorkPilotException):
-            raise WorkPilotException("boom")
+            raise WorkPilotException("boom", 500)
 
     def test_preserves_the_error_message(self):
-        exc = WorkPilotException("something went wrong")
+        exc = WorkPilotException("something went wrong", 500)
 
-        assert str(exc) == "something went wrong"
+        assert exc.detail == "something went wrong"
 
 
 @pytest.mark.parametrize("exception_class", ALL_DOMAIN_EXCEPTIONS)
@@ -57,7 +57,7 @@ class TestDomainExceptions:
     def test_preserves_the_error_message(self, exception_class):
         exc = exception_class("custom message")
 
-        assert str(exc) == "custom message"
+        assert exc.detail == "custom message"
 
     def test_does_not_catch_sibling_exceptions(self, exception_class):
         siblings = [e for e in ALL_DOMAIN_EXCEPTIONS if e is not exception_class]
