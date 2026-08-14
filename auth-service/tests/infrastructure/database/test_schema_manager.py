@@ -7,27 +7,34 @@ from src.infrastructure.database.schema_manager import SchemaManager
 class TestCreateSchema:
     def test_executes_create_schema_statement_with_the_given_schema_name(self):
         db = MagicMock()
+        mock_connection = MagicMock()
+        db.connection.return_value = mock_connection
 
         SchemaManager.create_schema(db, "tenant_openai_india")
 
-        db.execute.assert_called_once()
-        executed_stmt = db.execute.call_args[0][0]
-        assert str(executed_stmt) == 'CREATE SCHEMA "tenant_openai_india"'
+        mock_connection.exec_driver_sql.assert_called_once_with(
+            'CREATE SCHEMA "tenant_openai_india"'
+        )
 
     def test_wraps_schema_name_in_double_quotes(self):
         db = MagicMock()
+        mock_connection = MagicMock()
+        db.connection.return_value = mock_connection
 
         SchemaManager.create_schema(db, "my_schema")
 
-        executed_stmt = db.execute.call_args[0][0]
-        assert '"my_schema"' in str(executed_stmt)
+        mock_connection.exec_driver_sql.assert_called_once_with(
+            'CREATE SCHEMA "my_schema"'
+        )
 
     def test_uses_the_provided_session_to_execute(self):
         db = MagicMock()
+        mock_connection = MagicMock()
+        db.connection.return_value = mock_connection
 
         SchemaManager.create_schema(db, "another_schema")
 
-        db.execute.assert_called_once()
+        db.connection.assert_called_once()
 
 
 class TestCreateTenantTables:

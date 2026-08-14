@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Invitation to join WorkPilot</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h2>You have been invited to WorkPilot</h2>
+    <p>Hello,</p>
+    <p>You have been invited to join <strong>{{ company_name }}</strong> on WorkPilot as a <strong>{{ role }}</strong>.</p>
+    <p>Please click the button below to accept the invitation and set up your account. This link will expire on {{ expiry_date }}.</p>
+    
+    <div style="text-align: center; margin: 30px 0;">
+        <a href="{{ invite_link }}" style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block; font-weight: bold;">Accept Invitation</a>
+    </div>
+    
+    <p>If the button doesn't work, you can copy and paste the following link into your browser:</p>
+    <p style="word-break: break-all; background-color: #f8f9fa; padding: 10px; border-radius: 4px;">{{ invite_link }}</p>
+    
+    <p>If you have any questions or need support, please contact your administrator.</p>
+    
+    <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+    
+    <p style="font-size: 12px; color: #777;">
+        This email was sent by WorkPilot on behalf of {{ company_name }}. 
+        If you did not expect this invitation, you can safely ignore this email.
+    </p>
+</body>
+</html>

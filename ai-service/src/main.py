@@ -23,6 +23,9 @@ async def lifespan(app: FastAPI):
     """
 
     # Startup
+    if not settings.gemini_api_key or not settings.gemini_api_key.strip():
+        raise ValueError("GEMINI_API_KEY is not configured.")
+
     await http_client_provider.startup()
 
     yield

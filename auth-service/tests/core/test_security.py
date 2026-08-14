@@ -1,5 +1,4 @@
-from src.core.security import hash_password, verify_password
-
+from shared_infrastructure.core.security import hash_password, verify_password
 
 class TestHashPassword:
     def test_returns_a_string(self):

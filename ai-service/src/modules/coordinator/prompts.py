@@ -30,6 +30,7 @@ Rules:
     "domain": "<domain_name>",
     "intent": "<CONCISE_INTENT_STRING>"
 }}
+6. If the user asks about capabilities, what you can do, or how you can help, classify the domain as 'knowledge' and the intent as 'GET_CAPABILITIES'.
 """
 
 def build_intent_detection_prompt(supported_domains: list[str], user_message: str) -> str:
