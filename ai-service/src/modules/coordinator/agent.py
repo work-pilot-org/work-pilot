@@ -61,6 +61,7 @@ class CoordinatorAgent:
             execution_results = await tool_executor.execute_plan(
                 domain=intent_classification.domain,
                 plan=execution_plan,
+                user_message=user_message,
                 headers=headers
             )
             

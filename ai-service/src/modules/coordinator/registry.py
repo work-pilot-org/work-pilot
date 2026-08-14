@@ -16,6 +16,8 @@ from modules.coordinator.exceptions import UnknownDomainError
 from modules.hr.agent import get_hr_agent
 from modules.it.agent import get_it_agent
 from modules.knowledge.agent import get_knowledge_agent
+from modules.general.agent import get_general_agent
+from modules.workflow.agent import get_workflow_agent
 
 
 class SpecialistAgent(Protocol):
@@ -46,6 +48,8 @@ class AgentRegistry:
             AgentDomain.HR.value: get_hr_agent(),
             AgentDomain.IT.value: get_it_agent(),
             AgentDomain.KNOWLEDGE.value: get_knowledge_agent(),
+            AgentDomain.GENERAL.value: get_general_agent(),
+            AgentDomain.WORKFLOW.value: get_workflow_agent(),
         }
 
     def get_agent(self, domain: str) -> SpecialistAgent:
