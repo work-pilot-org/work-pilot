@@ -23,10 +23,11 @@ sys.path.insert(
 # ---------------------------------------------------------------------
 # Project imports
 # ---------------------------------------------------------------------
-from it_service.core.config import settings
-from it_service.infrastructure.database.base import TenantBase
+from shared_infrastructure.core.config import settings
+from shared_infrastructure.database.base import TenantBase
 
 # Import all models so Alembic can detect them
+from it_service.modules.assets.models import Asset
 
 # ---------------------------------------------------------------------
 # Alembic configuration

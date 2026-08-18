@@ -1,12 +1,14 @@
 from datetime import date
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, Response, status, BackgroundTasks
 from sqlalchemy.orm import Session
 
-from shared_infrastructure.core.dependencies import require_permissions
+from shared_infrastructure.core.dependencies import require_permissions, get_current_user_and_set_schema
 from shared_infrastructure.core.rbac import Permission
 from shared_infrastructure.database.session import get_db
+from shared_infrastructure.events import EventEnvelope
+from shared_infrastructure.publisher import publish_event
 from src.modules.leave.schemas import (
     CalendarEvent,
     DepartmentLeaveReportResponse,
@@ -148,11 +150,31 @@ leave_request_router = APIRouter(dependencies=[Depends(require_permissions([Perm
 )
 def create_leave_request(
     leave_request: LeaveRequestCreate,
+    background_tasks: BackgroundTasks,
+    current_user: dict = Depends(get_current_user_and_set_schema),
     db: Session = Depends(get_db),
 ):
     """Submit a new leave request."""
     service = LeaveRequestService(db)
-    return service.create_leave_request(leave_request)
+    result = service.create_leave_request(leave_request)
+    
+    event = EventEnvelope[dict](
+        event_type="leave.created",
+        source="hr-service",
+        tenant_id=current_user.get("schema_name", "public"),
+        payload={
+            "leave_request_id": str(result.id),
+            "employee_id": str(result.employee_id),
+            "leave_type": result.leave_type,
+            "start_date": str(result.start_date),
+            "end_date": str(result.end_date),
+            "total_days": float(result.total_days),
+            "status": result.status.value,
+        }
+    )
+    background_tasks.add_task(publish_event, "hr.leave", event)
+    
+    return result
 
 
 # -------------------------------------------------------------------
@@ -219,14 +241,34 @@ def update_leave_request(
 def update_leave_request_status(
     leave_request_id: UUID,
     status_update: LeaveRequestStatusUpdate,
+    background_tasks: BackgroundTasks,
+    current_user: dict = Depends(get_current_user_and_set_schema),
     db: Session = Depends(get_db),
 ):
     """Update a leave request status (approve/reject/etc)."""
     service = LeaveRequestService(db)
-    return service.update_leave_request_status(
+    result = service.update_leave_request_status(
         leave_request_id,
         status_update.status,
     )
+    
+    event = EventEnvelope[dict](
+        event_type="leave.updated",
+        source="hr-service",
+        tenant_id=current_user.get("schema_name", "public"),
+        payload={
+            "leave_request_id": str(result.id),
+            "employee_id": str(result.employee_id),
+            "leave_type": result.leave_type,
+            "start_date": str(result.start_date),
+            "end_date": str(result.end_date),
+            "total_days": float(result.total_days),
+            "status": result.status.value,
+        }
+    )
+    background_tasks.add_task(publish_event, "hr.leave", event)
+    
+    return result
 
 # -------------------------------------------------------------------
 # Cancel Leave Request

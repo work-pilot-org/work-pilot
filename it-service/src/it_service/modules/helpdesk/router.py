@@ -2,7 +2,7 @@ import uuid
 from typing import Annotated
 
 from shared_infrastructure.core.security import get_current_user
-from fastapi import APIRouter, Depends, Query, Request, status
+from fastapi import APIRouter, Depends, Query, Request, status, BackgroundTasks
 from sqlalchemy.orm import Session
 
 from shared_infrastructure.core.dependencies import (
@@ -45,6 +45,8 @@ from it_service.modules.helpdesk.schemas import (
 from it_service.modules.helpdesk.service import (
     TicketService,
 )
+from shared_infrastructure.events import EventEnvelope
+from shared_infrastructure.publisher import publish_event
 
 router = APIRouter(
     prefix="/tickets",
@@ -120,6 +122,7 @@ DatabaseDependency = Annotated[
 def create_ticket(
     payload: CreateTicketRequest,
     request: Request,
+    background_tasks: BackgroundTasks,
     db: DatabaseDependency,
     service: TicketServiceDependency,
     current_user: dict = Depends(get_current_user_and_set_schema),
@@ -129,11 +132,29 @@ def create_ticket(
     """
     requester_id = uuid.UUID(current_user.get("sub"))
 
-    return service.create_ticket(
+    result = service.create_ticket(
         db=db,
         requester_id=requester_id,
         payload=payload,
     )
+    
+    event = EventEnvelope[dict](
+        event_type="ticket.created",
+        source="it-service",
+        tenant_id=current_user.get("schema_name", "public"),
+        payload={
+            "ticket_id": str(result.id),
+            "requester_id": str(result.requester_id),
+            "assigned_to": str(result.assigned_to) if result.assigned_to else None,
+            "category": result.category.value if hasattr(result.category, 'value') else result.category,
+            "priority": result.priority.value if hasattr(result.priority, 'value') else result.priority,
+            "status": result.status.value if hasattr(result.status, 'value') else result.status,
+            "created_at": result.created_at.isoformat()
+        }
+    )
+    background_tasks.add_task(publish_event, "it.ticket", event)
+    
+    return result
 
 
 @router.get(
@@ -194,6 +215,7 @@ def get_ticket(
 def update_ticket(
     ticket_id: uuid.UUID,
     payload: UpdateTicketRequest,
+    background_tasks: BackgroundTasks,
     db: DatabaseDependency,
     service: TicketServiceDependency,
     current_user: dict = Depends(get_current_user_and_set_schema),
@@ -203,11 +225,29 @@ def update_ticket(
     """
     verify_ticket_ownership(ticket_id, current_user, db, bypass_permissions=[Permission.TICKETS_MANAGE])
 
-    return service.update_ticket(
+    result = service.update_ticket(
         db=db,
         ticket_id=ticket_id,
         payload=payload,
     )
+    
+    event = EventEnvelope[dict](
+        event_type="ticket.updated",
+        source="it-service",
+        tenant_id=current_user.get("schema_name", "public"),
+        payload={
+            "ticket_id": str(result.id),
+            "requester_id": str(result.requester_id),
+            "assigned_to": str(result.assigned_to) if result.assigned_to else None,
+            "category": result.category.value if hasattr(result.category, 'value') else result.category,
+            "priority": result.priority.value if hasattr(result.priority, 'value') else result.priority,
+            "status": result.status.value if hasattr(result.status, 'value') else result.status,
+            "created_at": result.created_at.isoformat()
+        }
+    )
+    background_tasks.add_task(publish_event, "it.ticket", event)
+    
+    return result
 
 
 @router.patch(
@@ -218,18 +258,38 @@ def update_ticket(
 def change_status(
     ticket_id: uuid.UUID,
     payload: UpdateTicketStatusRequest,
+    background_tasks: BackgroundTasks,
     db: DatabaseDependency,
     service: TicketServiceDependency,
+    current_user: dict = Depends(get_current_user_and_set_schema),
 ):
     """
     Update ticket status.
     """
 
-    return service.change_status(
+    result = service.change_status(
         db=db,
         ticket_id=ticket_id,
         payload=payload,
     )
+    
+    event = EventEnvelope[dict](
+        event_type="ticket.status_changed",
+        source="it-service",
+        tenant_id=current_user.get("schema_name", "public"),
+        payload={
+            "ticket_id": str(result.id),
+            "requester_id": str(result.requester_id),
+            "assigned_to": str(result.assigned_to) if result.assigned_to else None,
+            "category": result.category.value if hasattr(result.category, 'value') else result.category,
+            "priority": result.priority.value if hasattr(result.priority, 'value') else result.priority,
+            "status": result.status.value if hasattr(result.status, 'value') else result.status,
+            "created_at": result.created_at.isoformat()
+        }
+    )
+    background_tasks.add_task(publish_event, "it.ticket", event)
+    
+    return result
 
 
 @router.patch(
@@ -240,18 +300,38 @@ def change_status(
 def assign_ticket(
     ticket_id: uuid.UUID,
     payload: AssignTicketRequest,
+    background_tasks: BackgroundTasks,
     db: DatabaseDependency,
     service: TicketServiceDependency,
+    current_user: dict = Depends(get_current_user_and_set_schema),
 ):
     """
     Assign ticket.
     """
 
-    return service.assign_ticket(
+    result = service.assign_ticket(
         db=db,
         ticket_id=ticket_id,
         payload=payload,
     )
+    
+    event = EventEnvelope[dict](
+        event_type="ticket.assigned",
+        source="it-service",
+        tenant_id=current_user.get("schema_name", "public"),
+        payload={
+            "ticket_id": str(result.id),
+            "requester_id": str(result.requester_id),
+            "assigned_to": str(result.assigned_to) if result.assigned_to else None,
+            "category": result.category.value if hasattr(result.category, 'value') else result.category,
+            "priority": result.priority.value if hasattr(result.priority, 'value') else result.priority,
+            "status": result.status.value if hasattr(result.status, 'value') else result.status,
+            "created_at": result.created_at.isoformat()
+        }
+    )
+    background_tasks.add_task(publish_event, "it.ticket", event)
+    
+    return result
 
 
 @router.delete(

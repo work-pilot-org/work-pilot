@@ -13,4 +13,5 @@ members = [
     "workflow-service",
     "ai-service",
     "notification-service",
+    "analytics-service",
 ]

@@ -17,6 +17,7 @@ dependencies = [
     "shared-infrastructure",
     "celery>=5.4.0",
     "redis>=5.2.1",
+    "faststream[kafka]>=0.7.4",
 ]
 
 [tool.ruff.lint]

@@ -135,3 +135,39 @@ services:
     environment:
     - PYTHONPATH=/app/ai-service/src
     command: sh -c "uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  analytics-service:
+    build:
+      context: .
+      dockerfile: analytics-service/Dockerfile
+      target: dev
+    container_name: workpilot_analytics_service
+    restart: unless-stopped
+    env_file:
+    - ./analytics-service/.env
+    ports:
+    - 8007:8000
+    volumes:
+    - ./analytics-service:/app/analytics-service
+    - ./packages/shared-infrastructure:/app/packages/shared-infrastructure
+    - /app/analytics-service/.venv
+    working_dir: /app/analytics-service
+    command: 'sh -c "uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"'
+  
+  redpanda:
+    image: docker.redpanda.com/redpandadata/redpanda:v23.2.19
+    container_name: workpilot_redpanda
+    command:
+      - redpanda
+      - start
+      - --smp 1
+      - --memory 1G
+      - --reserve-memory 0M
+      - --overprovisioned
+      - --node-id 0
+      - --kafka-addr PLAINTEXT://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092
+      - --advertise-kafka-addr PLAINTEXT://redpanda:29092,OUTSIDE://localhost:9092
+    ports:
+      - 9092:9092
+      - 29092:29092
+    restart: unless-stopped

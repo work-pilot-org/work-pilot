@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, BackgroundTasks
 from sqlalchemy.orm import Session
 
 from shared_infrastructure.core.dependencies import (
@@ -21,6 +21,8 @@ from src.modules.employee.schemas import (
 )
 from src.modules.employee.service import EmployeeService
 from shared_infrastructure.core.security import get_current_user
+from shared_infrastructure.events import EventEnvelope
+from shared_infrastructure.publisher import publish_event
 
 router = APIRouter(
     prefix="/employees",
@@ -53,11 +55,27 @@ def create_employee(
 )
 def onboard_employee(
     employee: EmployeeCreate,
+    background_tasks: BackgroundTasks,
     current_user: dict = Depends(get_current_user_and_set_schema),
     db: Session = Depends(get_db),
 ):
     service = EmployeeService(db)
-    return service.onboard_employee(employee, current_user)
+    result = service.onboard_employee(employee, current_user)
+    
+    event = EventEnvelope[dict](
+        event_type="employee.onboarded",
+        source="hr-service",
+        tenant_id=current_user.get("schema_name", "public"),
+        payload={
+            "employee_id": str(result.id),
+            "first_name": result.first_name,
+            "last_name": result.last_name,
+            "employment_type": result.employment_type.value if hasattr(result.employment_type, 'value') else str(result.employment_type),
+            "status": result.status.value if hasattr(result.status, 'value') else str(result.status),
+        }
+    )
+    background_tasks.add_task(publish_event, "hr.employee", event)
+    return result
 
 
 @router.get(
@@ -113,13 +131,30 @@ def get_employee_by_id(
 def update_employee(
     employee_id: UUID,
     employee: EmployeeUpdate,
+    background_tasks: BackgroundTasks,
+    current_user: dict = Depends(get_current_user_and_set_schema),
     db: Session = Depends(get_db),
 ):
     service = EmployeeService(db)
-    return service.update_employee(
+    result = service.update_employee(
         employee_id,
         employee,
     )
+    
+    event = EventEnvelope[dict](
+        event_type="employee.updated",
+        source="hr-service",
+        tenant_id=current_user.get("schema_name", "public"),
+        payload={
+            "employee_id": str(result.id),
+            "first_name": result.first_name,
+            "last_name": result.last_name,
+            "employment_type": result.employment_type.value if hasattr(result.employment_type, 'value') else str(result.employment_type),
+            "status": result.status.value if hasattr(result.status, 'value') else str(result.status),
+        }
+    )
+    background_tasks.add_task(publish_event, "hr.employee", event)
+    return result
 
 
 @router.delete(
