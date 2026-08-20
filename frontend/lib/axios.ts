@@ -87,6 +87,23 @@ aiApi.interceptors.request.use((config) => {
   return config;
 });
 
+const ANALYTICS_SERVICE_URL = process.env.NEXT_PUBLIC_ANALYTICS_SERVICE_URL || "http://localhost:8007";
+export const analyticsApi = axios.create({
+  baseURL: ANALYTICS_SERVICE_URL,
+  withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+analyticsApi.interceptors.request.use((config) => {
+  const token = useAuthStore.getState().token;
+  if (token && config.headers) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 // --- Response Interceptor Setup ---
 import toast from "react-hot-toast";
 
@@ -125,3 +142,4 @@ hrApi.interceptors.response.use(responseInterceptor, errorInterceptor);
 itApi.interceptors.response.use(responseInterceptor, errorInterceptor);
 workflowApi.interceptors.response.use(responseInterceptor, errorInterceptor);
 aiApi.interceptors.response.use(responseInterceptor, errorInterceptor);
+analyticsApi.interceptors.response.use(responseInterceptor, errorInterceptor);

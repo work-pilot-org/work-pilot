@@ -15,6 +15,8 @@ services:
     - ./packages/shared-infrastructure:/app/packages/shared-infrastructure
     - /app/auth-service/.venv
     working_dir: /app/auth-service
+    environment:
+    - WATCHFILES_FORCE_POLLING=true
     command: 'sh -c "uv run alembic upgrade head && uv run uvicorn src.main:app --host
       0.0.0.0 --port 8000 --reload"
 
@@ -35,6 +37,8 @@ services:
     - ./packages/shared-infrastructure:/app/packages/shared-infrastructure
     - /app/hr-service/.venv
     working_dir: /app/hr-service
+    environment:
+    - WATCHFILES_FORCE_POLLING=true
     command: 'sh -c "uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"
 
       '
@@ -54,6 +58,8 @@ services:
     - ./packages/shared-infrastructure:/app/packages/shared-infrastructure
     - /app/it-service/.venv
     working_dir: /app/it-service
+    environment:
+    - WATCHFILES_FORCE_POLLING=true
     command: 'sh -c "uv run uvicorn src.it_service.main:app --host 0.0.0.0 --port
       8000 --reload"
 
@@ -74,6 +80,8 @@ services:
     - ./packages/shared-infrastructure:/app/packages/shared-infrastructure
     - /app/workflow-service/.venv
     working_dir: /app/workflow-service
+    environment:
+    - WATCHFILES_FORCE_POLLING=true
     command: 'sh -c "uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"
 
       '
@@ -93,6 +101,8 @@ services:
     - ./packages/shared-infrastructure:/app/packages/shared-infrastructure
     - /app/notification-service/.venv
     working_dir: /app/notification-service
+    environment:
+    - WATCHFILES_FORCE_POLLING=true
     command: 'sh -c "uv run alembic upgrade head && uv run uvicorn src.notification_service.main:app --host 0.0.0.0 --port 8000 --reload"
 
       '
@@ -134,6 +144,7 @@ services:
     working_dir: /app/ai-service
     environment:
     - PYTHONPATH=/app/ai-service/src
+    - WATCHFILES_FORCE_POLLING=true
     command: sh -c "uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"
 
   analytics-service:
@@ -152,6 +163,8 @@ services:
     - ./packages/shared-infrastructure:/app/packages/shared-infrastructure
     - /app/analytics-service/.venv
     working_dir: /app/analytics-service
+    environment:
+    - WATCHFILES_FORCE_POLLING=true
     command: 'sh -c "uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"'
   
   redpanda:

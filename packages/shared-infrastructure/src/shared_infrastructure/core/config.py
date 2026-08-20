@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     NOTIFICATION_SERVICE_URL: str | None = None
     AI_SERVICE_URL: str | None = None
     AUTH_SERVICE_URL: str | None = None
+    ANALYTICS_SERVICE_URL: str | None = None
 
     # AI Service Settings
     gemini_api_key: str | None = None
