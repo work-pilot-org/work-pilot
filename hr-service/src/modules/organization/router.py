@@ -1,9 +1,12 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, BackgroundTasks
 from sqlalchemy.orm import Session
+from datetime import datetime, timezone
 
-from shared_infrastructure.core.dependencies import require_permissions
+from shared_infrastructure.core.dependencies import require_permissions, get_current_user_and_set_schema
 from shared_infrastructure.core.rbac import Permission
 from shared_infrastructure.database.session import get_db
+from shared_infrastructure.events import EventEnvelope
+from shared_infrastructure.publisher import publish_event
 
 from .schemas import (
     BranchCreate,
@@ -39,9 +42,25 @@ router = APIRouter(
 )
 def create_department(
     department: DepartmentCreate,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user_and_set_schema),
 ):
-    return DepartmentService.create(db, department)
+    result = DepartmentService.create(db, department)
+    
+    event = EventEnvelope[dict](
+        event_type="department.created",
+        source="hr-service",
+        tenant_id=current_user.get("schema_name", "public"),
+        payload={
+            "entity_type": "department",
+            "id": str(result.id),
+            "name": result.name,
+            "status": "active" if result.is_active else "inactive"
+        }
+    )
+    background_tasks.add_task(publish_event, "hr.organization", event)
+    return result
 
 
 @router.get(
@@ -61,9 +80,25 @@ def get_departments(
 def update_department(
     department_id: int,
     department: DepartmentUpdate,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user_and_set_schema),
 ):
-    return DepartmentService.update(db, department_id, department)
+    result = DepartmentService.update(db, department_id, department)
+    
+    event = EventEnvelope[dict](
+        event_type="department.updated",
+        source="hr-service",
+        tenant_id=current_user.get("schema_name", "public"),
+        payload={
+            "entity_type": "department",
+            "id": str(result.id),
+            "name": result.name,
+            "status": "active" if result.is_active else "inactive"
+        }
+    )
+    background_tasks.add_task(publish_event, "hr.organization", event)
+    return result
 
 
 @router.delete(
@@ -83,9 +118,26 @@ def delete_department(
 )
 def create_designation(
     designation: DesignationCreate,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user_and_set_schema),
 ):
-    return DesignationService.create(db, designation)
+    result = DesignationService.create(db, designation)
+    
+    event = EventEnvelope[dict](
+        event_type="designation.created",
+        source="hr-service",
+        tenant_id=current_user.get("schema_name", "public"),
+        payload={
+            "entity_type": "designation",
+            "id": str(result.id),
+            "name": result.name,
+            "department_id": str(result.department_id) if result.department_id else None,
+            "status": "active" if result.is_active else "inactive"
+        }
+    )
+    background_tasks.add_task(publish_event, "hr.organization", event)
+    return result
 
 
 @router.get(
@@ -105,9 +157,26 @@ def get_designations(
 def update_designation(
     designation_id: int,
     designation: DesignationUpdate,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user_and_set_schema),
 ):
-    return DesignationService.update(db, designation_id, designation)
+    result = DesignationService.update(db, designation_id, designation)
+    
+    event = EventEnvelope[dict](
+        event_type="designation.updated",
+        source="hr-service",
+        tenant_id=current_user.get("schema_name", "public"),
+        payload={
+            "entity_type": "designation",
+            "id": str(result.id),
+            "name": result.name,
+            "department_id": str(result.department_id) if result.department_id else None,
+            "status": "active" if result.is_active else "inactive"
+        }
+    )
+    background_tasks.add_task(publish_event, "hr.organization", event)
+    return result
 
 
 @router.delete(

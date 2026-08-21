@@ -2,10 +2,12 @@ from shared_infrastructure.core.rbac import Permission
 from shared_infrastructure.core.dependencies import require_permissions
 from typing import List
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, status, BackgroundTasks
 from sqlalchemy.orm import Session
 
 from shared_infrastructure.database.session import get_db
+from shared_infrastructure.events import EventEnvelope
+from shared_infrastructure.publisher import publish_event
 from shared_infrastructure.core.dependencies import get_current_user_and_set_schema
 from shared_infrastructure.core.security import get_current_user, security
 from fastapi.security import HTTPAuthorizationCredentials
@@ -112,12 +114,48 @@ def delete_workflow(
 )
 async def start_workflow_execution(
     data: WorkflowExecutionCreate,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user_and_set_schema),
     credentials: HTTPAuthorizationCredentials = Depends(security),
 ):
     service = WorkflowService(db)
-    return await service.start_workflow_execution(data, token=credentials.credentials)
+    execution = await service.start_workflow_execution(data, token=credentials.credentials)
+    
+    event_start = EventEnvelope[dict](
+        event_type="workflow.execution.started",
+        source="workflow-service",
+        tenant_id=current_user.get("schema_name", "public"),
+        payload={
+            "workflow_id": execution.workflow_id,
+            "execution_id": execution.id,
+            "entity_type": execution.entity_type,
+            "status": execution.status
+        }
+    )
+    background_tasks.add_task(publish_event, "workflow.execution", event_start)
+    
+    history = service.get_history(execution.id)
+    first_step = next((h for h in history if h.decision == "pending"), None)
+    if first_step:
+        event_step = EventEnvelope[dict](
+            event_type="workflow.step.created",
+            source="workflow-service",
+            tenant_id=current_user.get("schema_name", "public"),
+            payload={
+                "workflow_id": execution.workflow_id,
+                "execution_id": execution.id,
+                "entity_type": execution.entity_type,
+                "status": execution.status,
+                "step_id": first_step.id,
+                "approver_id": first_step.approver_id,
+                "decision": first_step.decision,
+                "step_order": execution.current_step
+            }
+        )
+        background_tasks.add_task(publish_event, "workflow.execution", event_step)
+        
+    return execution
 
 
 @router.get(
@@ -153,19 +191,75 @@ def get_workflow_execution(
 async def approve_task(
     task_id: str,
     data: ApprovalDecision,
+    background_tasks: BackgroundTasks,
     _rbac=Depends(require_permissions([Permission.WORKFLOW_APPROVE])),
     db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user_and_set_schema),
     credentials: HTTPAuthorizationCredentials = Depends(security),
 ):
     service = WorkflowService(db)
-    return await service.approve_step(
+    approval = await service.approve_step(
         task_id=task_id,
         user_id=current_user.get("sub"),
         user_role=current_user.get("role", "EMPLOYEE"),
         decision_data=data,
         token=credentials.credentials,
     )
+    execution = service.get_execution(approval.execution_id)
+    
+    event_step_decided = EventEnvelope[dict](
+        event_type=f"workflow.step.{approval.decision}",
+        source="workflow-service",
+        tenant_id=current_user.get("schema_name", "public"),
+        payload={
+            "workflow_id": execution.workflow_id,
+            "execution_id": execution.id,
+            "entity_type": execution.entity_type,
+            "status": execution.status,
+            "step_id": approval.id,
+            "approver_id": approval.approver_id,
+            "decision": approval.decision,
+            "decided_at": approval.decided_at.isoformat() if approval.decided_at else None,
+            "step_order": execution.current_step
+        }
+    )
+    background_tasks.add_task(publish_event, "workflow.execution", event_step_decided)
+    
+    if execution.status == "pending":
+        history = service.get_history(execution.id)
+        next_step = next((h for h in history if h.decision == "pending"), None)
+        if next_step:
+            event_next_step = EventEnvelope[dict](
+                event_type="workflow.step.created",
+                source="workflow-service",
+                tenant_id=current_user.get("schema_name", "public"),
+                payload={
+                    "workflow_id": execution.workflow_id,
+                    "execution_id": execution.id,
+                    "entity_type": execution.entity_type,
+                    "status": execution.status,
+                    "step_id": next_step.id,
+                    "approver_id": next_step.approver_id,
+                    "decision": next_step.decision,
+                    "step_order": execution.current_step
+                }
+            )
+            background_tasks.add_task(publish_event, "workflow.execution", event_next_step)
+    else:
+        event_exec = EventEnvelope[dict](
+            event_type=f"workflow.execution.{execution.status}",
+            source="workflow-service",
+            tenant_id=current_user.get("schema_name", "public"),
+            payload={
+                "workflow_id": execution.workflow_id,
+                "execution_id": execution.id,
+                "entity_type": execution.entity_type,
+                "status": execution.status
+            }
+        )
+        background_tasks.add_task(publish_event, "workflow.execution", event_exec)
+
+    return approval
 
 
 @router.patch(
@@ -174,14 +268,28 @@ async def approve_task(
 )
 async def cancel_workflow(
     execution_id: str,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user_and_set_schema),
 ):
     service = WorkflowService(db)
-    return await service.cancel_workflow(
+    execution = await service.cancel_workflow(
         execution_id=execution_id,
         user_id=current_user.get("sub"),
     )
+    event_exec = EventEnvelope[dict](
+        event_type="workflow.execution.cancelled",
+        source="workflow-service",
+        tenant_id=current_user.get("schema_name", "public"),
+        payload={
+            "workflow_id": execution.workflow_id,
+            "execution_id": execution.id,
+            "entity_type": execution.entity_type,
+            "status": execution.status
+        }
+    )
+    background_tasks.add_task(publish_event, "workflow.execution", event_exec)
+    return execution
 
 
 @router.patch(
@@ -190,16 +298,52 @@ async def cancel_workflow(
 )
 async def restart_workflow(
     execution_id: str,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user_and_set_schema),
     credentials: HTTPAuthorizationCredentials = Depends(security),
 ):
     service = WorkflowService(db)
-    return await service.restart_workflow(
+    execution = await service.restart_workflow(
         execution_id=execution_id,
         user_id=current_user.get("sub"),
         token=credentials.credentials,
     )
+    
+    event_start = EventEnvelope[dict](
+        event_type="workflow.execution.started",
+        source="workflow-service",
+        tenant_id=current_user.get("schema_name", "public"),
+        payload={
+            "workflow_id": execution.workflow_id,
+            "execution_id": execution.id,
+            "entity_type": execution.entity_type,
+            "status": execution.status
+        }
+    )
+    background_tasks.add_task(publish_event, "workflow.execution", event_start)
+    
+    history = service.get_history(execution.id)
+    first_step = next((h for h in history if h.decision == "pending"), None)
+    if first_step:
+        event_step = EventEnvelope[dict](
+            event_type="workflow.step.created",
+            source="workflow-service",
+            tenant_id=current_user.get("schema_name", "public"),
+            payload={
+                "workflow_id": execution.workflow_id,
+                "execution_id": execution.id,
+                "entity_type": execution.entity_type,
+                "status": execution.status,
+                "step_id": first_step.id,
+                "approver_id": first_step.approver_id,
+                "decision": first_step.decision,
+                "step_order": execution.current_step
+            }
+        )
+        background_tasks.add_task(publish_event, "workflow.execution", event_step)
+        
+    return execution
 
 @router.get(
     "/workflow-executions/{execution_id}/history",

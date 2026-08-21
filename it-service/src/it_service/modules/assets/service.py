@@ -72,6 +72,7 @@ class AssetService:
                 detail=f"Asset is not available for assignment. Current status: {asset.status.value}",
             )
         asset.assigned_to = payload.assigned_to
+        asset.assignment_id = uuid.uuid4()
         asset.status = AssetStatus.ASSIGNED
         return self.repository.save(db, asset)
 
@@ -83,6 +84,7 @@ class AssetService:
                 detail=f"Asset is not currently assigned. Current status: {asset.status.value}",
             )
         asset.assigned_to = None
+        asset.assignment_id = None
         asset.status = AssetStatus.AVAILABLE
         return self.repository.save(db, asset)
 

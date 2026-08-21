@@ -18,6 +18,7 @@ from modules.it.agent import get_it_agent
 from modules.knowledge.agent import get_knowledge_agent
 from modules.general.agent import get_general_agent
 from modules.workflow.agent import get_workflow_agent
+from modules.analytics.agent import get_analytics_agent
 
 
 class SpecialistAgent(Protocol):
@@ -50,6 +51,7 @@ class AgentRegistry:
             AgentDomain.KNOWLEDGE.value: get_knowledge_agent(),
             AgentDomain.GENERAL.value: get_general_agent(),
             AgentDomain.WORKFLOW.value: get_workflow_agent(),
+            AgentDomain.ANALYTICS.value: get_analytics_agent(),
         }
 
     def get_agent(self, domain: str) -> SpecialistAgent:

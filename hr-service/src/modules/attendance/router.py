@@ -1,7 +1,7 @@
 from datetime import date
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, status, BackgroundTasks
 from sqlalchemy.orm import Session
 
 from shared_infrastructure.core.dependencies import (
@@ -23,7 +23,8 @@ from src.modules.attendance.schemas import (
     MonthlyAttendanceReportResponse,
 )
 from src.modules.attendance.use_cases import AttendanceUseCases
-
+from shared_infrastructure.publisher import publish_event
+from shared_infrastructure.events import EventEnvelope
 router = APIRouter(
     prefix="/attendance",
     tags=["Attendance"],
@@ -46,12 +47,32 @@ def get_service(db: Session = Depends(get_db)) -> AttendanceUseCases:
 )
 def check_in(
     request: AttendanceCheckIn,
+    background_tasks: BackgroundTasks,
     current_user: dict = Depends(get_current_user_and_set_schema),
     db: Session = Depends(get_db),
     service: AttendanceUseCases = Depends(get_service),
 ):
     verify_employee_ownership(request.employee_id, current_user, db, bypass_permissions=[Permission.ATTENDANCE_MANAGE])
-    return service.check_in(request)
+    attendance = service.check_in(request)
+    
+    event = EventEnvelope[dict](
+        event_type="attendance.created",
+        source="hr-service",
+        tenant_id=current_user.get("schema_name", "public"),
+        payload={
+            "attendance_id": attendance.id,
+            "employee_id": str(attendance.employee_id),
+            "check_in": str(attendance.check_in) if attendance.check_in else None,
+            "check_out": str(attendance.check_out) if attendance.check_out else None,
+            "attendance_date": str(attendance.attendance_date),
+            "status": attendance.status.value,
+            "working_minutes": attendance.working_minutes,
+            "overtime_minutes": attendance.overtime_minutes,
+        }
+    )
+    background_tasks.add_task(publish_event, "hr.attendance", event)
+    
+    return attendance
 
 
 # ----------------------------------------------------
@@ -65,12 +86,32 @@ def check_in(
 )
 def check_out(
     request: AttendanceCheckOut,
+    background_tasks: BackgroundTasks,
     current_user: dict = Depends(get_current_user_and_set_schema),
     db: Session = Depends(get_db),
     service: AttendanceUseCases = Depends(get_service),
 ):
     verify_employee_ownership(request.employee_id, current_user, db, bypass_permissions=[Permission.ATTENDANCE_MANAGE])
-    return service.check_out(request)
+    attendance = service.check_out(request)
+    
+    event = EventEnvelope[dict](
+        event_type="attendance.updated",
+        source="hr-service",
+        tenant_id=current_user.get("schema_name", "public"),
+        payload={
+            "attendance_id": attendance.id,
+            "employee_id": str(attendance.employee_id),
+            "check_in": str(attendance.check_in) if attendance.check_in else None,
+            "check_out": str(attendance.check_out) if attendance.check_out else None,
+            "attendance_date": str(attendance.attendance_date),
+            "status": attendance.status.value,
+            "working_minutes": attendance.working_minutes,
+            "overtime_minutes": attendance.overtime_minutes,
+        }
+    )
+    background_tasks.add_task(publish_event, "hr.attendance", event)
+    
+    return attendance
 
 
 # ----------------------------------------------------
