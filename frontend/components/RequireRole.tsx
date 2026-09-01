@@ -14,11 +14,6 @@ export function RequireRole({ allowedRoles, children, fallback = null }: Require
     return <>{fallback}</>;
   }
 
-  // Admin bypass
-  if (user.roles.includes("TENANT_ADMIN")) {
-    return <>{children}</>;
-  }
-
   // Check if user has ANY allowed role
   const hasAccess = user.roles.some(role => allowedRoles.includes(role));
   

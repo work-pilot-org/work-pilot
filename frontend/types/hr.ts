@@ -1,6 +1,24 @@
+export interface EmployeeCreateRequest {
+  employee_code: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  role: string;
+  joining_date: string;
+  employment_type: string;
+  employment_status?: string;
+  phone?: string;
+  gender?: string;
+  date_of_birth?: string;
+  department_id?: string;
+  designation_id?: string;
+  manager_id?: string;
+  work_location?: string;
+}
+
 export interface EmployeeResponse {
   id: string;
-  auth_user_id: string;
+  auth_user_id?: string;
   employee_code: string;
   first_name: string;
   last_name: string;
@@ -16,6 +34,7 @@ export interface EmployeeResponse {
   work_location?: string;
   profile_photo?: string;
   is_active: boolean;
+  invitation_status?: string;
   created_at: string;
   updated_at: string;
 }

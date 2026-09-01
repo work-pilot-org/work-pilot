@@ -46,6 +46,9 @@ class InvitationService:
         if not tenant:
             raise HTTPException(status_code=404, detail="Tenant not found")
             
+        if req.role == req.role.ORG_ADMIN:
+            raise HTTPException(status_code=403, detail="Cannot invite users as Organization Admin. This role is reserved for the account owner.")
+            
         email = req.email.strip().lower()
 
         # Prevent duplicate pending invitations

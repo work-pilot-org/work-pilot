@@ -2,19 +2,20 @@
 
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/authStore";
-import { itRepository } from "@/repositories/itRepository";
-import { TicketResponse } from "@/types/it";
 import { Laptop, AlertCircle, Clock, CheckCircle2, Ticket, ShieldAlert } from "lucide-react";
 import { LoadingState } from "@/components/common/LoadingState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
+import { getTicketSummary, getAssetAssignments } from "@/lib/api/analytics";
+import { CustomBarChart, CustomPieChart } from "@/components/analytics/AnalyticsCharts";
 
 export function ITDashboard() {
   const { user } = useAuthStore();
   const router = useRouter();
   
-  const [tickets, setTickets] = useState<TicketResponse[]>([]);
+  const [ticketSummary, setTicketSummary] = useState<any[]>([]);
+  const [assetAssignments, setAssetAssignments] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,10 +23,14 @@ export function ITDashboard() {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const data = await itRepository.getTickets();
-        setTickets(data);
+        const [ticketsData, assetsData] = await Promise.all([
+          getTicketSummary().catch(() => ({ summary: [] })),
+          getAssetAssignments().catch(() => ({ assignments: [] }))
+        ]);
+        setTicketSummary(ticketsData.summary || []);
+        setAssetAssignments(assetsData.assignments || []);
       } catch (err: unknown) {
-        setError("Failed to load IT dashboard data.");
+        setError("Failed to load IT dashboard analytics data.");
       } finally {
         setIsLoading(false);
       }
@@ -36,9 +41,16 @@ export function ITDashboard() {
   if (isLoading) return <LoadingState message="Loading IT Operations..." className="py-20" />;
   if (error) return <ErrorState message={error} />;
 
-  const activeTickets = tickets.filter(t => t.status !== "RESOLVED" && t.status !== "CLOSED");
-  const urgentTickets = activeTickets.filter(t => t.priority === "URGENT" || t.priority === "HIGH");
-  const unassignedCount = activeTickets.filter(t => !t.assigned_to).length;
+  const activeTickets = ticketSummary.filter(t => t.status !== "RESOLVED" && t.status !== "CLOSED")
+    .reduce((acc, curr) => acc + (curr.tickets || 0), 0);
+  
+  const urgentTickets = ticketSummary.filter(t => (t.priority === "URGENT" || t.priority === "HIGH") && t.status !== "RESOLVED" && t.status !== "CLOSED")
+    .reduce((acc, curr) => acc + (curr.tickets || 0), 0);
+
+  const resolvedTickets = ticketSummary.filter(t => t.status === "RESOLVED" || t.status === "CLOSED")
+    .reduce((acc, curr) => acc + (curr.tickets || 0), 0);
+
+  const activeAssets = assetAssignments.filter(a => a.status === "ACTIVE").length;
 
   return (
     <div className="flex flex-col h-full space-y-6 max-w-7xl mx-auto pb-12">
@@ -69,31 +81,74 @@ export function ITDashboard() {
             <span className="text-sm font-semibold text-muted-foreground">Active Tickets</span>
             <AlertCircle className="w-4 h-4 text-warning" />
           </div>
-          <div className="text-3xl font-bold text-foreground">{activeTickets.length}</div>
+          <div className="text-3xl font-bold text-foreground">{activeTickets}</div>
         </div>
         
         <div className="bg-surface border border-border-strong rounded-xl p-5 shadow-sm border-l-4 border-l-destructive">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-semibold text-muted-foreground">High/Urgent</span>
+            <span className="text-sm font-semibold text-muted-foreground">High/Urgent Active</span>
             <ShieldAlert className="w-4 h-4 text-destructive" />
           </div>
-          <div className="text-3xl font-bold text-foreground">{urgentTickets.length}</div>
+          <div className="text-3xl font-bold text-foreground">{urgentTickets}</div>
         </div>
         
         <div className="bg-surface border border-border-strong rounded-xl p-5 shadow-sm">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-semibold text-muted-foreground">Unassigned</span>
-            <Clock className="w-4 h-4 text-muted-foreground" />
+            <span className="text-sm font-semibold text-muted-foreground">Active Asset Assignments</span>
+            <Laptop className="w-4 h-4 text-muted-foreground" />
           </div>
-          <div className="text-3xl font-bold text-foreground">{unassignedCount}</div>
+          <div className="text-3xl font-bold text-foreground">{activeAssets}</div>
         </div>
         
         <div className="bg-surface border border-border-strong rounded-xl p-5 shadow-sm">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-semibold text-muted-foreground">Resolved (Total)</span>
+            <span className="text-sm font-semibold text-muted-foreground">Resolved Tickets</span>
             <CheckCircle2 className="w-4 h-4 text-success" />
           </div>
-          <div className="text-3xl font-bold text-foreground">{tickets.length - activeTickets.length}</div>
+          <div className="text-3xl font-bold text-foreground">{resolvedTickets}</div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
+        <div className="bg-surface p-6 rounded-xl border border-border shadow-sm">
+          <h3 className="text-lg font-medium text-foreground mb-4">Tickets by Status & Priority</h3>
+          <CustomBarChart 
+            data={ticketSummary} 
+            xAxisKey="status" 
+            bars={[{ key: "tickets", color: "#f59e0b", name: "Tickets" }]} 
+          />
+        </div>
+        
+        <div className="bg-surface p-6 rounded-xl border border-border shadow-sm flex flex-col">
+          <h3 className="text-lg font-medium text-foreground mb-4">Recent Asset Assignments</h3>
+          <div className="flex-1 overflow-auto max-h-[300px]">
+            {assetAssignments.length === 0 ? (
+              <div className="h-full flex items-center justify-center text-muted-foreground text-sm border-2 border-dashed border-border rounded-lg">
+                No recent assignments
+              </div>
+            ) : (
+              <table className="w-full text-sm text-left">
+                <thead className="text-xs text-muted-foreground uppercase bg-surface-hover sticky top-0">
+                  <tr>
+                    <th className="px-4 py-2">Asset</th>
+                    <th className="px-4 py-2">Employee</th>
+                    <th className="px-4 py-2">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {assetAssignments.slice(0, 5).map((asset, i) => (
+                    <tr key={i} className="border-b border-border">
+                      <td className="px-4 py-3 font-medium text-foreground">{asset.asset_name}</td>
+                      <td className="px-4 py-3">{asset.employee_name || 'N/A'}</td>
+                      <td className="px-4 py-3">
+                        <span className="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs font-semibold">{asset.status}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
         </div>
       </div>
 
@@ -111,32 +166,6 @@ export function ITDashboard() {
               <span className="text-sm font-medium text-foreground">Hardware Assets</span>
             </button>
           </div>
-        </div>
-
-        {/* Priority Attention */}
-        <div className="bg-surface rounded-xl border border-border-strong shadow-sm p-6 flex flex-col">
-          <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-            <ShieldAlert className="w-5 h-5 text-destructive" /> Needs Attention
-          </h3>
-          {urgentTickets.length === 0 ? (
-            <div className="flex-1 flex items-center justify-center text-sm text-muted-foreground border-2 border-dashed border-border rounded-lg">
-              No urgent tickets in the queue.
-            </div>
-          ) : (
-            <div className="space-y-4 flex-1 overflow-auto max-h-[300px] pr-2">
-              {urgentTickets.slice(0, 5).map(ticket => (
-                <div key={ticket.id} className="flex items-center gap-4 p-3 rounded-lg border border-destructive/30 bg-destructive/5">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{ticket.title}</p>
-                    <p className="text-xs text-muted-foreground truncate">{ticket.category} • {ticket.status}</p>
-                  </div>
-                  <Button variant="outline" size="sm" className="shadow-sm h-8 border-destructive/30 text-destructive hover:bg-destructive/10" onClick={() => router.push(`/dashboard/it/tickets`)}>
-                    Resolve
-                  </Button>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
       </div>
 

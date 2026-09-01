@@ -77,8 +77,8 @@ app.add_middleware(
 # =====================================================
 
 # Register Analytics Routers
-app.include_router(hr_router, prefix="/analytics/hr")
-app.include_router(it_router, prefix="/analytics/it")
+app.include_router(hr_router)
+app.include_router(it_router)
 app.include_router(workflow_router, prefix="/analytics")
 
 # =====================================================

@@ -71,7 +71,7 @@ def onboard_employee(
             "first_name": result.first_name,
             "last_name": result.last_name,
             "employment_type": result.employment_type.value if hasattr(result.employment_type, 'value') else str(result.employment_type),
-            "status": result.status.value if hasattr(result.status, 'value') else str(result.status),
+            "status": result.employment_status.value if hasattr(result.employment_status, 'value') else str(result.employment_status),
         }
     )
     background_tasks.add_task(publish_event, "hr.employee", event)
@@ -150,7 +150,7 @@ def update_employee(
             "first_name": result.first_name,
             "last_name": result.last_name,
             "employment_type": result.employment_type.value if hasattr(result.employment_type, 'value') else str(result.employment_type),
-            "status": result.status.value if hasattr(result.status, 'value') else str(result.status),
+            "status": result.employment_status.value if hasattr(result.employment_status, 'value') else str(result.employment_status),
         }
     )
     background_tasks.add_task(publish_event, "hr.employee", event)

@@ -4,13 +4,15 @@ import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { hrRepository } from "@/repositories/hrRepository";
 import { workflowRepository } from "@/repositories/workflowRepository";
-import { Users, ClipboardList, Clock, ArrowRight, Check, X } from "lucide-react";
+import { Users, ClipboardList, Clock, ArrowRight, Check, X, Activity } from "lucide-react";
 import { LoadingState } from "@/components/common/LoadingState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { EmployeeResponse } from "@/types/hr";
 import { WorkflowExecutionResponse } from "@/types/workflow";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
+import { getWorkflowPerformance } from "@/lib/api/analytics";
+import { CustomBarChart } from "@/components/analytics/AnalyticsCharts";
 
 export function ManagerDashboard() {
   const { user } = useAuthStore();
@@ -18,6 +20,7 @@ export function ManagerDashboard() {
   
   const [team, setTeam] = useState<EmployeeResponse[]>([]);
   const [executions, setExecutions] = useState<WorkflowExecutionResponse[]>([]);
+  const [workflowPerformance, setWorkflowPerformance] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,14 +28,16 @@ export function ManagerDashboard() {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const [empData, execData] = await Promise.all([
+        const [empData, execData, perfData] = await Promise.all([
           hrRepository.getEmployees().catch(() => []),
-          workflowRepository.getWorkflowExecutions().catch(() => [])
+          workflowRepository.getWorkflowExecutions().catch(() => []),
+          getWorkflowPerformance().catch(() => ({ summary: [] }))
         ]);
         
         // Simulating team scoped data (normally handled by backend permissions)
         setTeam(empData.slice(0, 8)); 
         setExecutions(execData);
+        setWorkflowPerformance(perfData.summary || perfData || []);
       } catch (err: unknown) {
         setError("Failed to load Manager dashboard data.");
       } finally {
@@ -68,7 +73,7 @@ export function ManagerDashboard() {
       </div>
       
       {/* Real Metrics Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-surface border border-border-strong rounded-xl p-5 shadow-sm">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-semibold text-muted-foreground">Team Size</span>
@@ -85,6 +90,14 @@ export function ManagerDashboard() {
           <div className="text-3xl font-bold text-foreground">{pendingApprovals.length}</div>
         </div>
         
+        <div className="bg-surface border border-border-strong rounded-xl p-5 shadow-sm">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-semibold text-muted-foreground">Workflow Executions</span>
+            <Activity className="w-4 h-4 text-primary" />
+          </div>
+          <div className="text-3xl font-bold text-foreground">{workflowPerformance.reduce((a, b) => a + (b.total_executions || 0), 0)}</div>
+        </div>
+
         <div className="bg-surface border border-border-strong rounded-xl p-5 shadow-sm">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-semibold text-muted-foreground">Team Absences</span>
@@ -125,6 +138,16 @@ export function ManagerDashboard() {
               ))}
             </div>
           )}
+        </div>
+
+        {/* Team Analytics */}
+        <div className="bg-surface rounded-xl border border-border-strong shadow-sm p-6 flex flex-col">
+          <h3 className="text-lg font-semibold text-foreground mb-4">Team Workflow Performance</h3>
+          <CustomBarChart 
+            data={workflowPerformance} 
+            xAxisKey="workflow_name" 
+            bars={[{ key: "avg_completion_minutes", color: "#6366f1", name: "Avg Time (Min)" }]} 
+          />
         </div>
 
         {/* Team Members */}

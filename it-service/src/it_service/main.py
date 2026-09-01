@@ -6,6 +6,7 @@ from it_service.modules.access.router import router as access_router
 from it_service.modules.assets.router import router as assets_router
 from it_service.modules.devices.router import router as devices_router
 from it_service.modules.helpdesk.router import router as helpdesk_router
+from it_service.modules.helpdesk.internal_router import internal_router as helpdesk_internal_router
 from it_service.modules.licenses.router import router as licenses_router
 from it_service.modules.maintenance.router import router as maintenance_router
 from it_service.modules.software.router import router as software_router
@@ -40,6 +41,7 @@ app.add_middleware(
 # ==========================================================
 
 app.include_router(helpdesk_router)
+app.include_router(helpdesk_internal_router)
 app.include_router(assets_router)
 app.include_router(devices_router)
 app.include_router(software_router)

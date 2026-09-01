@@ -2,7 +2,7 @@ from enum import Enum
 
 
 class Role(str, Enum):
-    TENANT_ADMIN = "TENANT_ADMIN"
+    ORG_ADMIN = "ORG_ADMIN"
     HR_ADMIN = "HR_ADMIN"
     IT_ADMIN = "IT_ADMIN"
     MANAGER = "MANAGER"
@@ -35,7 +35,7 @@ class Permission(str, Enum):
 
 # Mapping of roles to their default permissions
 ROLE_PERMISSIONS: dict[Role, list[Permission]] = {
-    Role.TENANT_ADMIN: [
+    Role.ORG_ADMIN: [
         Permission.ADMIN_ALL,
         Permission.HR_MANAGE, Permission.ORGANIZATION_MANAGE, Permission.DEPARTMENTS_MANAGE, 
         Permission.BRANCHES_MANAGE, Permission.DESIGNATIONS_MANAGE, Permission.SHIFTS_MANAGE, 

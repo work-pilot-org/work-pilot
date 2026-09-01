@@ -6,16 +6,21 @@ import { hrRepository } from "@/repositories/hrRepository";
 import { Users, Clock, Calendar, CheckCircle2, UserPlus, AlertTriangle } from "lucide-react";
 import { LoadingState } from "@/components/common/LoadingState";
 import { ErrorState } from "@/components/common/ErrorState";
-import { EmployeeResponse, AttendanceResponse } from "@/types/hr";
+import { EmployeeResponse } from "@/types/hr";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
+import { getAttendanceSummary, getLeaveUtilization, getHeadcount } from "@/lib/api/analytics";
+import { CustomBarChart, CustomPieChart } from "@/components/analytics/AnalyticsCharts";
 
 export function HRDashboard() {
   const { user } = useAuthStore();
   const router = useRouter();
   
   const [employees, setEmployees] = useState<EmployeeResponse[]>([]);
-  const [attendance, setAttendance] = useState<AttendanceResponse[]>([]);
+  const [attendanceSummary, setAttendanceSummary] = useState<any[]>([]);
+  const [leaveSummary, setLeaveSummary] = useState<any[]>([]);
+  const [headcountSummary, setHeadcountSummary] = useState<any[]>([]);
+  
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,12 +28,16 @@ export function HRDashboard() {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const [empData, attData] = await Promise.all([
+        const [empData, attData, leaveData, hcData] = await Promise.all([
           hrRepository.getEmployees().catch(() => []),
-          hrRepository.getTodayAttendance().catch(() => [])
+          getAttendanceSummary().catch(() => ({ summary: [] })),
+          getLeaveUtilization().catch(() => ({ summary: [] })),
+          getHeadcount().catch(() => ({ summary: [] }))
         ]);
         setEmployees(empData);
-        setAttendance(attData);
+        setAttendanceSummary(attData.summary || []);
+        setLeaveSummary(leaveData.summary || []);
+        setHeadcountSummary(hcData.summary || []);
       } catch (err: unknown) {
         setError("Failed to load HR dashboard data.");
       } finally {
@@ -41,10 +50,10 @@ export function HRDashboard() {
   if (isLoading) return <LoadingState message="Loading HR Overview..." className="py-20" />;
   if (error) return <ErrorState message={error} />;
 
-  const totalEmployees = employees.length;
-  const presentCount = attendance.filter(a => a.status === "PRESENT").length;
-  const absentCount = attendance.filter(a => a.status === "ABSENT").length;
-  const lateCount = attendance.filter(a => a.status === "LATE").length;
+  const totalEmployees = headcountSummary.reduce((acc, curr) => acc + (curr.count || 0), 0);
+  const presentCount = attendanceSummary.find(a => a.status === "PRESENT")?.records || 0;
+  const absentCount = attendanceSummary.find(a => a.status === "ABSENT")?.records || 0;
+  const lateCount = attendanceSummary.find(a => a.status === "LATE")?.records || 0;
 
   return (
     <div className="flex flex-col h-full space-y-6 max-w-7xl mx-auto pb-12">
@@ -99,6 +108,21 @@ export function HRDashboard() {
             <AlertTriangle className="w-4 h-4 text-destructive" />
           </div>
           <div className="text-3xl font-bold text-foreground">{absentCount}</div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
+        <div className="bg-surface p-6 rounded-xl border border-border shadow-sm">
+          <h3 className="text-lg font-medium text-foreground mb-4">Leave Utilization</h3>
+          <CustomPieChart data={leaveSummary} dataKey="requests" nameKey="status" />
+        </div>
+        <div className="bg-surface p-6 rounded-xl border border-border shadow-sm">
+          <h3 className="text-lg font-medium text-foreground mb-4">Headcount Distribution</h3>
+          <CustomBarChart 
+            data={headcountSummary} 
+            xAxisKey="status" 
+            bars={[{ key: "count", color: "#3b82f6", name: "Employees" }]} 
+          />
         </div>
       </div>
 
