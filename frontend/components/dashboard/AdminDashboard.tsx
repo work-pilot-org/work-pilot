@@ -131,7 +131,7 @@ export function AdminDashboard() {
               <div className="bg-surface border border-border-strong rounded-xl shadow-sm p-5">
                 <h3 className="text-sm font-semibold text-foreground mb-4">Quick Links</h3>
                 <div className="space-y-2">
-                  <Link href="/dashboard/hr" className="flex items-center justify-between p-3 rounded-lg hover:bg-surface-hover border border-transparent transition-colors group">
+                  <Link href="/dashboard/organization" className="flex items-center justify-between p-3 rounded-lg hover:bg-surface-hover border border-transparent transition-colors group">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-primary/5 flex items-center justify-center">
                         <Users className="w-4 h-4 text-primary" />

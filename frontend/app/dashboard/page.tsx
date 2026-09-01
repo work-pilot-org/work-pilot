@@ -24,7 +24,7 @@ export default function DashboardPage() {
   const primaryRole = user?.roles?.[0] || "EMPLOYEE";
 
   switch (primaryRole) {
-    case "TENANT_ADMIN":
+    case "ORG_ADMIN":
       return <AdminDashboard />;
     case "HR_ADMIN":
       return <HRDashboard />;

@@ -90,7 +90,7 @@ export const hrRepository = {
     }
   },
 
-  async onboardEmployee(employee: Partial<EmployeeResponse>): Promise<EmployeeResponse> {
+  async onboardEmployee(employee: import("@/types/hr").EmployeeCreateRequest): Promise<EmployeeResponse> {
     try {
       const response = await hrApi.post<EmployeeResponse>("/employees/onboard", employee);
       return response.data;

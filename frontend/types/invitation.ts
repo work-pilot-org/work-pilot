@@ -14,6 +14,9 @@ export interface InvitationResponse {
   status: InvitationStatus;
   expires_at: string;
   created_at: string;
+  updated_at: string;
+  created_by?: string;
+  accepted_by_user_id?: string;
   last_sent_at?: string;
   revoked_at?: string;
 }

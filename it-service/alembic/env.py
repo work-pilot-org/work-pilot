@@ -28,6 +28,12 @@ from shared_infrastructure.database.base import TenantBase
 
 # Import all models so Alembic can detect them
 from it_service.modules.assets.models import Asset
+from it_service.modules.helpdesk.models import Ticket, TicketComment, TicketAttachment, TicketActivity
+from it_service.modules.devices.models import Device, DeviceMaintenanceHistory
+from it_service.modules.access.models import AccessRequest
+from it_service.modules.software.models import Software, InstalledSoftware, InstallationRequest
+from it_service.modules.licenses.models import License, LicenseAssignment
+from it_service.modules.maintenance.models import MaintenanceRecord
 
 # ---------------------------------------------------------------------
 # Alembic configuration

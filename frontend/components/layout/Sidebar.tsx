@@ -36,35 +36,41 @@ const navConfig: NavItem[] = [
     name: "WorkPilot AI",
     href: "/dashboard/chat",
     icon: Briefcase,
-    allowedRoles: ["TENANT_ADMIN", "HR_ADMIN", "IT_ADMIN", "MANAGER", "EMPLOYEE"],
+    allowedRoles: ["ORG_ADMIN", "HR_ADMIN", "IT_ADMIN", "MANAGER", "EMPLOYEE"],
+  },
+  { 
+    name: "Organization", 
+    href: "/dashboard/organization", 
+    icon: Building2,
+    allowedRoles: ["ORG_ADMIN"],
   },
   { 
     name: "HR", 
     href: "/dashboard/hr", 
     icon: Users,
-    allowedRoles: ["TENANT_ADMIN", "HR_ADMIN", "MANAGER"],
+    allowedRoles: ["HR_ADMIN", "MANAGER"],
     children: [
-      { name: "Employees",    href: "/dashboard/hr",              icon: Users,      allowedRoles: ["TENANT_ADMIN", "HR_ADMIN"] },
-      { name: "Attendance",   href: "/dashboard/hr/attendance",   icon: UserCheck,  allowedRoles: ["TENANT_ADMIN", "HR_ADMIN", "MANAGER"] },
-      { name: "Leave",        href: "/dashboard/hr/leave",        icon: Calendar,   allowedRoles: ["TENANT_ADMIN", "HR_ADMIN"] },
-      { name: "Organization", href: "/dashboard/hr/organization", icon: Building2,  allowedRoles: ["TENANT_ADMIN", "HR_ADMIN"] },
-      { name: "Policies",     href: "/dashboard/hr/policies/leave", icon: ShieldCheck, allowedRoles: ["TENANT_ADMIN", "HR_ADMIN"] },
+      { name: "Employees",    href: "/dashboard/hr",              icon: Users,      allowedRoles: ["HR_ADMIN"] },
+      { name: "Attendance",   href: "/dashboard/hr/attendance",   icon: UserCheck,  allowedRoles: ["HR_ADMIN", "MANAGER"] },
+      { name: "Leave",        href: "/dashboard/hr/leave",        icon: Calendar,   allowedRoles: ["HR_ADMIN"] },
+      { name: "Organization", href: "/dashboard/hr/organization", icon: Building2,  allowedRoles: ["HR_ADMIN"] },
+      { name: "Policies",     href: "/dashboard/hr/policies/leave", icon: ShieldCheck, allowedRoles: ["HR_ADMIN"] },
     ]
   },
   {
     name: "IT Service",
     href: "/dashboard/it/tickets",
     icon: LayoutDashboard,
-    allowedRoles: ["TENANT_ADMIN", "IT_ADMIN"],
+    allowedRoles: ["IT_ADMIN"],
     children: [
-      { name: "Helpdesk", href: "/dashboard/it/tickets", icon: LayoutDashboard, allowedRoles: ["TENANT_ADMIN", "IT_ADMIN"] }
+      { name: "Helpdesk", href: "/dashboard/it/tickets", icon: LayoutDashboard, allowedRoles: ["IT_ADMIN"] }
     ]
   },
   {
     name: "Workflows",
     href: "/dashboard/workflows",
     icon: Briefcase,
-    allowedRoles: ["TENANT_ADMIN", "MANAGER"],
+    allowedRoles: ["ORG_ADMIN", "MANAGER"],
   }
 ];
 

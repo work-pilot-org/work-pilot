@@ -18,7 +18,7 @@ import { Mail } from "lucide-react";
 import toast from "react-hot-toast";
 import { InviteEmployeeModal } from "./InviteEmployeeModal";
 
-export function PendingInvitationsTab() {
+export function PendingInvitationsTab({ refreshTrigger = 0 }: { refreshTrigger?: number }) {
   const [invitations, setInvitations] = useState<InvitationResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +40,7 @@ export function PendingInvitationsTab() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchInvitations();
-  }, []);
+  }, [refreshTrigger]);
 
   const handleResend = async (id: string) => {
     try {

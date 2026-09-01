@@ -7,6 +7,8 @@ from shared_infrastructure.core.exceptions import (
     DomainAlreadyExistsException,
     EmailAlreadyExistsException,
     InvalidCredentialsException,
+    InternalServerException,
+    ConflictException,
 )
 
 from src.modules.auth.schemas import (
@@ -306,10 +308,16 @@ class AuthService:
             # Create Tenant Schema
             # ------------------------------------------
 
-            SchemaManager.create_schema(
-                db,
-                schema_name,
-            )
+            try:
+                SchemaManager.create_schema(
+                    db,
+                    schema_name,
+                )
+            except Exception as e:
+                db.rollback()
+                if "already exists" in str(e).lower() or "duplicatetable" in str(e).lower():
+                    raise ConflictException("Company schema already exists. Registration may have failed previously.")
+                raise InternalServerException(f"Failed to create schema: {str(e)}")
 
             # ------------------------------------------
             # Switch to Tenant Schema
@@ -324,10 +332,16 @@ class AuthService:
             # Create Tenant Tables
             # ------------------------------------------
 
-            SchemaManager.create_tenant_tables(
-                db,
-                schema_name,
-            )
+            try:
+                SchemaManager.create_tenant_tables(
+                    db,
+                    schema_name,
+                )
+            except Exception as e:
+                db.rollback()
+                if "already exists" in str(e).lower() or "duplicatetable" in str(e).lower():
+                    raise ConflictException("Company tables already exist. Registration may have failed previously.")
+                raise InternalServerException(f"Failed to create tenant tables: {str(e)}")
             
             db.commit()
 
@@ -349,19 +363,21 @@ class AuthService:
                         hr_init_url,
                         json={"schema_name": schema_name},
                         headers={"X-Internal-Token": settings.SECRET_KEY},
-                        timeout=30.0,
+                        timeout=120.0,
                     )
 
                     if init_res.status_code not in (200, 201):
                         db.rollback()
-                        raise Exception(
+                        raise InternalServerException(
                             "Failed to initialize hr-service tables: "
                             f"{init_res.text}"
                         )
 
                 except Exception as e:
+                    if isinstance(e, InternalServerException):
+                        raise
                     db.rollback()
-                    raise Exception(
+                    raise InternalServerException(
                         "Failed to communicate with HR service for init: "
                         f"{str(e)}"
                     )
@@ -382,20 +398,57 @@ class AuthService:
                         notification_init_url,
                         json={"schema_name": schema_name},
                         headers={"X-Internal-Token": settings.SECRET_KEY},
-                        timeout=30.0,
+                        timeout=120.0,
                     )
 
                     if init_res.status_code not in (200, 201):
                         db.rollback()
-                        raise Exception(
+                        raise InternalServerException(
                             "Failed to initialize notification-service tables: "
                             f"{init_res.text}"
                         )
 
                 except Exception as e:
+                    if isinstance(e, InternalServerException):
+                        raise
                     db.rollback()
-                    raise Exception(
+                    raise InternalServerException(
                         "Failed to communicate with Notification service for init: "
+                        f"{str(e)}"
+                    )
+
+
+            # ------------------------------------------
+            # Initialize IT-Service Tables
+            # ------------------------------------------
+
+            if settings.IT_SERVICE_URL:
+                it_init_url = (
+                    f"{settings.IT_SERVICE_URL}"
+                    "/internal/tickets/tenants/init"
+                )
+
+                try:
+                    init_res = httpx.post(
+                        it_init_url,
+                        json={"schema_name": schema_name},
+                        headers={"X-Internal-Token": settings.SECRET_KEY},
+                        timeout=120.0,
+                    )
+
+                    if init_res.status_code not in (200, 201):
+                        db.rollback()
+                        raise InternalServerException(
+                            "Failed to initialize it-service tables: "
+                            f"{init_res.text}"
+                        )
+
+                except Exception as e:
+                    if isinstance(e, InternalServerException):
+                        raise
+                    db.rollback()
+                    raise InternalServerException(
+                        "Failed to communicate with IT service for init: "
                         f"{str(e)}"
                     )
 
@@ -417,12 +470,12 @@ class AuthService:
 
 
             # ------------------------------------------
-            # Assign TENANT_ADMIN Role to User
+            # Assign ORG_ADMIN Role to User
             # ------------------------------------------
 
             tenant_admin_role = next(
                 r for r in db_roles
-                if r.name == RBACRole.TENANT_ADMIN.value
+                if r.name == RBACRole.ORG_ADMIN.value
             )
 
             user_role = UserRole(
@@ -463,14 +516,16 @@ class AuthService:
                 )
 
                 if response.status_code not in (200, 201):
-                    raise Exception(
+                    raise InternalServerException(
                         f"Failed to create ORG_ADMIN in hr-service: "
                         f"{response.text}"
                     )
 
             except Exception as e:
+                if isinstance(e, InternalServerException):
+                    raise
                 db.rollback()
-                raise Exception(
+                raise InternalServerException(
                     "Failed to communicate with HR service for admin creation: "
                     f"{str(e)}"
                 )
