@@ -174,15 +174,15 @@ export const hrRepository = {
     await hrApi.delete(`/organization/departments/${id}`);
   },
 
-  async getDesignations(): Promise<any[]> {
+  async getDesignations(): Promise<import("@/types/hr").DesignationResponse[]> {
     const response = await hrApi.get("/organization/designations");
     return response.data;
   },
-  async createDesignation(data: any): Promise<any> {
+  async createDesignation(data: Partial<import("@/types/hr").DesignationResponse>): Promise<import("@/types/hr").DesignationResponse> {
     const response = await hrApi.post("/organization/designations", data);
     return response.data;
   },
-  async updateDesignation(id: number, data: any): Promise<any> {
+  async updateDesignation(id: number, data: Partial<import("@/types/hr").DesignationResponse>): Promise<import("@/types/hr").DesignationResponse> {
     const response = await hrApi.put(`/organization/designations/${id}`, data);
     return response.data;
   },
@@ -190,11 +190,11 @@ export const hrRepository = {
     await hrApi.delete(`/organization/designations/${id}`);
   },
 
-  async getBranches(): Promise<any[]> {
+  async getBranches(): Promise<import("@/types/hr").BranchResponse[]> {
     const response = await hrApi.get("/organization/branches");
     return response.data;
   },
-  async getShifts(): Promise<any[]> {
+  async getShifts(): Promise<import("@/types/hr").ShiftResponse[]> {
     const response = await hrApi.get("/organization/shifts");
     return response.data;
   },

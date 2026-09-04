@@ -15,9 +15,6 @@ async def publish_event(topic: str, event: EventEnvelope) -> None:
     """Publish a standardized event to Kafka."""
 
     try:
-        if not broker.connected:
-            await broker.connect()
-
         await broker.publish(
             event.model_dump(mode="json"),
             topic,

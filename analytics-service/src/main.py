@@ -11,6 +11,8 @@ from src.etl.consumers import broker
 from src.api.hr_analytics import router as hr_router
 from src.api.it_analytics import router as it_router
 from src.api.workflow_analytics import router as workflow_router
+from src.api.internal import internal_router
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await broker.start()
@@ -65,7 +67,7 @@ origins = [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_origin_regex=r"http://.*\.localhost:3000",
+    allow_origin_regex=r"http://.*\.localhost:\d+",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -80,6 +82,7 @@ app.add_middleware(
 app.include_router(hr_router)
 app.include_router(it_router)
 app.include_router(workflow_router, prefix="/analytics")
+app.include_router(internal_router)
 
 # =====================================================
 # Root Endpoint

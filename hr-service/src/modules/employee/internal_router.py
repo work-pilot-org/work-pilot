@@ -69,12 +69,17 @@ class LinkUserRequest(BaseModel):
     auth_user_id: UUID
     schema_name: str
 
+from fastapi import BackgroundTasks
+
 @internal_router.post("/admin", dependencies=[Depends(verify_internal_token)])
 def create_org_admin(
     req: AdminCreateRequest,
+    background_tasks: BackgroundTasks,
     x_tenant_id: int = Header(...),
     db: Session = Depends(get_db)
 ):
+    from shared_infrastructure.events import EventEnvelope
+    from shared_infrastructure.publisher import publish_event
     try:
         set_tenant_schema(db, req.schema_name)
         repo = EmployeeRepository(db)
@@ -89,8 +94,22 @@ def create_org_admin(
             employment_type="FULL_TIME",
             invitation_status="ACCEPTED"
         )
-        repo.create_employee(employee)
+        created_employee = repo.create_employee(employee)
         db.commit()
+
+        event = EventEnvelope[dict](
+            event_type="employee.onboarded",
+            source="hr-service",
+            tenant_id=req.schema_name,
+            payload={
+                "employee_id": str(created_employee.id),
+                "first_name": created_employee.first_name,
+                "last_name": created_employee.last_name,
+                "employment_type": created_employee.employment_type.value if hasattr(created_employee.employment_type, 'value') else str(created_employee.employment_type),
+                "status": created_employee.employment_status.value if hasattr(created_employee.employment_status, 'value') else str(created_employee.employment_status),
+            }
+        )
+        background_tasks.add_task(publish_event, "hr.employee", event)
     finally:
         set_public_schema(db)
         

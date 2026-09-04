@@ -454,6 +454,41 @@ class AuthService:
 
 
             # ------------------------------------------
+            # Initialize Analytics-Service Tables
+            # ------------------------------------------
+
+            if settings.ANALYTICS_SERVICE_URL:
+                analytics_init_url = (
+                    f"{settings.ANALYTICS_SERVICE_URL}"
+                    "/internal/analytics/tenants/init"
+                )
+
+                try:
+                    init_res = httpx.post(
+                        analytics_init_url,
+                        json={"schema_name": schema_name},
+                        headers={"X-Internal-Token": settings.SECRET_KEY},
+                        timeout=120.0,
+                    )
+
+                    if init_res.status_code not in (200, 201):
+                        db.rollback()
+                        raise InternalServerException(
+                            "Failed to initialize analytics-service tables: "
+                            f"{init_res.text}"
+                        )
+
+                except Exception as e:
+                    if isinstance(e, InternalServerException):
+                        raise
+                    db.rollback()
+                    raise InternalServerException(
+                        "Failed to communicate with Analytics service for init: "
+                        f"{str(e)}"
+                    )
+
+
+            # ------------------------------------------
             # Seed Roles
             # ------------------------------------------
 
@@ -473,14 +508,14 @@ class AuthService:
             # Assign ORG_ADMIN Role to User
             # ------------------------------------------
 
-            tenant_admin_role = next(
+            org_admin_role = next(
                 r for r in db_roles
                 if r.name == RBACRole.ORG_ADMIN.value
             )
 
             user_role = UserRole(
                 user_id=user.id,
-                role_id=tenant_admin_role.id,
+                role_id=org_admin_role.id,
             )
 
             db.add(user_role)

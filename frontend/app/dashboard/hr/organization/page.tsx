@@ -51,7 +51,7 @@ export default function OrganizationPage() {
   if (error) return <ErrorState message={error} onRetry={fetchData} />;
 
   return (
-    <RequireRole allowedRoles={["TENANT_ADMIN", "HR_ADMIN"]}>
+    <RequireRole allowedRoles={["ORG_ADMIN", "HR_ADMIN"]}>
       <div className="flex flex-col h-full space-y-8 max-w-7xl mx-auto pb-12">
         
         {/* Header */}

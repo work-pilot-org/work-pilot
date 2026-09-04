@@ -17,6 +17,7 @@ services:
     working_dir: /app/auth-service
     environment:
     - WATCHFILES_FORCE_POLLING=true
+    - ANALYTICS_SERVICE_URL=http://analytics-service:8000
     command: 'sh -c "uv run alembic upgrade head && uv run uvicorn src.main:app --host
       0.0.0.0 --port 8000 --reload"
 
@@ -123,6 +124,7 @@ services:
     - /app/.next
     environment:
     - NEXT_PUBLIC_AUTH_SERVICE_URL=http://localhost:8001
+    - ANALYTICS_INTERNAL_URL=http://analytics-service:8000
     - WATCHPACK_POLLING=true
     - CHOKIDAR_USEPOLLING=true
     command: npm run dev
@@ -165,7 +167,7 @@ services:
     working_dir: /app/analytics-service
     environment:
     - WATCHFILES_FORCE_POLLING=true
-    command: 'sh -c "uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"'
+    command: 'sh -c "uv run python run_mig.py && uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"'
   
   redpanda:
     image: docker.redpanda.com/redpandadata/redpanda:v23.2.19

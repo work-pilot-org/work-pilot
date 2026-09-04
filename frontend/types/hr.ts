@@ -82,6 +82,36 @@ export interface DepartmentResponse {
   updated_at: string;
 }
 
+export interface DesignationResponse {
+  id: number;
+  name: string;
+  department_id?: number;
+  description?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BranchResponse {
+  id: number;
+  name: string;
+  location?: string;
+  address?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ShiftResponse {
+  id: number;
+  name: string;
+  start_time: string;
+  end_time: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface LeaveTypeResponse {
   id: number;
   name: string;
