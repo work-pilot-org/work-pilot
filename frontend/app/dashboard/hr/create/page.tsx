@@ -52,7 +52,7 @@ export default function CreateEmployeePage() {
 
   return (
     <RequireRole 
-      allowedRoles={["TENANT_ADMIN", "HR_ADMIN"]}
+      allowedRoles={["ORG_ADMIN", "HR_ADMIN"]}
       fallback={
         <div className="flex flex-col items-center justify-center min-h-[400px] text-center px-4 bg-surface rounded-xl border border-border-strong shadow-sm p-12">
           <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mb-4">

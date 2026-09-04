@@ -12,7 +12,7 @@ def set_tenant_schema(
     to the specified tenant schema.
     """
     schema_name = validate_schema_name(schema_name)
-    db.connection().exec_driver_sql(f'SET search_path TO "{schema_name}", public')
+    db.execute(text(f'SET search_path TO "{schema_name}", public'))
 
 
 def set_public_schema(

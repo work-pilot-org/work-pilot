@@ -3,6 +3,11 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'packages', 'shared-infrastructure', 'src')))
+
 from shared_infrastructure.core.config import settings
 
 # Import the Base classes
@@ -42,18 +47,40 @@ def run_migrations_offline() -> None:
 
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode."""
-    connectable = engine_from_config(
-        config.get_section(config.config_ini_section),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+    # Check if a connection was passed in (e.g. from init_tenant_tables)
+    connectable = config.attributes.get('connection', None)
+    
+    if connectable is None:
+        connectable = engine_from_config(
+            config.get_section(config.config_ini_section),
+            prefix="sqlalchemy.",
+            poolclass=pool.NullPool,
+        )
 
-    with connectable.connect() as connection:
+        with connectable.connect() as connection:
+            from sqlalchemy import text
+            schemas_query = "SELECT schema_name FROM information_schema.schemata WHERE schema_name LIKE 'tenant_%'"
+            schemas = [row[0] for row in connection.execute(text(schemas_query)).fetchall()]
+            
+            for schema_name in schemas:
+                connection.execute(text(f'SET search_path TO "{schema_name}"'))
+                context.configure(
+                    connection=connection,
+                    target_metadata=target_metadata,
+                    compare_type=True,
+                    version_table="alembic_version_analytics",
+                    include_schemas=False,
+                )
+
+                with context.begin_transaction():
+                    context.run_migrations()
+    else:
         context.configure(
-            connection=connection,
+            connection=connectable,
             target_metadata=target_metadata,
             compare_type=True,
             version_table="alembic_version_analytics",
+            include_schemas=False,
         )
 
         with context.begin_transaction():

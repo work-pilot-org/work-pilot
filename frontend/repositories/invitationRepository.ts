@@ -22,7 +22,7 @@ export const invitationRepository = {
     }
   },
 
-  async listPendingInvitations(): Promise<InvitationResponse[]> {
+  async listInvitations(): Promise<InvitationResponse[]> {
     try {
       const response = await api.get<InvitationResponse[]>("/invitations");
       return response.data;

@@ -81,6 +81,20 @@ class InvitationRepository:
             .all()
         )
 
+    def get_all_by_tenant(
+        self,
+        db: Session,
+        tenant_id: int
+    ) -> List[Invitation]:
+        return (
+            db.query(Invitation)
+            .filter(
+                Invitation.tenant_id == tenant_id
+            )
+            .order_by(Invitation.created_at.desc())
+            .all()
+        )
+
     def update_invitation(
         self,
         db: Session,

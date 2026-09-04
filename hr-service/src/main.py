@@ -27,10 +27,20 @@ from src.modules.policies.router import (
     shift_policy_router,
 )
 
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    from shared_infrastructure.publisher import broker
+    await broker.start()
+    yield
+    await broker.close()
+
 app = FastAPI(
     title=settings.APP_NAME,
     version="1.0.0",
     debug=settings.DEBUG,
+    lifespan=lifespan,
 )
 
 
@@ -71,12 +81,13 @@ async def global_exception_handler(
 
 origins = [
     "http://localhost:3000",
+    "http://google.localhost:3000",
 ]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_origin_regex=r"http://.*\.localhost:3000",
+    allow_origin_regex=r"http://[a-zA-Z0-9-]+\.localhost:\d+",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

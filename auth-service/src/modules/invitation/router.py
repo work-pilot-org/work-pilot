@@ -45,6 +45,14 @@ def create_invitation(
     Create a new employee invitation (Admin only).
     """
     tenant_id = current_user_payload.get("tenant_id")
+    if not tenant_id:
+        from src.modules.tenant.repository import TenantRepository
+        tenant = TenantRepository().get_by_schema_name(db, current_user_payload.get("schema_name"))
+        if tenant:
+            tenant_id = tenant.id
+    if tenant_id:
+        tenant_id = int(tenant_id)
+    
     actor_id = UUID(current_user_payload.get("sub"))
     
     # We need the frontend URL to construct the invite link. For now, assume it's passed or env var.
@@ -64,15 +72,23 @@ def create_invitation(
     response_model=List[InvitationResponse],
     status_code=status.HTTP_200_OK,
 )
-def list_pending_invitations(
+def list_invitations(
     current_user_payload: dict = Depends(require_permissions([Permission.EMPLOYEE_MANAGE])),
     db: Session = Depends(get_db),
 ):
     """
-    List pending invitations for the current tenant (Admin only).
+    List all invitations for the current tenant (Admin only).
     """
     tenant_id = current_user_payload.get("tenant_id")
-    return invitation_repo.get_pending_by_tenant(db, tenant_id)
+    if not tenant_id:
+        from src.modules.tenant.repository import TenantRepository
+        tenant = TenantRepository().get_by_schema_name(db, current_user_payload.get("schema_name"))
+        if tenant:
+            tenant_id = tenant.id
+    if tenant_id:
+        tenant_id = int(tenant_id)
+            
+    return invitation_repo.get_all_by_tenant(db, tenant_id)
 
 
 @router.post(
@@ -90,6 +106,13 @@ def resend_invitation(
     Resend an invitation email with a fresh token.
     """
     tenant_id = current_user_payload.get("tenant_id")
+    if not tenant_id:
+        from src.modules.tenant.repository import TenantRepository
+        tenant = TenantRepository().get_by_schema_name(db, current_user_payload.get("schema_name"))
+        if tenant:
+            tenant_id = tenant.id
+    if tenant_id:
+        tenant_id = int(tenant_id)
     
     inv = invitation_repo.get_by_id(db, invitation_id)
     if not inv or inv.tenant_id != tenant_id:
@@ -141,6 +164,13 @@ def revoke_invitation(
     Revoke a pending invitation.
     """
     tenant_id = current_user_payload.get("tenant_id")
+    if not tenant_id:
+        from src.modules.tenant.repository import TenantRepository
+        tenant = TenantRepository().get_by_schema_name(db, current_user_payload.get("schema_name"))
+        if tenant:
+            tenant_id = tenant.id
+    if tenant_id:
+        tenant_id = int(tenant_id)
     
     inv = invitation_repo.get_by_id(db, invitation_id)
     if not inv or inv.tenant_id != tenant_id:

@@ -53,15 +53,22 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection,
-            target_metadata=target_metadata,
-            compare_type=True,
-            version_table="alembic_version_hr",
-        )
+        from sqlalchemy import text
+        schemas_query = "SELECT schema_name FROM information_schema.schemata WHERE schema_name LIKE 'tenant_%'"
+        schemas = [row[0] for row in connection.execute(text(schemas_query)).fetchall()]
 
-        with context.begin_transaction():
-            context.run_migrations()
+        for schema_name in schemas:
+            connection.execute(text(f'SET search_path TO "{schema_name}"'))
+            context.configure(
+                connection=connection,
+                target_metadata=target_metadata,
+                compare_type=True,
+                version_table="alembic_version_hr",
+                include_schemas=False,
+            )
+
+            with context.begin_transaction():
+                context.run_migrations()
 
 
 if context.is_offline_mode():

@@ -92,7 +92,7 @@ export default function AnalyticsDashboard() {
   const totalLeaveRequests = leave?.reduce((acc: number, curr: any) => acc + (curr.requests || 0), 0) || 0;
 
   return (
-    <RequireRole allowedRoles={["TENANT_ADMIN"]}>
+    <RequireRole allowedRoles={["ORG_ADMIN"]}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 h-full flex flex-col space-y-6">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Organization Analytics</h1>

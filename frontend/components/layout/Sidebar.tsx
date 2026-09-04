@@ -13,6 +13,8 @@ import {
   Calendar,
   Building2,
   ShieldCheck,
+  Mail,
+  BarChart3,
 } from "lucide-react";
 import { useState } from "react";
 import { RequireRole } from "@/components/RequireRole";
@@ -43,6 +45,11 @@ const navConfig: NavItem[] = [
     href: "/dashboard/organization", 
     icon: Building2,
     allowedRoles: ["ORG_ADMIN"],
+    children: [
+      { name: "Overview", href: "/dashboard/organization", icon: BarChart3, allowedRoles: ["ORG_ADMIN"] },
+      { name: "Employees", href: "/dashboard/organization/employees", icon: Users, allowedRoles: ["ORG_ADMIN"] },
+      { name: "Invitations", href: "/dashboard/organization/invitations", icon: Mail, allowedRoles: ["ORG_ADMIN"] },
+    ]
   },
   { 
     name: "HR", 

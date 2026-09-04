@@ -25,22 +25,23 @@ def get_ticket_summary(
     """
     
     query = db.query(
-        FactITTicket.ticket_status,
-        FactITTicket.ticket_priority,
+        FactITTicket.status,
+        FactITTicket.priority,
         func.count(FactITTicket.id).label("total_tickets")
     )
     
-    if category:
-        query = query.filter(FactITTicket.ticket_category == category)
+    # Category is not on FactITTicket model
+    # if category:
+    #     query = query.filter(FactITTicket.ticket_category == category)
         
-    summary = query.group_by(FactITTicket.ticket_status, FactITTicket.ticket_priority).all()
+    summary = query.group_by(FactITTicket.status, FactITTicket.priority).all()
     
     return {
         "tenant_id": current_user.get("schema_name"),
         "summary": [
             {
-                "status": row.ticket_status,
-                "priority": row.ticket_priority,
+                "status": row.status,
+                "priority": row.priority,
                 "tickets": row.total_tickets
             }
             for row in summary
