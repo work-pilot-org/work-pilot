@@ -3,8 +3,8 @@
 import { useAuthStore } from "@/store/authStore";
 import { useRouter, usePathname } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
-import { LogOut, Bell, User, ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { LogOut, User, ChevronDown } from "lucide-react";
+import { NotificationCenter } from "@/components/layout/NotificationCenter";
 
 function getContextualInfo(pathname: string) {
   if (pathname.includes("/dashboard/hr")) return { title: "Human Resources", subtitle: "Manage your organization and team members" };
@@ -61,14 +61,24 @@ export default function Header() {
         </span>
       </div>
       
-      <div className="flex-1 md:hidden"></div>
+      <div className="flex-1 max-w-xl mx-8 hidden md:block">
+        <div className="relative group">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg className="h-4 w-4 text-gray-400 group-focus-within:text-indigo-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <input
+            type="text"
+            className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-all duration-200"
+            placeholder="Search WorkPilot..."
+          />
+        </div>
+      </div>
 
       {/* Right side actions */}
       <div className="flex items-center gap-4 ml-auto">
-        <Button variant="outline" size="sm" className="relative h-9 w-9 p-0 rounded-full text-muted-foreground hover:text-foreground border-transparent hover:bg-surface-hover shadow-none">
-          <Bell className="w-4 h-4" />
-          <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full ring-2 ring-surface"></span>
-        </Button>
+        <NotificationCenter />
 
         <div className="h-6 w-px bg-border hidden sm:block"></div>
         

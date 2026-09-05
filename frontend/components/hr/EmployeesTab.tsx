@@ -103,48 +103,57 @@ export function EmployeesTab({ refreshTrigger = 0 }: { refreshTrigger?: number }
   }
 
   return (
-    <div className="flex flex-col space-y-6 mt-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface p-4 rounded-xl border border-border-strong shadow-sm">
+    <div className="space-y-8 mt-2">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight text-gray-900">Employees</h2>
+          <p className="text-sm text-gray-500 mt-1">Manage organization employees and access roles.</p>
+        </div>
+      </div>
+      
+      {/* Contextual Toolbar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
         <div className="relative max-w-md w-full">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <input 
             type="text" 
             placeholder="Search by name, role, or code..." 
-            className="flex h-10 w-full rounded-md border border-border bg-transparent px-9 py-2 text-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
+            className="flex h-10 w-full rounded-md border border-gray-200 bg-transparent px-9 py-2 text-sm transition-colors placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-500"
             value={searchKeyword}
             onChange={(e) => setSearchKeyword(e.target.value)}
           />
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="h-10 border-border text-muted-foreground bg-transparent">
+        <div className="flex items-center gap-3">
+          <Button variant="outline" size="sm" className="h-10 border-gray-200 text-gray-600 bg-white hover:bg-gray-50">
             <Filter className="mr-2 h-4 w-4" />
             Filters
           </Button>
-          <div className="text-sm text-muted-foreground border-l border-border pl-4 ml-2">
+          <div className="text-sm font-medium text-gray-500 border-l border-gray-200 pl-4 ml-1">
             {employees.length} members
           </div>
         </div>
       </div>
       
+      {/* Data Table Area */}
       {employees.length === 0 ? (
-        <div className="bg-surface rounded-xl border border-border-strong shadow-sm p-12">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-12">
           <EmptyState 
             title="No employees found"
             description={searchKeyword ? "No employees match your search criteria." : "There are currently no employees in your organization."}
-            icon={<Users className="w-8 h-8 text-muted-foreground" />}
+            icon={<Users className="w-8 h-8 text-gray-400" />}
           />
         </div>
       ) : (
         <div className="flex flex-col space-y-4">
-          <div className="border rounded-lg overflow-hidden bg-white">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>Employee</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Joined</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                <TableRow className="bg-gray-50 hover:bg-gray-50">
+                  <TableHead className="font-semibold text-gray-900 py-4">Employee</TableHead>
+                  <TableHead className="font-semibold text-gray-900 py-4">Role</TableHead>
+                  <TableHead className="font-semibold text-gray-900 py-4">Status</TableHead>
+                  <TableHead className="font-semibold text-gray-900 py-4">Joined</TableHead>
+                  <TableHead className="text-right font-semibold text-gray-900 py-4">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

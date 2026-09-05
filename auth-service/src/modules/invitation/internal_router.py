@@ -35,7 +35,7 @@ def create_invitation_internally(
     
     # We map InternalInvitationCreate to InvitationCreateRequest
     from src.modules.invitation.schemas import InvitationCreateRequest
-    from src.modules.employee.models import Role
+    from shared_infrastructure.core.rbac import Role
     
     mapped_req = InvitationCreateRequest(
         email=req.email,

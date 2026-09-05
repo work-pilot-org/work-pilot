@@ -3,7 +3,7 @@ from uuid import UUID
 from pydantic import BaseModel, EmailStr, Field, validator
 from typing import Optional
 
-from src.modules.employee.models import Role
+from shared_infrastructure.core.rbac import Role
 from src.modules.invitation.models import InvitationStatus
 
 
