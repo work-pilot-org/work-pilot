@@ -156,4 +156,4 @@ class RevokedToken(PublicBase):
         DateTime,
         default=datetime.utcnow,
         nullable=False,
-    )
+    )

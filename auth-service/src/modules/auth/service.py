@@ -49,7 +49,7 @@ from shared_infrastructure.database.tenant_session import (
     set_public_schema,
 )
 
-from src.modules.employee.models import Role
+from shared_infrastructure.core.rbac import Role
 
 from src.modules.password_reset.service import PasswordResetService
 

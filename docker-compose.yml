@@ -83,9 +83,7 @@ services:
     working_dir: /app/workflow-service
     environment:
     - WATCHFILES_FORCE_POLLING=true
-    command: 'sh -c "uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"
-
-      '
+    command: 'sh -c "uv run alembic upgrade head && uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"'
   notification-service:
     build:
       context: .

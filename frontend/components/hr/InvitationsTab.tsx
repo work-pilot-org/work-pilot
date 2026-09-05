@@ -87,74 +87,84 @@ export function InvitationsTab({ refreshTrigger = 0 }: { refreshTrigger?: number
   };
 
   return (
-    <div className="space-y-6 mt-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold tracking-tight text-gray-900">Pending Invitations</h2>
-        <Button onClick={() => setIsInviteModalOpen(true)}>
+    <div className="space-y-8 mt-2">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight text-gray-900">Invitations</h2>
+          <p className="text-sm text-gray-500 mt-1">Manage organization invitations and onboarding status.</p>
+        </div>
+        <Button onClick={() => setIsInviteModalOpen(true)} className="shadow-sm">
+          <Mail className="mr-2 h-4 w-4" />
           Invite Employee
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white border rounded-lg p-4 shadow-sm flex flex-col justify-center">
-          <p className="text-sm font-medium text-gray-500">Sent</p>
-          <h3 className="text-2xl font-bold text-gray-900">{invitations.length}</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <div className="bg-white rounded-xl p-6 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100 flex flex-col justify-center transition-all hover:shadow-md">
+          <p className="text-sm font-medium text-gray-500 mb-2">Total Sent</p>
+          <h3 className="text-3xl font-bold text-gray-900 tracking-tight">{invitations.length}</h3>
         </div>
-        <div className="bg-white border rounded-lg p-4 shadow-sm flex flex-col justify-center">
-          <p className="text-sm font-medium text-gray-500">Pending</p>
-          <h3 className="text-2xl font-bold text-gray-900">{invitations.filter(i => i.status === 'PENDING').length}</h3>
+        <div className="bg-white rounded-xl p-6 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100 flex flex-col justify-center transition-all hover:shadow-md">
+          <p className="text-sm font-medium text-gray-500 mb-2">Pending</p>
+          <h3 className="text-3xl font-bold text-amber-600 tracking-tight">{invitations.filter(i => i.status === 'PENDING').length}</h3>
         </div>
-        <div className="bg-white border rounded-lg p-4 shadow-sm flex flex-col justify-center">
-          <p className="text-sm font-medium text-gray-500">Accepted</p>
-          <h3 className="text-2xl font-bold text-gray-900">{invitations.filter(i => i.status === 'ACCEPTED').length}</h3>
+        <div className="bg-white rounded-xl p-6 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100 flex flex-col justify-center transition-all hover:shadow-md">
+          <p className="text-sm font-medium text-gray-500 mb-2">Accepted</p>
+          <h3 className="text-3xl font-bold text-emerald-600 tracking-tight">{invitations.filter(i => i.status === 'ACCEPTED').length}</h3>
         </div>
-        <div className="bg-white border rounded-lg p-4 shadow-sm flex flex-col justify-center">
-          <p className="text-sm font-medium text-gray-500">Expired/Revoked</p>
-          <h3 className="text-2xl font-bold text-gray-900">{invitations.filter(i => i.status === 'EXPIRED' || i.status === 'REVOKED').length}</h3>
+        <div className="bg-white rounded-xl p-6 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100 flex flex-col justify-center transition-all hover:shadow-md">
+          <p className="text-sm font-medium text-gray-500 mb-2">Expired/Revoked</p>
+          <h3 className="text-3xl font-bold text-gray-900 tracking-tight">{invitations.filter(i => i.status === 'EXPIRED' || i.status === 'REVOKED').length}</h3>
         </div>
       </div>
 
       {invitations.length === 0 ? (
-        <EmptyState
-          title="No invitations found"
-          description="There are currently no invitations for this organization."
-          icon={<Mail className="w-6 h-6" />}
-        />
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-12">
+          <EmptyState
+            title="No invitations found"
+            description="There are currently no invitations for this organization."
+            icon={<Mail className="w-8 h-8 text-gray-400" />}
+          />
+        </div>
       ) : (
-        <div className="border rounded-lg overflow-hidden">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>Email</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Sent Date</TableHead>
-                <TableHead>Expiry Date</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+              <TableRow className="bg-gray-50 hover:bg-gray-50">
+                <TableHead className="font-semibold text-gray-900 py-4">Email</TableHead>
+                <TableHead className="font-semibold text-gray-900 py-4">Role</TableHead>
+                <TableHead className="font-semibold text-gray-900 py-4">Sent Date</TableHead>
+                <TableHead className="font-semibold text-gray-900 py-4">Expiry Date</TableHead>
+                <TableHead className="font-semibold text-gray-900 py-4">Status</TableHead>
+                <TableHead className="text-right font-semibold text-gray-900 py-4">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {invitations.map((inv) => (
-                <TableRow key={inv.id}>
-                  <TableCell className="font-medium">{inv.email}</TableCell>
-                  <TableCell>{inv.role.replace("_", " ")}</TableCell>
-                  <TableCell>{new Date(inv.created_at).toLocaleDateString()}</TableCell>
-                  <TableCell>{new Date(inv.expires_at).toLocaleDateString()}</TableCell>
-                  <TableCell>
-                    <Badge variant={getStatusVariant(inv.status) as any}>
+                <TableRow key={inv.id} className="hover:bg-gray-50 transition-colors">
+                  <TableCell className="font-medium text-gray-900 py-4">{inv.email}</TableCell>
+                  <TableCell className="py-4">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-800">
+                      {inv.role.replace("_", " ")}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-gray-500 py-4">{new Date(inv.created_at).toLocaleDateString()}</TableCell>
+                  <TableCell className="text-gray-500 py-4">{new Date(inv.expires_at).toLocaleDateString()}</TableCell>
+                  <TableCell className="py-4">
+                    <Badge variant={getStatusVariant(inv.status) as any} className="font-medium">
                       {inv.status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-right space-x-2">
+                  <TableCell className="text-right space-x-2 py-4">
                     {inv.status === "PENDING" && (
-                      <>
-                        <Button variant="outline" size="sm" onClick={() => handleResend(inv.id)}>
+                      <div className="flex justify-end gap-2">
+                        <Button variant="outline" size="sm" onClick={() => handleResend(inv.id)} className="h-8 shadow-sm">
                           Resend
                         </Button>
-                        <Button variant="destructive" size="sm" onClick={() => handleRevoke(inv.id)}>
+                        <Button variant="destructive" size="sm" onClick={() => handleRevoke(inv.id)} className="h-8 shadow-sm bg-red-50 text-red-600 border-red-200 hover:bg-red-100 hover:border-red-300 hover:text-red-700">
                           Revoke
                         </Button>
-                      </>
+                      </div>
                     )}
                   </TableCell>
                 </TableRow>

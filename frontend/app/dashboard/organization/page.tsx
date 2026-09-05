@@ -1,6 +1,1 @@
-"use client";
-import { OverviewTab } from "@/components/hr/OverviewTab";
-
-export default function OrganizationOverviewPage() {
-  return <OverviewTab />;
-}
+import { redirect } from 'next/navigation'; export default function OrgPage() { redirect('/dashboard/organization/overview'); }

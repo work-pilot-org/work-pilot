@@ -14,7 +14,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from shared_infrastructure.database.base import PublicBase
-from src.modules.employee.models import Role
+from shared_infrastructure.core.rbac import Role
 
 
 class InvitationStatus(str, Enum):

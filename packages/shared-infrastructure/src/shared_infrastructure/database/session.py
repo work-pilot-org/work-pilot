@@ -8,8 +8,8 @@ engine = create_engine(
     echo=True,
     pool_pre_ping=True,       # Verifies connection is alive before checking out of pool
     pool_recycle=300,         # Recycles connections every 5 minutes
-    pool_size=10,             # Sets base pool size
-    max_overflow=20           # Allows 20 extra connections during spikes
+    pool_size=2,              # Sets base pool size (reduced from 10 for Supabase limits)
+    max_overflow=3            # Allows extra connections during spikes (reduced from 20)
 )
 
 SessionLocal = sessionmaker(

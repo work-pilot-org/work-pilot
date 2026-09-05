@@ -17,6 +17,7 @@ from src.modules.leave.router import (
 )
 from src.modules.leave.router import (
     router as leave_router,
+    leave_request_router,
 )
 from src.modules.organization.router import router as organization_router
 from src.modules.policies.router import (
@@ -105,6 +106,7 @@ app.include_router(attendance_router)
 app.include_router(leave_router)
 app.include_router(leave_type_router)
 app.include_router(employee_leave_router)
+app.include_router(leave_request_router)
 app.include_router(leave_balance_router)
 app.include_router(leave_report_router)
 app.include_router(leave_calendar_router)
