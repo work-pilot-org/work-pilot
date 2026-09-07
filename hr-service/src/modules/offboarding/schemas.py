@@ -3,20 +3,20 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict
 from typing import Optional
 
-class OnboardingTaskBase(BaseModel):
+class OffboardingTaskBase(BaseModel):
     task_name: str
     description: Optional[str] = None
     is_completed: bool = False
 
-class OnboardingTaskCreate(OnboardingTaskBase):
+class OffboardingTaskCreate(OffboardingTaskBase):
     employee_id: UUID
 
-class OnboardingTaskUpdate(BaseModel):
+class OffboardingTaskUpdate(BaseModel):
     task_name: Optional[str] = None
     description: Optional[str] = None
     is_completed: Optional[bool] = None
 
-class OnboardingTaskResponse(OnboardingTaskBase):
+class OffboardingTaskResponse(OffboardingTaskBase):
     model_config = ConfigDict(from_attributes=True)
     id: UUID
     employee_id: UUID

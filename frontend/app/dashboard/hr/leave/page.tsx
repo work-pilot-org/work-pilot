@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/Button";
 
 export default function LeaveRequestsPage() {
   const [leaveRequests, setLeaveRequests] = useState<LeaveRequestResponse[]>([]);
+  const [employees, setEmployees] = useState<import("@/types/hr").EmployeeResponse[]>([]);
   const [report, setReport] = useState<OrganizationLeaveReportResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,12 +29,14 @@ export default function LeaveRequestsPage() {
     try {
       setIsLoading(true);
       setError(null);
-      const [requestsData, reportData] = await Promise.all([
+      const [requestsData, reportData, employeesData] = await Promise.all([
         hrRepository.getLeaveRequests(),
-        hrRepository.getOrganizationLeaveReport().catch(() => null) // Fallback if endpoint fails
+        hrRepository.getOrganizationLeaveReport().catch(() => null), // Fallback if endpoint fails
+        hrRepository.getEmployees().catch(() => [])
       ]);
       setLeaveRequests(requestsData);
       setReport(reportData);
+      setEmployees(employeesData);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to load leave data.");
     } finally {
@@ -122,10 +125,12 @@ export default function LeaveRequestsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {pendingRequests.map((request) => (
+                {pendingRequests.map((request) => {
+                  const emp = employees.find(e => e.id === request.employee_id);
+                  return (
                   <TableRow key={request.id} className="hover:bg-warning/5">
                     <TableCell className="font-medium text-foreground">
-                      {request.employee_id.split("-")[0]}...
+                      {emp ? `${emp.first_name} ${emp.last_name}` : `${request.employee_id.split("-")[0]}...`}
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline" className="bg-surface">
@@ -161,7 +166,8 @@ export default function LeaveRequestsPage() {
                       </div>
                     </TableCell>
                   </TableRow>
-                ))}
+                  );
+                })}
               </TableBody>
             </Table>
           </div>
@@ -193,10 +199,12 @@ export default function LeaveRequestsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {pastRequests.map((request) => (
+                {pastRequests.map((request) => {
+                  const emp = employees.find(e => e.id === request.employee_id);
+                  return (
                   <TableRow key={request.id}>
                     <TableCell className="font-medium text-muted-foreground">
-                      {request.employee_id.split("-")[0]}...
+                      {emp ? `${emp.first_name} ${emp.last_name}` : `${request.employee_id.split("-")[0]}...`}
                     </TableCell>
                     <TableCell>
                       {request.leave_type.replace("_", " ")}
@@ -219,7 +227,8 @@ export default function LeaveRequestsPage() {
                       </Badge>
                     </TableCell>
                   </TableRow>
-                ))}
+                  );
+                })}
               </TableBody>
             </Table>
           </div>

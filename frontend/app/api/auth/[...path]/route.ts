@@ -3,13 +3,14 @@ import { NextRequest, NextResponse } from "next/server";
 // We must use the internal Docker network URL, not localhost, because this runs on the Next.js server inside a container.
 let AUTH_SERVICE_URL = process.env.INTERNAL_AUTH_SERVICE_URL || process.env.NEXT_PUBLIC_AUTH_SERVICE_URL || "http://auth-service:8000";
 
-// If running in Docker, NEXT_PUBLIC_AUTH_SERVICE_URL might be http://localhost:8001 for the browser,
-// but the server needs to hit the container name.
-if (AUTH_SERVICE_URL.includes("localhost:8001")) {
-  AUTH_SERVICE_URL = AUTH_SERVICE_URL.replace("localhost:8001", "auth-service:8000");
-} else if (AUTH_SERVICE_URL.includes("localhost:8000")) {
-  // Just in case it's set to localhost:8000
-  AUTH_SERVICE_URL = AUTH_SERVICE_URL.replace("localhost:8000", "auth-service:8000");
+// Only perform the Docker override if we haven't explicitly set an internal URL
+if (!process.env.INTERNAL_AUTH_SERVICE_URL) {
+  if (AUTH_SERVICE_URL.includes("localhost:8001")) {
+    AUTH_SERVICE_URL = AUTH_SERVICE_URL.replace("localhost:8001", "auth-service:8000");
+  } else if (AUTH_SERVICE_URL.includes("localhost:8000")) {
+    // Just in case it's set to localhost:8000
+    AUTH_SERVICE_URL = AUTH_SERVICE_URL.replace("localhost:8000", "auth-service:8000");
+  }
 }
 
 async function handleRequest(request: NextRequest) {

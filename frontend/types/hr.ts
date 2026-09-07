@@ -209,3 +209,23 @@ export interface ProbationPolicyResponse extends PolicyBaseResponse {
   confirmation_required: boolean;
   notice_period: number;
 }
+
+export interface OnboardingTaskResponse {
+  id: string;
+  employee_id: string;
+  task_name: string;
+  description?: string;
+  is_completed: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface OffboardingTaskResponse {
+  id: string;
+  employee_id: string;
+  task_name: string;
+  description?: string;
+  is_completed: boolean;
+  created_at: string;
+  updated_at: string;
+}

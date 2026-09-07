@@ -4,10 +4,10 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from shared_infrastructure.database.base import TenantBase
-from src.modules.employee.models import Employee  # To ensure Employee is known
+from src.modules.employee.models import Employee
 
-class OnboardingTask(TenantBase):
-    __tablename__ = "onboarding_tasks"
+class OffboardingTask(TenantBase):
+    __tablename__ = "offboarding_tasks"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     employee_id = Column(
