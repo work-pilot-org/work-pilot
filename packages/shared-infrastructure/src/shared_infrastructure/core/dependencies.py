@@ -35,6 +35,12 @@ def get_current_user_and_set_schema(
     set_tenant_schema(db, schema_name)
     return payload
 
+def get_tenant_id(current_user: dict = Depends(get_current_user_and_set_schema)) -> str:
+    tenant_id = current_user.get("tenant_id")
+    if not tenant_id:
+        raise HTTPException(status_code=400, detail="tenant_id missing in token")
+    return tenant_id
+
 def require_permissions(required_permissions: list[Permission]):
     def permission_dependency(
         current_user: dict = Depends(get_current_user_and_set_schema)

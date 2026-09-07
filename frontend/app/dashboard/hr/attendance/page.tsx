@@ -21,6 +21,7 @@ import { DropdownMenu } from "@/components/ui/DropdownMenu";
 
 export default function AttendancePage() {
   const [attendance, setAttendance] = useState<AttendanceResponse[]>([]);
+  const [employees, setEmployees] = useState<import("@/types/hr").EmployeeResponse[]>([]);
   const [employeeId, setEmployeeId] = useState<string | null>(null);
   const [myAttendance, setMyAttendance] = useState<AttendanceResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,14 +31,16 @@ export default function AttendancePage() {
     try {
       setIsLoading(true);
       setError(null);
-      const [attendanceData, profileData, myToday] = await Promise.all([
+      const [attendanceData, profileData, myToday, employeesData] = await Promise.all([
         hrRepository.getTodayAttendance().catch(() => []),
         hrRepository.getMyProfile(),
-        hrRepository.getMyTodayAttendance().catch(() => null)
+        hrRepository.getMyTodayAttendance().catch(() => null),
+        hrRepository.getEmployees().catch(() => [])
       ]);
       setAttendance(attendanceData);
       setEmployeeId(profileData.id);
       setMyAttendance(myToday);
+      setEmployees(employeesData);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to load attendance data.");
     } finally {
@@ -203,10 +206,12 @@ export default function AttendancePage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {attendance.map((record) => (
+                  {attendance.map((record) => {
+                    const emp = employees.find(e => e.id === record.employee_id);
+                    return (
                     <TableRow key={record.id} className="group hover:bg-surface-hover">
                       <TableCell className="font-medium text-foreground">
-                        {record.employee_id.split("-")[0]}...
+                        {emp ? `${emp.first_name} ${emp.last_name}` : `${record.employee_id.split("-")[0]}...`}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {record.check_in || <span className="opacity-50">--:--</span>}
@@ -237,7 +242,8 @@ export default function AttendancePage() {
                           />
                       </TableCell>
                     </TableRow>
-                  ))}
+                    );
+                  })}
                 </TableBody>
               </Table>
             )}

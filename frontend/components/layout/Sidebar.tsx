@@ -63,7 +63,7 @@ const navConfig: NavItem[] = [
       { name: "Departments", href: "/dashboard/hr/departments", icon: Building2, allowedRoles: ["HR_ADMIN"] },
       { name: "Attendance", href: "/dashboard/hr/attendance", icon: UserCheck, allowedRoles: ["HR_ADMIN"] },
       { name: "Leave", href: "/dashboard/hr/leave", icon: Calendar, allowedRoles: ["HR_ADMIN"] },
-      { name: "Leave Policies", href: "/dashboard/hr/policies", icon: ShieldCheck, allowedRoles: ["HR_ADMIN"] },
+      { name: "Leave Policies", href: "/dashboard/hr/policies/leave", icon: ShieldCheck, allowedRoles: ["HR_ADMIN"] },
       { name: "Onboarding", href: "/dashboard/hr/onboarding", icon: UserCheck, allowedRoles: ["HR_ADMIN"] },
       { name: "Offboarding", href: "/dashboard/hr/offboarding", icon: UserCheck, allowedRoles: ["HR_ADMIN"] },
       { name: "Analytics", href: "/dashboard/hr/analytics", icon: BarChart3, allowedRoles: ["HR_ADMIN"] },

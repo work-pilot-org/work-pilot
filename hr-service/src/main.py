@@ -27,6 +27,8 @@ from src.modules.policies.router import (
     probation_policy_router,
     shift_policy_router,
 )
+from src.modules.onboarding.router import router as onboarding_router
+from src.modules.offboarding.router import router as offboarding_router
 
 from contextlib import asynccontextmanager
 
@@ -116,7 +118,8 @@ app.include_router(attendance_policy_router)
 app.include_router(shift_policy_router)
 app.include_router(holiday_policy_router)
 app.include_router(probation_policy_router)
-
+app.include_router(onboarding_router)
+app.include_router(offboarding_router)
 # =====================================================
 # Root Endpoint
 # =====================================================

@@ -73,6 +73,9 @@ export const hrRepository = {
   },
 
   async getEmployeeById(id: string): Promise<EmployeeResponse> {
+    if (!id || id === "none" || id === "null" || id === "undefined" || id === "NaN") {
+      throw new Error("Invalid Employee ID.");
+    }
     try {
       const response = await hrApi.get<EmployeeResponse>(`/employees/${id}`);
       return response.data;
@@ -252,6 +255,44 @@ export const hrRepository = {
   async getProbationPolicies(): Promise<import("@/types/hr").ProbationPolicyResponse[]> {
     const response = await hrApi.get("/probation-policies");
     return response.data;
+  },
+
+  async getOnboardingTasks(employeeId: string): Promise<import("@/types/hr").OnboardingTaskResponse[]> {
+    const response = await hrApi.get(`/onboarding/tasks/${employeeId}`);
+    return response.data;
+  },
+
+  async createOnboardingTask(data: any): Promise<import("@/types/hr").OnboardingTaskResponse> {
+    const response = await hrApi.post("/onboarding/tasks", data);
+    return response.data;
+  },
+
+  async updateOnboardingTask(taskId: string, data: any): Promise<import("@/types/hr").OnboardingTaskResponse> {
+    const response = await hrApi.patch(`/onboarding/tasks/${taskId}`, data);
+    return response.data;
+  },
+
+  async deleteOnboardingTask(taskId: string): Promise<void> {
+    await hrApi.delete(`/onboarding/tasks/${taskId}`);
+  },
+
+  async getOffboardingTasks(employeeId: string): Promise<import("@/types/hr").OffboardingTaskResponse[]> {
+    const response = await hrApi.get(`/offboarding/tasks/${employeeId}`);
+    return response.data;
+  },
+
+  async createOffboardingTask(data: any): Promise<import("@/types/hr").OffboardingTaskResponse> {
+    const response = await hrApi.post("/offboarding/tasks", data);
+    return response.data;
+  },
+
+  async updateOffboardingTask(taskId: string, data: any): Promise<import("@/types/hr").OffboardingTaskResponse> {
+    const response = await hrApi.patch(`/offboarding/tasks/${taskId}`, data);
+    return response.data;
+  },
+
+  async deleteOffboardingTask(taskId: string): Promise<void> {
+    await hrApi.delete(`/offboarding/tasks/${taskId}`);
   }
 };
 

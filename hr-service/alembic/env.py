@@ -11,6 +11,8 @@ from src.modules.attendance.models import *
 from src.modules.employee.models import *
 from src.modules.leave.models import *
 from src.modules.policies.models import *
+from src.modules.onboarding.models import *
+from src.modules.offboarding.models import *
 
 config = context.config
 

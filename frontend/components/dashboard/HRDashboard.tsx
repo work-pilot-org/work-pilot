@@ -168,7 +168,7 @@ export function HRDashboard() {
                     <p className="text-sm font-medium text-foreground">{emp.first_name} {emp.last_name}</p>
                     <p className="text-xs text-muted-foreground">{emp.employment_type} • {emp.employee_code}</p>
                   </div>
-                  <Button variant="outline" size="sm" className="shadow-sm h-8" onClick={() => router.push(`/dashboard/hr/${emp.id}`)}>
+                  <Button variant="outline" size="sm" className="shadow-sm h-8" onClick={() => router.push(`/dashboard/hr/employees/${emp.id}`)}>
                     View
                   </Button>
                 </div>
