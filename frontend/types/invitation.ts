@@ -19,6 +19,9 @@ export interface InvitationResponse {
   accepted_by_user_id?: string;
   last_sent_at?: string;
   revoked_at?: string;
+  email_sent?: boolean;
+  invite_link?: string;
+  email_error?: string;
 }
 
 export interface InvitationValidateResponse {

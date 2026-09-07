@@ -88,9 +88,17 @@ class InvitationService:
             invitation.last_sent_at = datetime.utcnow()
             self.repository.update_invitation(db, invitation)
             db.commit()
+            
+            setattr(invitation, "email_sent", True)
+            setattr(invitation, "invite_link", None)
         except Exception as e:
             # We don't rollback the DB because the invite is valid, just log it.
-            print(f"Failed to send invitation email to {email}: {str(e)}")
+            error_msg = str(e)
+            print(f"Failed to send invitation email to {email}: {error_msg}")
+            
+            setattr(invitation, "email_sent", False)
+            setattr(invitation, "invite_link", invite_link)
+            setattr(invitation, "email_error", error_msg)
 
         return invitation
 

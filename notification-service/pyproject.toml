@@ -28,7 +28,6 @@ dependencies = [
     # Logging
     "structlog>=25.4.0",
     "shared-infrastructure",
-    "sendgrid>=6.12.5",
     "jinja2>=3.1.6",
     "email-validator>=2.3.0",
 ]

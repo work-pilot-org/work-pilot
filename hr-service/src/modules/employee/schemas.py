@@ -190,6 +190,10 @@ class EmployeeResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
+    invitation_email_sent: bool | None = None
+    invitation_link: str | None = None
+    invitation_email_error: str | None = None
+
     model_config = ConfigDict(from_attributes=True)
 
 

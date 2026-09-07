@@ -1,9 +1,9 @@
-﻿from pathlib import Path
+import smtplib
+from email.message import EmailMessage
+from pathlib import Path
 from typing import Any
 
 from jinja2 import Environment, FileSystemLoader
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
 import structlog
 
 from shared_infrastructure.core.config import settings
@@ -17,7 +17,7 @@ logger = structlog.get_logger(__name__)
 
 class EmailService:
     """
-    Service responsible for compiling and delivering emails using SendGrid.
+    Service responsible for compiling and delivering emails using SMTP.
     """
 
     def __init__(self) -> None:
@@ -26,15 +26,19 @@ class EmailService:
             loader=FileSystemLoader(template_path)
         )
 
-        self.api_key = settings.SENDGRID_API_KEY
-        self.email_from = settings.EMAIL_FROM
+        self.smtp_host = settings.SMTP_HOST
+        self.smtp_port = settings.SMTP_PORT
+        self.smtp_username = settings.SMTP_USERNAME
+        self.smtp_password = settings.SMTP_PASSWORD
+        self.smtp_from = settings.SMTP_FROM
+        
         self.email_from_name = settings.EMAIL_FROM_NAME
 
         # Defensive validation of required environment configuration
-        if not self.api_key:
-            raise EmailConfigurationError("SENDGRID_API_KEY is not configured.")
-        if not self.email_from:
-            raise EmailConfigurationError("EMAIL_FROM is not configured.")
+        if not self.smtp_host or not self.smtp_port:
+            raise EmailConfigurationError("SMTP_HOST and SMTP_PORT are not configured.")
+        if not self.smtp_from:
+            raise EmailConfigurationError("SMTP_FROM is not configured.")
 
     def send_email(
         self,
@@ -44,36 +48,40 @@ class EmailService:
         plain_text_content: str | None = None,
     ) -> int:
         """
-        Sends a generic email using SendGrid.
+        Sends a generic email using SMTP.
 
         Returns:
-            int: The HTTP status code returned by SendGrid.
+            int: The HTTP status code returned (200 for success).
         """
-        message = Mail(
-            from_email=self.email_from,
-            to_emails=to_email,
-            subject=subject,
-            html_content=html_content,
-            plain_text_content=plain_text_content,
-        )
+        from_email = f"{self.email_from_name} <{self.smtp_from}>" if self.email_from_name else self.smtp_from
 
-        if self.email_from_name:
-            message.from_email.name = self.email_from_name
+        msg = EmailMessage()
+        msg["Subject"] = subject
+        msg["From"] = from_email
+        msg["To"] = to_email
+        
+        if plain_text_content:
+            msg.set_content(plain_text_content)
+            msg.add_alternative(html_content, subtype="html")
+        else:
+            msg.set_content(html_content, subtype="html")
 
         try:
-            sg = SendGridAPIClient(self.api_key)
-            response = sg.send(message)
+            with smtplib.SMTP(self.smtp_host, self.smtp_port) as server:
+                server.starttls()
+                if self.smtp_username and self.smtp_password:
+                    server.login(self.smtp_username, self.smtp_password)
+                server.send_message(msg)
             
             logger.info(
                 "Email sent successfully",
                 to_email=to_email,
-                status_code=response.status_code,
             )
-            return response.status_code
+            return 200
 
-        except Exception as e:
+        except smtplib.SMTPException as e:
             logger.error(
-                "SendGrid email delivery failed",
+                "SMTP email delivery failed",
                 to_email=to_email,
                 error=str(e),
             )
@@ -90,7 +98,7 @@ class EmailService:
         Loads a Jinja2 template, renders it with context, and sends it.
 
         Returns:
-            int: The HTTP status code returned by SendGrid.
+            int: The HTTP status code returned (200 on success).
         """
         try:
             template = self.environment.get_template(template_name)

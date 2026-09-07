@@ -1,4 +1,4 @@
-﻿import pytest
+import pytest
 from unittest.mock import MagicMock, patch
 
 from shared_infrastructure.core.config import settings
@@ -14,7 +14,7 @@ from notification_service.core.exceptions import (
 def mock_settings(monkeypatch):
     monkeypatch.setattr(
         settings,
-        "SENDGRID_API_KEY",
+        "RESEND_API_KEY",
         "SG.test_key",
     )
     monkeypatch.setattr(
@@ -37,22 +37,21 @@ def test_email_service_imports_and_instantiates(mock_settings):
     assert service.email_from_name == "WorkPilot Test"
 
 
-def test_email_service_fails_on_missing_config(monkeypatch):
     monkeypatch.setattr(
         settings,
-        "SENDGRID_API_KEY",
+        "RESEND_API_KEY",
         None,
     )
 
     with pytest.raises(
         EmailConfigurationError,
-        match="SENDGRID_API_KEY is not configured",
+        match="RESEND_API_KEY is not configured",
     ):
         EmailService()
 
     monkeypatch.setattr(
         settings,
-        "SENDGRID_API_KEY",
+        "RESEND_API_KEY",
         "SG.key",
     )
     monkeypatch.setattr(
@@ -68,18 +67,12 @@ def test_email_service_fails_on_missing_config(monkeypatch):
         EmailService()
 
 
-@patch("notification_service.core.email.SendGridAPIClient")
+@patch("resend.Emails.send")
 def test_send_generic_email_success(
-    mock_client_class,
+    mock_send,
     mock_settings,
 ):
-    mock_client = MagicMock()
-
-    mock_response = MagicMock()
-    mock_response.status_code = 202
-
-    mock_client.send.return_value = mock_response
-    mock_client_class.return_value = mock_client
+    mock_send.return_value = {"id": "mock_id_123"}
 
     service = EmailService()
 
@@ -90,34 +83,24 @@ def test_send_generic_email_success(
         plain_text_content="Test plain text",
     )
 
-    assert status == 202
+    assert status == 200
 
-    mock_client_class.assert_called_once_with(
-        "SG.test_key"
-    )
-
-    mock_client.send.assert_called_once()
-
-    # Verify SendGrid Mail payload.
-    mail_call_arg = mock_client.send.call_args[0][0]
-
-    assert mail_call_arg.from_email.email == "test@workpilot.com"
-    assert mail_call_arg.from_email.name == "WorkPilot Test"
-    assert mail_call_arg.subject.subject == "Test Subject"
+    mock_send.assert_called_once()
+    
+    call_payload = mock_send.call_args[0][0]
+    assert call_payload["from"] == "WorkPilot Test <test@workpilot.com>"
+    assert call_payload["to"] == "recipient@example.com"
+    assert call_payload["subject"] == "Test Subject"
+    assert call_payload["html"] == "<p>Test</p>"
+    assert call_payload["text"] == "Test plain text"
 
 
-@patch("notification_service.core.email.SendGridAPIClient")
+@patch("resend.Emails.send")
 def test_send_generic_email_delivery_failure(
-    mock_client_class,
+    mock_send,
     mock_settings,
 ):
-    mock_client = MagicMock()
-
-    mock_client.send.side_effect = Exception(
-        "SendGrid connection timed out"
-    )
-
-    mock_client_class.return_value = mock_client
+    mock_send.side_effect = Exception("Resend connection timed out")
 
     service = EmailService()
 
@@ -143,7 +126,7 @@ def test_send_template_email_renders_jinja(
     with patch.object(
         service,
         "send_email",
-        return_value=202,
+        return_value=200,
     ) as mock_send:
         status = service.send_template_email(
             to_email="recipient@example.com",
@@ -156,7 +139,7 @@ def test_send_template_email_renders_jinja(
             },
         )
 
-    assert status == 202
+    assert status == 200
 
     mock_send.assert_called_once()
 
