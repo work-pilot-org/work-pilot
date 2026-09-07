@@ -167,6 +167,14 @@ class EmployeeService:
             raise HTTPException(status_code=500, detail="Failed to communicate with Auth service.")
             
         dto = EmployeeResponse.model_validate(employee)
+        try:
+            auth_response_data = response.json()
+            dto.invitation_email_sent = auth_response_data.get("email_sent")
+            dto.invitation_link = auth_response_data.get("invite_link")
+            dto.invitation_email_error = auth_response_data.get("email_error")
+        except ValueError:
+            pass
+            
         self.db.commit()
         return dto
 

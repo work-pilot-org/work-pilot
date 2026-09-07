@@ -1,15 +1,15 @@
+import smtplib
+from email.message import EmailMessage
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
 
 from shared_infrastructure.core.config import settings
 
 
 class EmailService:
     """
-    Service responsible for sending application emails.
+    Service responsible for sending application emails via SMTP.
     """
 
     def __init__(self) -> None:
@@ -19,13 +19,39 @@ class EmailService:
             loader=FileSystemLoader(template_path)
         )
 
+        self.smtp_host = settings.SMTP_HOST
+        self.smtp_port = settings.SMTP_PORT
+        self.smtp_username = settings.SMTP_USERNAME
+        self.smtp_password = settings.SMTP_PASSWORD
+        self.smtp_from = settings.SMTP_FROM
+        
+        self.email_from_name = settings.EMAIL_FROM_NAME
+
+    def _send_email_via_smtp(self, msg: EmailMessage) -> None:
+        if not self.smtp_host or not self.smtp_port:
+            print("SMTP_HOST or SMTP_PORT not configured. Skipping email send.")
+            return
+
+        try:
+            with smtplib.SMTP(self.smtp_host, self.smtp_port) as server:
+                server.starttls()
+                if self.smtp_username and self.smtp_password:
+                    server.login(self.smtp_username, self.smtp_password)
+                server.send_message(msg)
+                print(f"Email sent successfully to {msg['To']}")
+        except smtplib.SMTPException as e:
+            print("========== SMTP ERROR ==========")
+            print(f"Failed to send email to {msg['To']}")
+            print("================================")
+            raise
+
     def send_password_reset_email(
         self,
         email: str,
         reset_link: str,
     ) -> None:
         """
-        Send password reset email using SendGrid.
+        Send password reset email using SMTP.
         """
 
         # Load HTML template
@@ -38,45 +64,16 @@ class EmailService:
             reset_link=reset_link,
         )
 
-        # Create email
-        message = Mail(
-            from_email=settings.EMAIL_FROM,
-            to_emails=email,
-            subject="Reset Your WorkPilot Password",
-            html_content=html_content,
-        )
+        # Create email sender format
+        from_email = f"{self.email_from_name} <{self.smtp_from}>" if self.email_from_name else self.smtp_from
 
-        # Set sender display name
-        message.from_email.name = settings.EMAIL_FROM_NAME
+        msg = EmailMessage()
+        msg["Subject"] = "Reset Your WorkPilot Password"
+        msg["From"] = from_email
+        msg["To"] = email
+        msg.add_alternative(html_content, subtype="html")
 
-        try:
-            sg = SendGridAPIClient(
-                settings.SENDGRID_API_KEY
-            )
-
-            response = sg.send(message)
-
-            print(
-                f"Password reset email sent successfully "
-                f"(Status Code: {response.status_code})"
-            )
-
-        except Exception as e:
-            print("========== SENDGRID ERROR ==========")
-
-            if hasattr(e, "status_code"):
-                print("Status Code:", e.status_code)
-
-            if hasattr(e, "body"):
-                print("Response Body:", e.body)
-
-            if hasattr(e, "headers"):
-                print("Headers:", e.headers)
-
-            print("Exception:", str(e))
-            print("====================================")
-
-            raise
+        self._send_email_via_smtp(msg)
 
     def send_invitation_email(
         self,
@@ -87,7 +84,7 @@ class EmailService:
         expiry_date: str,
     ) -> None:
         """
-        Send an employee invitation email using SendGrid.
+        Send an employee invitation email using SMTP.
         """
 
         # Load HTML template
@@ -111,43 +108,15 @@ class EmailService:
             f"If you did not expect this invitation, you can safely ignore this email."
         )
 
-        # Create email
-        message = Mail(
-            from_email=settings.EMAIL_FROM,
-            to_emails=email,
-            subject=f"You've been invited to join {company_name} on WorkPilot",
-            plain_text_content=plain_text_content,
-            html_content=html_content,
-        )
+        # Create email sender format
+        from_email = f"{self.email_from_name} <{self.smtp_from}>" if self.email_from_name else self.smtp_from
 
-        # Set sender display name
-        message.from_email.name = settings.EMAIL_FROM_NAME
+        msg = EmailMessage()
+        msg["Subject"] = f"You've been invited to join {company_name} on WorkPilot"
+        msg["From"] = from_email
+        msg["To"] = email
+        msg.set_content(plain_text_content)
+        msg.add_alternative(html_content, subtype="html")
 
-        try:
-            sg = SendGridAPIClient(
-                settings.SENDGRID_API_KEY
-            )
+        self._send_email_via_smtp(msg)
 
-            response = sg.send(message)
-
-            print(
-                f"Invitation email sent successfully "
-                f"(Status Code: {response.status_code})"
-            )
-
-        except Exception as e:
-            print("========== SENDGRID ERROR ==========")
-
-            if hasattr(e, "status_code"):
-                print("Status Code:", e.status_code)
-
-            if hasattr(e, "body"):
-                print("Response Body:", e.body)
-
-            if hasattr(e, "headers"):
-                print("Headers:", e.headers)
-
-            print("Exception:", str(e))
-            print("====================================")
-
-            raise

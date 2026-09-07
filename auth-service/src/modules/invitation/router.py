@@ -144,8 +144,18 @@ def resend_invitation(
         inv.last_sent_at = datetime.datetime.utcnow()
         invitation_repo.update_invitation(db, inv)
         db.commit()
+        
+        setattr(inv, "email_sent", True)
+        setattr(inv, "invite_link", None)
     except Exception as e:
-        print(f"Failed to resend invitation email to {inv.email}: {str(e)}")
+        error_msg = str(e)
+        print(f"Failed to resend invitation email to {inv.email}: {error_msg}")
+        
+        # We don't rollback the DB because the invite is valid, just log it.
+        # It's up to the frontend to show the manual link fallback.
+        setattr(inv, "email_sent", False)
+        setattr(inv, "invite_link", invite_link)
+        setattr(inv, "email_error", error_msg)
         
     return inv
 

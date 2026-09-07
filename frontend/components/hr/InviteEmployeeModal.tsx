@@ -49,8 +49,33 @@ export function InviteEmployeeModal({ isOpen, onClose, onSuccess }: InviteEmploy
         employment_status: "ACTIVE"
       };
 
-      await hrRepository.onboardEmployee(payload);
-      toast.success("Employee onboarded and invitation sent successfully");
+      const res = await hrRepository.onboardEmployee(payload);
+      
+      if (res.invitation_email_sent === false && res.invitation_link) {
+        toast.error(
+          (t) => (
+            <div className="flex flex-col space-y-2">
+              <span className="font-semibold text-sm">Invitation created, but the email could not be delivered.</span>
+              {res.invitation_email_error && (
+                <span className="text-xs text-red-600 bg-red-50 p-1 rounded border border-red-100">{res.invitation_email_error}</span>
+              )}
+              <span className="text-xs text-gray-500">You can copy the invitation link and send it manually.</span>
+              <button 
+                onClick={() => {
+                  navigator.clipboard.writeText(res.invitation_link!);
+                  toast.success("Link copied!", { id: t.id });
+                }}
+                className="mt-2 bg-indigo-600 text-white text-xs px-2 py-1 rounded w-fit hover:bg-indigo-700"
+              >
+                Copy Link
+              </button>
+            </div>
+          ),
+          { duration: 10000 }
+        );
+      } else {
+        toast.success("Employee onboarded and invitation sent successfully");
+      }
       
       // Reset form
       setEmail("");

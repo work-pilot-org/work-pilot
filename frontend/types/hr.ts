@@ -35,6 +35,9 @@ export interface EmployeeResponse {
   profile_photo?: string;
   is_active: boolean;
   invitation_status?: string;
+  invitation_email_sent?: boolean;
+  invitation_link?: string;
+  invitation_email_error?: string;
   created_at: string;
   updated_at: string;
 }

@@ -16,8 +16,11 @@ class Settings(BaseSettings):
     PASSWORD_RESET_EXPIRE_MINUTES: int = 30
     RESET_TOKEN_EXPIRE_MINUTES: int | None = None
     
-    SENDGRID_API_KEY: str | None = None
-    EMAIL_FROM: str | None = None
+    SMTP_HOST: str | None = None
+    SMTP_PORT: int | None = None
+    SMTP_USERNAME: str | None = None
+    SMTP_PASSWORD: str | None = None
+    SMTP_FROM: str | None = None
     EMAIL_FROM_NAME: str | None = None
     
     # Service URLs

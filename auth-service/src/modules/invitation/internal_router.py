@@ -51,6 +51,11 @@ def create_invitation_internally(
             actor_id=UUID(x_actor_id),
             frontend_url=frontend_url
         )
-        return {"status": "ok", "invitation_id": str(invitation.id)}
+        return {
+            "status": "ok", 
+            "invitation_id": str(invitation.id),
+            "email_sent": getattr(invitation, "email_sent", None),
+            "invite_link": getattr(invitation, "invite_link", None)
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

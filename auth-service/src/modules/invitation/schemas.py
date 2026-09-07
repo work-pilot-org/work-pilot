@@ -30,6 +30,9 @@ class InvitationResponse(BaseModel):
     accepted_by_user_id: Optional[UUID]
     revoked_at: Optional[datetime]
     last_sent_at: Optional[datetime]
+    email_sent: Optional[bool] = None
+    invite_link: Optional[str] = None
+    email_error: Optional[str] = None
 
     class Config:
         orm_mode = True
