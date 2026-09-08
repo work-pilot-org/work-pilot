@@ -26,6 +26,7 @@ export function ChatPanel({ onClose }: ChatPanelProps) {
     }
   ]);
   const [isTyping, setIsTyping] = useState(false);
+  const [conversationId, setConversationId] = useState<string | undefined>(undefined);
 
   const handleSendMessage = async (content: string) => {
     const newMessage: Message = { id: Date.now().toString(), role: "user", content };
@@ -33,8 +34,15 @@ export function ChatPanel({ onClose }: ChatPanelProps) {
     setIsTyping(true);
     
     try {
-      const response = await aiRepository.chat({ message: content });
+      const response = await aiRepository.chat({ 
+        message: content,
+        conversation_id: conversationId 
+      });
       
+      if (response.conversation_id) {
+        setConversationId(response.conversation_id);
+      }
+
       setMessages(prev => [
         ...prev, 
         { id: (Date.now() + 1).toString(), role: "ai", content: response.data }

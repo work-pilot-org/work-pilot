@@ -28,7 +28,7 @@ async def check_in(
 ):
     return await hr_client.check_in(
         payload=payload.model_dump(mode="json"),
-    )
+     headers=headers)
 
 
 async def check_out(
@@ -37,7 +37,7 @@ async def check_out(
 ):
     return await hr_client.check_out(
         payload=payload.model_dump(mode="json"),
-    )
+     headers=headers)
 
 
 # ==========================================================
@@ -50,7 +50,7 @@ async def create_attendance(
 ):
     return await hr_client.create_attendance(
         payload=payload.model_dump(mode="json"),
-    )
+     headers=headers)
 
 
 async def get_all_attendance(
@@ -61,7 +61,7 @@ async def get_all_attendance(
     return await hr_client.get_all_attendance(
         skip=skip,
         limit=limit,
-    )
+     headers=headers)
 
 
 async def get_attendance(
@@ -70,7 +70,7 @@ async def get_attendance(
 ):
     return await hr_client.get_attendance(
         attendance_id=attendance_id,
-    )
+     headers=headers)
 
 
 async def update_attendance(
@@ -81,7 +81,7 @@ async def update_attendance(
     return await hr_client.update_attendance(
         attendance_id=attendance_id,
         payload=payload.model_dump(exclude_unset=True),
-    )
+     headers=headers)
 
 
 async def delete_attendance(
@@ -90,7 +90,7 @@ async def delete_attendance(
 ):
     return await hr_client.delete_attendance(
         attendance_id=attendance_id,
-    )
+     headers=headers)
 
 
 # ==========================================================
@@ -98,21 +98,33 @@ async def delete_attendance(
 # ==========================================================
 
 async def get_employee_attendance(
-    employee_id: UUID,
+    employee_id: UUID | None = None,
     headers: dict[str, str] | None = None,
 ):
+
+    if employee_id is None:
+        me = await hr_client.get_my_employee(headers=headers)
+        if not me or "id" not in me:
+            return {"error": "[STATUS: FAILED] I couldn't find an employee profile linked to your account. Please contact HR."}
+        employee_id = me["id"]
     return await hr_client.get_employee_attendance(
         employee_id=str(employee_id),
-    )
+     headers=headers)
 
 
 async def attendance_summary(
-    employee_id: UUID,
+    employee_id: UUID | None = None,
     headers: dict[str, str] | None = None,
 ):
+
+    if employee_id is None:
+        me = await hr_client.get_my_employee(headers=headers)
+        if not me or "id" not in me:
+            return {"error": "[STATUS: FAILED] I couldn't find an employee profile linked to your account. Please contact HR."}
+        employee_id = me["id"]
     return await hr_client.attendance_summary(
         employee_id=str(employee_id),
-    )
+     headers=headers)
 
 
 # ==========================================================
@@ -125,7 +137,7 @@ async def get_attendance_by_date(
 ):
     return await hr_client.get_attendance_by_date(
         attendance_date=attendance_date.isoformat(),
-    )
+     headers=headers)
 
 
 async def today_attendance(
@@ -152,7 +164,7 @@ async def update_attendance_status(
     return await hr_client.update_attendance_status(
         attendance_id=attendance_id,
         payload=payload.model_dump(),
-    )
+     headers=headers)
 
 
 # ==========================================================
@@ -167,7 +179,7 @@ async def monthly_report(
     return await hr_client.monthly_report(
         year=year,
         month=month,
-    )
+     headers=headers)
 
 
 async def export_attendance(
@@ -178,7 +190,7 @@ async def export_attendance(
     return await hr_client.export_attendance(
         month=month,
         year=year,
-    )
+     headers=headers)
 
 
 # ==========================================================

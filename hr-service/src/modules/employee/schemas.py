@@ -159,6 +159,16 @@ class EmployeeUpdate(BaseModel):
         return self
 
 
+class EmployeePersonalInfoUpdate(BaseModel):
+    phone: str | None = Field(
+        default=None,
+        min_length=10,
+        max_length=15,
+    )
+    gender: Gender | None = None
+    date_of_birth: date | None = None
+    work_location: str | None = None
+
 class EmployeeResponse(BaseModel):
     id: UUID
     auth_user_id: UUID | None = None

@@ -1,4 +1,4 @@
-﻿from fastapi import FastAPI
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from notification_service.modules.notifications.internal_router import (
     internal_router,
@@ -22,6 +22,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
+    allow_origin_regex=r"http://.*\.localhost:\d+",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

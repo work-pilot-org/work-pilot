@@ -90,7 +90,7 @@ export function EmployeeDashboard() {
             </p>
           </div>
         </div>
-        <Button variant="outline" className="shadow-sm" onClick={() => router.push('/dashboard/hr/leave')}>
+        <Button variant="outline" className="shadow-sm" onClick={() => router.push('/dashboard/employee/leave')}>
           Request Leave
         </Button>
       </div>
@@ -177,7 +177,7 @@ export function EmployeeDashboard() {
           {/* Quick Links */}
           <div className="bg-surface-hover/30 border border-border rounded-xl p-4 flex flex-col gap-2">
             <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-2">Quick Links</h3>
-            <button onClick={() => router.push('/dashboard/hr/attendance')} className="flex items-center justify-between p-2 rounded-lg hover:bg-surface transition-colors text-sm font-medium text-foreground">
+            <button onClick={() => router.push('/dashboard/employee/attendance')} className="flex items-center justify-between p-2 rounded-lg hover:bg-surface transition-colors text-sm font-medium text-foreground">
               <div className="flex items-center gap-2"><Calendar className="w-4 h-4 text-muted-foreground" /> Timesheets</div>
               <ArrowRight className="w-4 h-4 text-muted-foreground" />
             </button>

@@ -18,6 +18,7 @@ from src.modules.employee.repository import EmployeeRepository
 from src.modules.employee.schemas import (
     EmployeeCreate,
     EmployeeDocumentCreate,
+    EmployeePersonalInfoUpdate,
     EmployeeProfileUpdate,
     EmployeeUpdate,
     EmployeeResponse,
@@ -238,6 +239,26 @@ class EmployeeService:
         employee = self.repository.update_employee(employee)
         self.db.commit()
         return employee
+
+    def update_personal_info(
+        self,
+        employee_id: UUID,
+        data: EmployeePersonalInfoUpdate,
+    ) -> Employee:
+        employee = self.repository.get_employee_by_id(employee_id)
+        if not employee:
+            raise EmployeeNotFoundException()
+
+        update_data = data.model_dump(exclude_unset=True)
+        for field, value in update_data.items():
+            if hasattr(value, "value"):
+                value = value.value
+            setattr(employee, field, value)
+
+        employee = self.repository.update_employee(employee)
+        self.db.commit()
+        return employee
+
 
     # =====================================================
     # Delete Employee (Soft Delete)

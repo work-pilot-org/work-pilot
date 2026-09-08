@@ -34,7 +34,7 @@ async def update_access_request(
         request_id,
         payload,
         headers,
-    )
+     headers=headers)
 
 
 async def update_access_status(
@@ -46,7 +46,7 @@ async def update_access_status(
         request_id,
         payload,
         headers,
-    )
+     headers=headers)
 
 
 async def delete_access_request(
@@ -56,7 +56,7 @@ async def delete_access_request(
     return await it_client.delete_access_request(
         request_id,
         headers,
-    )
+     headers=headers)
 
 
 tool_registry.register(

@@ -89,3 +89,54 @@ def verify_ticket_ownership(ticket_id, current_user: dict, db: Session, bypass_p
     if not result or str(result[0]) != str(user_id):
         raise HTTPException(status_code=403, detail="Forbidden: Not the owner of this record")
     return True
+
+def verify_asset_ownership(asset_id, current_user: dict, db: Session, bypass_permissions: list[Permission] = None):
+    if bypass_permissions:
+        roles = current_user.get("roles", [])
+        user_perms = get_permissions_for_roles(roles)
+        if Permission.ADMIN_ALL in user_perms or any(p in user_perms for p in bypass_permissions):
+            return True
+            
+    user_id = current_user.get("sub")
+    
+    from sqlalchemy import text
+    query = text("SELECT assigned_to FROM assets WHERE id = :asset_id")
+    result = db.execute(query, {"asset_id": str(asset_id)}).fetchone()
+    
+    if not result or str(result[0]) != str(user_id):
+        raise HTTPException(status_code=403, detail="Forbidden: Not the owner of this record")
+    return True
+
+def verify_access_request_ownership(request_id, current_user: dict, db: Session, bypass_permissions: list[Permission] = None):
+    if bypass_permissions:
+        roles = current_user.get("roles", [])
+        user_perms = get_permissions_for_roles(roles)
+        if Permission.ADMIN_ALL in user_perms or any(p in user_perms for p in bypass_permissions):
+            return True
+            
+    user_id = current_user.get("sub")
+    
+    from sqlalchemy import text
+    query = text("SELECT requested_by FROM access_requests WHERE id = :request_id")
+    result = db.execute(query, {"request_id": str(request_id)}).fetchone()
+    
+    if not result or str(result[0]) != str(user_id):
+        raise HTTPException(status_code=403, detail="Forbidden: Not the owner of this record")
+    return True
+
+def verify_leave_ownership(leave_request_id, current_user: dict, db: Session, bypass_permissions: list[Permission] = None):
+    if bypass_permissions:
+        roles = current_user.get("roles", [])
+        user_perms = get_permissions_for_roles(roles)
+        if Permission.ADMIN_ALL in user_perms or any(p in user_perms for p in bypass_permissions):
+            return True
+            
+    user_id = current_user.get("sub")
+    
+    from sqlalchemy import text
+    query = text("SELECT employee_id FROM leave_requests WHERE id = :leave_request_id")
+    result = db.execute(query, {"leave_request_id": str(leave_request_id)}).fetchone()
+    
+    if not result or str(result[0]) != str(user_id):
+        raise HTTPException(status_code=403, detail="Forbidden: Not the owner of this record")
+    return True

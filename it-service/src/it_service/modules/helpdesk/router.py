@@ -188,6 +188,35 @@ def list_tickets(
 
 
 @router.get(
+    "/my",
+    response_model=list[TicketResponse],
+)
+def list_my_tickets(
+    db: DatabaseDependency,
+    service: TicketServiceDependency,
+    status: TicketStatus | None = Query(None),
+    priority: TicketPriority | None = Query(None),
+    search: str | None = Query(None),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, ge=1, le=100),
+    current_user: dict = Depends(get_current_user_and_set_schema),
+):
+    """
+    List tickets for the current employee.
+    """
+    requester_id = uuid.UUID(current_user.get("sub"))
+    return service.list_tickets(
+        db=db,
+        status=status,
+        priority=priority,
+        requester_id=requester_id,
+        search=search,
+        skip=skip,
+        limit=limit,
+    )
+
+
+@router.get(
     "/{ticket_id}",
     response_model=TicketResponse,
 )

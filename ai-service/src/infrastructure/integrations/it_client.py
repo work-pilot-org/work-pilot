@@ -71,6 +71,15 @@ class ITClient:
             headers=headers,
         )
 
+    async def list_my_tickets(
+        self,
+        headers: dict[str, str] | None = None,
+    ) -> Any:
+        return await self._client.get(
+            f"{self._base_url}/tickets/my",
+            headers=headers,
+        )
+
     async def get_ticket(
         self,
         ticket_id: UUID,
@@ -168,6 +177,30 @@ class ITClient:
 
         return await self._client.get(
             f"{self._base_url}/assets",
+            params=params,
+            headers=headers,
+        )
+
+    async def list_my_assets(
+        self,
+        category: str | None = None,
+        status: str | None = None,
+        search: str | None = None,
+        skip: int = 0,
+        limit: int = 20,
+        headers: dict[str, str] | None = None,
+    ) -> Any:
+        params = {
+            "category": category,
+            "status": status,
+            "search": search,
+            "skip": skip,
+            "limit": limit,
+        }
+        params = {k: v for k, v in params.items() if v is not None}
+
+        return await self._client.get(
+            f"{self._base_url}/assets/my",
             params=params,
             headers=headers,
         )
@@ -602,6 +635,15 @@ class ITClient:
     ):
         return await self._client.get(
             f"{self._base_url}/access",
+            headers=headers,
+        )
+
+    async def list_my_access_requests(
+        self,
+        headers: dict[str, str] | None = None,
+    ) -> Any:
+        return await self._client.get(
+            f"{self._base_url}/access/my",
             headers=headers,
         )
 

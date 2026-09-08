@@ -26,7 +26,7 @@ async def create_employee(
 ):
     return await hr_client.create_employee(
         payload=payload.model_dump(mode="json"),
-    )
+     headers=headers)
 
 
 async def get_all_employees(
@@ -36,32 +36,50 @@ async def get_all_employees(
 
 
 async def get_employee(
-    employee_id: UUID,
+    employee_id: UUID | None = None,
     headers: dict[str, str] | None = None,
 ):
+
+    if employee_id is None:
+        me = await hr_client.get_my_employee(headers=headers)
+        if not me or "id" not in me:
+            return {"error": "[STATUS: FAILED] I couldn't find an employee profile linked to your account. Please contact HR."}
+        employee_id = me["id"]
     return await hr_client.get_employee(
         employee_id=str(employee_id),
-    )
+     headers=headers)
 
 
 async def update_employee(
-    employee_id: UUID,
+    employee_id: UUID | None = None,
     payload: UpdateEmployeeToolInput,
     headers: dict[str, str] | None = None,
 ):
+
+    if employee_id is None:
+        me = await hr_client.get_my_employee(headers=headers)
+        if not me or "id" not in me:
+            return {"error": "[STATUS: FAILED] I couldn't find an employee profile linked to your account. Please contact HR."}
+        employee_id = me["id"]
     return await hr_client.update_employee(
         employee_id=str(employee_id),
         payload=payload.model_dump(exclude_unset=True),
-    )
+     headers=headers)
 
 
 async def delete_employee(
-    employee_id: UUID,
+    employee_id: UUID | None = None,
     headers: dict[str, str] | None = None,
 ):
+
+    if employee_id is None:
+        me = await hr_client.get_my_employee(headers=headers)
+        if not me or "id" not in me:
+            return {"error": "[STATUS: FAILED] I couldn't find an employee profile linked to your account. Please contact HR."}
+        employee_id = me["id"]
     return await hr_client.delete_employee(
         employee_id=str(employee_id),
-    )
+     headers=headers)
 
 
 async def search_employee(
@@ -74,7 +92,7 @@ async def search_employee(
         keyword=keyword,
         page=page,
         size=size,
-    )
+     headers=headers)
 
 
 # ==========================================================
@@ -82,23 +100,35 @@ async def search_employee(
 # ==========================================================
 
 async def get_employee_profile(
-    employee_id: UUID,
+    employee_id: UUID | None = None,
     headers: dict[str, str] | None = None,
 ):
+
+    if employee_id is None:
+        me = await hr_client.get_my_employee(headers=headers)
+        if not me or "id" not in me:
+            return {"error": "[STATUS: FAILED] I couldn't find an employee profile linked to your account. Please contact HR."}
+        employee_id = me["id"]
     return await hr_client.get_employee_profile(
         employee_id=str(employee_id),
-    )
+     headers=headers)
 
 
 async def update_employee_profile(
-    employee_id: UUID,
+    employee_id: UUID | None = None,
     payload: UpdateEmployeeProfileToolInput,
     headers: dict[str, str] | None = None,
 ):
+
+    if employee_id is None:
+        me = await hr_client.get_my_employee(headers=headers)
+        if not me or "id" not in me:
+            return {"error": "[STATUS: FAILED] I couldn't find an employee profile linked to your account. Please contact HR."}
+        employee_id = me["id"]
     return await hr_client.update_employee_profile(
         employee_id=str(employee_id),
         payload=payload.model_dump(exclude_unset=True),
-    )
+     headers=headers)
 
 
 # ==========================================================
@@ -106,34 +136,52 @@ async def update_employee_profile(
 # ==========================================================
 
 async def upload_document(
-    employee_id: UUID,
+    employee_id: UUID | None = None,
     payload: UploadEmployeeDocumentToolInput,
     headers: dict[str, str] | None = None,
 ):
+
+    if employee_id is None:
+        me = await hr_client.get_my_employee(headers=headers)
+        if not me or "id" not in me:
+            return {"error": "[STATUS: FAILED] I couldn't find an employee profile linked to your account. Please contact HR."}
+        employee_id = me["id"]
     return await hr_client.upload_document(
         employee_id=str(employee_id),
         payload=payload.model_dump(mode="json"),
-    )
+     headers=headers)
 
 
 async def get_documents(
-    employee_id: UUID,
+    employee_id: UUID | None = None,
     headers: dict[str, str] | None = None,
 ):
+
+    if employee_id is None:
+        me = await hr_client.get_my_employee(headers=headers)
+        if not me or "id" not in me:
+            return {"error": "[STATUS: FAILED] I couldn't find an employee profile linked to your account. Please contact HR."}
+        employee_id = me["id"]
     return await hr_client.get_documents(
         employee_id=str(employee_id),
-    )
+     headers=headers)
 
 
 async def delete_document(
-    employee_id: UUID,
+    employee_id: UUID | None = None,
     document_id: UUID,
     headers: dict[str, str] | None = None,
 ):
+
+    if employee_id is None:
+        me = await hr_client.get_my_employee(headers=headers)
+        if not me or "id" not in me:
+            return {"error": "[STATUS: FAILED] I couldn't find an employee profile linked to your account. Please contact HR."}
+        employee_id = me["id"]
     return await hr_client.delete_document(
         employee_id=str(employee_id),
         document_id=str(document_id),
-    )
+     headers=headers)
 
 
 # ==========================================================

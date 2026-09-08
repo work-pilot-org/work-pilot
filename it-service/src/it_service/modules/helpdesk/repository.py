@@ -62,6 +62,7 @@ class TicketRepository:
         status: TicketStatus | None = None,
         priority: TicketPriority | None = None,
         assigned_to: UUID | None = None,
+        requester_id: UUID | None = None,
         search: str | None = None,
         skip: int = 0,
         limit: int = 20,
@@ -83,6 +84,11 @@ class TicketRepository:
         if assigned_to:
             statement = statement.where(
                 Ticket.assigned_to == assigned_to
+            )
+
+        if requester_id:
+            statement = statement.where(
+                Ticket.requester_id == requester_id
             )
 
         if search:

@@ -1,10 +1,10 @@
 from datetime import date
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Response, status, BackgroundTasks
+from fastapi import APIRouter, Depends, Response, status, BackgroundTasks, HTTPException
 from sqlalchemy.orm import Session
 
-from shared_infrastructure.core.dependencies import require_permissions, get_current_user_and_set_schema
+from shared_infrastructure.core.dependencies import require_permissions, get_current_user_and_set_schema, verify_leave_ownership
 from shared_infrastructure.core.rbac import Permission
 from shared_infrastructure.database.session import get_db
 from shared_infrastructure.events import EventEnvelope
@@ -133,7 +133,7 @@ def delete_leave_type(
 # Leave Requests Router
 # ==================================================================
 
-leave_request_router = APIRouter(dependencies=[Depends(require_permissions([Permission.HR_MANAGE]))], 
+leave_request_router = APIRouter(dependencies=[Depends(get_current_user_and_set_schema)], 
     prefix="/leave-requests",
     tags=["Leave Requests"],
 )
@@ -155,6 +155,17 @@ def create_leave_request(
     db: Session = Depends(get_db),
 ):
     """Submit a new leave request."""
+    from shared_infrastructure.core.rbac import Permission, get_permissions_for_roles
+    roles = current_user.get("roles", [])
+    user_perms = get_permissions_for_roles(roles)
+    if Permission.ADMIN_ALL not in user_perms and Permission.HR_MANAGE not in user_perms:
+        from src.modules.employee.repository import EmployeeRepository
+        emp_repo = EmployeeRepository(db)
+        employee = emp_repo.get_employee_by_auth_user_id(UUID(current_user["sub"]))
+        if not employee:
+            raise HTTPException(status_code=403, detail="No employee record found for current user")
+        leave_request.employee_id = employee.id
+
     service = LeaveRequestService(db)
     result = service.create_leave_request(leave_request)
     
@@ -184,6 +195,7 @@ def create_leave_request(
 @leave_request_router.get(
     "",
     response_model=list[LeaveRequestResponse],
+    dependencies=[Depends(require_permissions([Permission.HR_MANAGE]))]
 )
 def get_all_leave_requests(
     db: Session = Depends(get_db),
@@ -191,6 +203,25 @@ def get_all_leave_requests(
     """Retrieve all leave requests."""
     service = LeaveRequestService(db)
     return service.get_all_leave_requests()
+
+@leave_request_router.get(
+    "/my",
+    response_model=list[LeaveRequestListResponse],
+)
+def get_my_leave_requests(
+    current_user: dict = Depends(get_current_user_and_set_schema),
+    db: Session = Depends(get_db),
+):
+    """Retrieve all leave requests for the current employee."""
+    from src.modules.employee.repository import EmployeeRepository
+    from fastapi import HTTPException
+    emp_repo = EmployeeRepository(db)
+    employee = emp_repo.get_employee_by_auth_user_id(UUID(current_user["sub"]))
+    if not employee:
+        raise HTTPException(status_code=403, detail="No employee record found for current user")
+    
+    service = LeaveRequestService(db)
+    return service.get_employee_leave_requests(employee.id)
 
 
 # -------------------------------------------------------------------
@@ -203,9 +234,11 @@ def get_all_leave_requests(
 )
 def get_leave_request(
     leave_request_id: UUID,
+    current_user: dict = Depends(get_current_user_and_set_schema),
     db: Session = Depends(get_db),
 ):
     """Retrieve a specific leave request."""
+    verify_leave_ownership(leave_request_id, current_user, db, bypass_permissions=[Permission.HR_MANAGE])
     service = LeaveRequestService(db)
     return service.get_leave_request_by_id(leave_request_id)
 
@@ -217,6 +250,7 @@ def get_leave_request(
 @leave_request_router.put(
     "/{leave_request_id}",
     response_model=LeaveRequestResponse,
+    dependencies=[Depends(require_permissions([Permission.HR_MANAGE]))]
 )
 def update_leave_request(
     leave_request_id: UUID,
@@ -237,6 +271,7 @@ def update_leave_request(
 @leave_request_router.patch(
     "/{leave_request_id}/status",
     response_model=LeaveRequestResponse,
+    dependencies=[Depends(require_permissions([Permission.HR_MANAGE]))]
 )
 def update_leave_request_status(
     leave_request_id: UUID,
@@ -277,6 +312,7 @@ def update_leave_request_status(
 @leave_request_router.delete(
     "/{leave_request_id}",
     status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(require_permissions([Permission.HR_MANAGE]))]
 )
 def cancel_leave_request(
     leave_request_id: UUID,

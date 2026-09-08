@@ -11,11 +11,28 @@ import {
 } from "@/types/it";
 import axios from "axios";
 import { ApiError } from "@/types/auth";
+import {
+  AccessRequestResponse,
+  CreateAccessRequest,
+} from "@/types/it";
 
 export const itRepository = {
   async getTickets(params?: { search?: string, status?: string, priority?: string }): Promise<TicketResponse[]> {
     try {
       const response = await itApi.get<TicketResponse[]>("/tickets", { params });
+      return response.data;
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err) && err.response?.data) {
+        const detail = (err.response.data as ApiError).detail;
+        throw new Error(typeof detail === "string" ? detail : "Failed to fetch tickets.");
+      }
+      throw new Error(err instanceof Error ? err.message : "An unexpected error occurred.");
+    }
+  },
+
+  async getMyTickets(params?: { search?: string, status?: string, priority?: string }): Promise<TicketResponse[]> {
+    try {
+      const response = await itApi.get<TicketResponse[]>("/tickets/my", { params });
       return response.data;
     } catch (err: unknown) {
       if (axios.isAxiosError(err) && err.response?.data) {
@@ -92,6 +109,19 @@ export const itRepository = {
     }
   },
 
+  async getMyAssets(params?: { search?: string, status?: string, category?: string }): Promise<AssetResponse[]> {
+    try {
+      const response = await itApi.get<AssetResponse[]>("/assets/my", { params });
+      return response.data;
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err) && err.response?.data) {
+        const detail = (err.response.data as ApiError).detail;
+        throw new Error(typeof detail === "string" ? detail : "Failed to fetch assets.");
+      }
+      throw new Error(err instanceof Error ? err.message : "An unexpected error occurred.");
+    }
+  },
+
   async createAsset(data: CreateAssetRequest): Promise<AssetResponse> {
     try {
       const response = await itApi.post<AssetResponse>("/assets", data);
@@ -151,6 +181,32 @@ export const itRepository = {
       if (axios.isAxiosError(err) && err.response?.data) {
         const detail = (err.response.data as ApiError).detail;
         throw new Error(typeof detail === "string" ? detail : "Failed to delete asset.");
+      }
+      throw new Error(err instanceof Error ? err.message : "An unexpected error occurred.");
+    }
+  },
+
+  async getMyAccessRequests(params?: { request_type?: string, status?: string }): Promise<AccessRequestResponse[]> {
+    try {
+      const response = await itApi.get<AccessRequestResponse[]>("/access/my", { params });
+      return response.data;
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err) && err.response?.data) {
+        const detail = (err.response.data as ApiError).detail;
+        throw new Error(typeof detail === "string" ? detail : "Failed to fetch access requests.");
+      }
+      throw new Error(err instanceof Error ? err.message : "An unexpected error occurred.");
+    }
+  },
+
+  async createAccessRequest(data: CreateAccessRequest): Promise<AccessRequestResponse> {
+    try {
+      const response = await itApi.post<AccessRequestResponse>("/access", data);
+      return response.data;
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err) && err.response?.data) {
+        const detail = (err.response.data as ApiError).detail;
+        throw new Error(typeof detail === "string" ? detail : "Failed to create access request.");
       }
       throw new Error(err instanceof Error ? err.message : "An unexpected error occurred.");
     }

@@ -39,6 +39,15 @@ export const hrRepository = {
     }
   },
 
+  async updateMyProfile(data: any): Promise<EmployeeResponse> {
+    try {
+      const response = await hrApi.patch<EmployeeResponse>("/employees/me/personal-info", data);
+      return response.data;
+    } catch (err: unknown) {
+      return handleApiError(err, "Failed to update your profile.");
+    }
+  },
+
   async getMyTodayAttendance(): Promise<import("@/types/hr").AttendanceResponse | null> {
     try {
       const response = await hrApi.get<import("@/types/hr").AttendanceResponse | null>("/attendance/me/today");
@@ -153,6 +162,24 @@ export const hrRepository = {
       return response.data;
     } catch (err: unknown) {
       return handleApiError(err, "Failed to fetch leave requests.");
+    }
+  },
+
+  async getMyLeaveRequests(): Promise<import("@/types/hr").LeaveRequestResponse[]> {
+    try {
+      const response = await hrApi.get<import("@/types/hr").LeaveRequestResponse[]>("/leave-requests/my");
+      return response.data;
+    } catch (err: unknown) {
+      return handleApiError(err, "Failed to fetch your leave requests.");
+    }
+  },
+
+  async createLeaveRequest(data: any): Promise<import("@/types/hr").LeaveRequestResponse> {
+    try {
+      const response = await hrApi.post<import("@/types/hr").LeaveRequestResponse>("/leave-requests", data);
+      return response.data;
+    } catch (err: unknown) {
+      return handleApiError(err, "Failed to create leave request.");
     }
   },
 

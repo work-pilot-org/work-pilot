@@ -13,6 +13,7 @@ from modules.coordinator.constants import MAX_TOOL_RETRIES
 from modules.coordinator.exceptions import ToolExecutionError
 from modules.coordinator.planner import ExecutionPlan
 from modules.coordinator.registry import agent_registry
+import httpx
 
 
 logger = get_logger(__name__)
@@ -112,7 +113,14 @@ class ToolExecutor:
                 # We strictly reuse the existing `run` interface found on your agents
                 return await agent.run(message=message, headers=headers)
                 
-            except Exception as e:
+            except httpx.HTTPStatusError as e:
+                if e.response.status_code in (401, 403):
+                    logger.warning(
+                        "Permission denied by downstream service",
+                        agent_name=agent_name,
+                        status_code=e.response.status_code
+                    )
+                    return f"Action Denied: The user does not have the required permissions to perform this action (Status {e.response.status_code}). Please politely inform the user that they lack the necessary access rights."
                 last_error = e
                 logger.warning(
                     "Specialist agent execution failed, retrying...",
