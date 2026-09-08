@@ -34,14 +34,14 @@ async def update_license(
         license_id,
         payload,
         headers,
-    )
+     headers=headers)
 
 
 async def delete_license(license_id: UUID, headers=None):
     return await it_client.delete_license(
         license_id,
         headers,
-    )
+     headers=headers)
 
 
 async def assign_license(
@@ -53,7 +53,7 @@ async def assign_license(
         license_id,
         payload,
         headers,
-    )
+     headers=headers)
 
 
 async def return_license(
@@ -63,7 +63,7 @@ async def return_license(
     return await it_client.return_license(
         license_id,
         headers,
-    )
+     headers=headers)
 
 
 async def list_license_assignments(
@@ -73,7 +73,7 @@ async def list_license_assignments(
     return await it_client.list_license_assignments(
         license_id,
         headers,
-    )
+     headers=headers)
 
 
 tool_registry.register("create_license", create_license)

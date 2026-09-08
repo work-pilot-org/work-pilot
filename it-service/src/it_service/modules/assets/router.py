@@ -4,7 +4,7 @@ from shared_infrastructure.core.security import get_current_user
 from fastapi import APIRouter, Depends, Query, status, BackgroundTasks
 from sqlalchemy.orm import Session
 
-from shared_infrastructure.core.dependencies import require_permissions
+from shared_infrastructure.core.dependencies import require_permissions, verify_asset_ownership
 from shared_infrastructure.core.rbac import Permission
 from shared_infrastructure.database.session import get_db
 from shared_infrastructure.publisher import publish_event
@@ -25,7 +25,6 @@ router = APIRouter(
     tags=["Assets"],
     dependencies=[
         Depends(get_current_user),
-        Depends(require_permissions([Permission.ASSETS_MANAGE]))
     ],
 )
 
@@ -34,7 +33,7 @@ def get_asset_service() -> AssetService:
     return AssetService(repository=AssetRepository())
 
 
-@router.post("", response_model=AssetResponse, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=AssetResponse, status_code=status.HTTP_201_CREATED, dependencies=[Depends(require_permissions([Permission.ASSETS_MANAGE]))])
 def create_asset(
     payload: CreateAssetRequest,
     background_tasks: BackgroundTasks,
@@ -60,7 +59,7 @@ def create_asset(
     return asset
 
 
-@router.get("", response_model=list[AssetResponse])
+@router.get("", response_model=list[AssetResponse], dependencies=[Depends(require_permissions([Permission.ASSETS_MANAGE]))])
 def list_assets(
     category: AssetCategory | None = Query(None),
     status: AssetStatus | None = Query(None),
@@ -82,16 +81,41 @@ def list_assets(
     )
 
 
+@router.get("/my", response_model=list[AssetResponse])
+def list_my_assets(
+    category: AssetCategory | None = Query(None),
+    status: AssetStatus | None = Query(None),
+    search: str | None = Query(None),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, ge=1, le=100),
+    db: Session = Depends(get_db),
+    service: AssetService = Depends(get_asset_service),
+    current_user: dict = Depends(get_current_user),
+):
+    assigned_to = uuid.UUID(current_user.get("sub"))
+    return service.list_assets(
+        db,
+        category=category,
+        status=status,
+        assigned_to=assigned_to,
+        search=search,
+        skip=skip,
+        limit=limit,
+    )
+
+
 @router.get("/{asset_id}", response_model=AssetResponse)
 def get_asset(
     asset_id: uuid.UUID,
     db: Session = Depends(get_db),
     service: AssetService = Depends(get_asset_service),
+    current_user: dict = Depends(get_current_user),
 ):
+    verify_asset_ownership(asset_id, current_user, db, bypass_permissions=[Permission.ASSETS_MANAGE])
     return service.get_asset(db, asset_id)
 
 
-@router.put("/{asset_id}", response_model=AssetResponse)
+@router.put("/{asset_id}", response_model=AssetResponse, dependencies=[Depends(require_permissions([Permission.ASSETS_MANAGE]))])
 def update_asset(
     asset_id: uuid.UUID,
     payload: UpdateAssetRequest,
@@ -118,7 +142,7 @@ def update_asset(
     return asset
 
 
-@router.post("/{asset_id}/assign", response_model=AssetResponse)
+@router.post("/{asset_id}/assign", response_model=AssetResponse, dependencies=[Depends(require_permissions([Permission.ASSETS_MANAGE]))])
 def assign_asset(
     asset_id: uuid.UUID,
     payload: AssignAssetRequest,
@@ -144,7 +168,7 @@ def assign_asset(
     return asset
 
 
-@router.post("/{asset_id}/return", response_model=AssetResponse)
+@router.post("/{asset_id}/return", response_model=AssetResponse, dependencies=[Depends(require_permissions([Permission.ASSETS_MANAGE]))])
 def return_asset(
     asset_id: uuid.UUID,
     background_tasks: BackgroundTasks,
@@ -175,7 +199,7 @@ def return_asset(
     return asset
 
 
-@router.delete("/{asset_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{asset_id}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(require_permissions([Permission.ASSETS_MANAGE]))])
 def delete_asset(
     asset_id: uuid.UUID,
     db: Session = Depends(get_db),

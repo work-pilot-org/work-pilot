@@ -31,7 +31,7 @@ async def create_leave_type(
 ):
     return await hr_client.create_leave_type(
         payload=payload.model_dump(mode="json"),
-    )
+     headers=headers)
 
 
 async def get_leave_types(
@@ -46,7 +46,7 @@ async def get_leave_type(
 ):
     return await hr_client.get_leave_type(
         leave_type_id=leave_type_id,
-    )
+     headers=headers)
 
 
 async def update_leave_type(
@@ -57,7 +57,7 @@ async def update_leave_type(
     return await hr_client.update_leave_type(
         leave_type_id=leave_type_id,
         payload=payload.model_dump(exclude_unset=True),
-    )
+     headers=headers)
 
 
 async def delete_leave_type(
@@ -66,7 +66,7 @@ async def delete_leave_type(
 ):
     return await hr_client.delete_leave_type(
         leave_type_id=leave_type_id,
-    )
+     headers=headers)
 
 
 # ==========================================================
@@ -79,7 +79,7 @@ async def create_leave_request(
 ):
     return await hr_client.create_leave_request(
         payload=payload.model_dump(mode="json"),
-    )
+     headers=headers)
 
 
 async def get_all_leave_requests(
@@ -94,7 +94,7 @@ async def get_leave_request(
 ):
     return await hr_client.get_leave_request(
         leave_request_id=str(leave_request_id),
-    )
+     headers=headers)
 
 
 async def update_leave_request(
@@ -105,7 +105,7 @@ async def update_leave_request(
     return await hr_client.update_leave_request(
         leave_request_id=str(leave_request_id),
         payload=payload.model_dump(exclude_unset=True),
-    )
+     headers=headers)
 
 
 async def update_leave_request_status(
@@ -116,7 +116,7 @@ async def update_leave_request_status(
     return await hr_client.update_leave_request_status(
         leave_request_id=str(leave_request_id),
         payload=payload.model_dump(),
-    )
+     headers=headers)
 
 
 async def cancel_leave_request(
@@ -125,7 +125,7 @@ async def cancel_leave_request(
 ):
     return await hr_client.cancel_leave_request(
         leave_request_id=str(leave_request_id),
-    )
+     headers=headers)
 
 
 # ==========================================================
@@ -133,33 +133,51 @@ async def cancel_leave_request(
 # ==========================================================
 
 async def get_employee_leave_requests(
-    employee_id: UUID,
+    employee_id: UUID | None = None,
     headers: dict[str, str] | None = None,
 ):
+
+    if employee_id is None:
+        me = await hr_client.get_my_employee(headers=headers)
+        if not me or "id" not in me:
+            return {"error": "[STATUS: FAILED] I couldn't find an employee profile linked to your account. Please contact HR."}
+        employee_id = me["id"]
     return await hr_client.get_employee_leave_requests(
         employee_id=str(employee_id),
-    )
+     headers=headers)
 
 
 async def get_employee_leave_balance(
-    employee_id: UUID,
+    employee_id: UUID | None = None,
     headers: dict[str, str] | None = None,
 ):
+
+    if employee_id is None:
+        me = await hr_client.get_my_employee(headers=headers)
+        if not me or "id" not in me:
+            return {"error": "[STATUS: FAILED] I couldn't find an employee profile linked to your account. Please contact HR."}
+        employee_id = me["id"]
     result = await hr_client.get_employee_leave_balance(
         employee_id=str(employee_id),
-    )
+     headers=headers)
     if result is not None and not result.get("balances"):
         return {"error": "leave balance not initialized"}
     return result
 
 
 async def get_employee_leave_summary(
-    employee_id: UUID,
+    employee_id: UUID | None = None,
     headers: dict[str, str] | None = None,
 ):
+
+    if employee_id is None:
+        me = await hr_client.get_my_employee(headers=headers)
+        if not me or "id" not in me:
+            return {"error": "[STATUS: FAILED] I couldn't find an employee profile linked to your account. Please contact HR."}
+        employee_id = me["id"]
     return await hr_client.get_employee_leave_summary(
         employee_id=str(employee_id),
-    )
+     headers=headers)
 
 
 # ==========================================================
@@ -172,7 +190,7 @@ async def create_leave_balance(
 ):
     return await hr_client.create_leave_balance(
         payload=payload.model_dump(mode="json"),
-    )
+     headers=headers)
 
 async def bulk_create_leave_balance(
     payload: BulkCreateLeaveBalanceToolInput,
@@ -196,7 +214,7 @@ async def get_leave_balance(
 ):
     return await hr_client.get_leave_balance(
         balance_id=str(balance_id),
-    )
+     headers=headers)
 
 
 async def update_leave_balance(
@@ -207,7 +225,7 @@ async def update_leave_balance(
     return await hr_client.update_leave_balance(
         balance_id=str(balance_id),
         payload=payload.model_dump(exclude_unset=True),
-    )
+     headers=headers)
 
 
 async def delete_leave_balance(
@@ -216,7 +234,7 @@ async def delete_leave_balance(
 ):
     return await hr_client.delete_leave_balance(
         balance_id=str(balance_id),
-    )
+     headers=headers)
 
 
 # ==========================================================
@@ -237,7 +255,7 @@ async def monthly_leave_report(
     return await hr_client.monthly_leave_report(
         year=year,
         month=month,
-    )
+     headers=headers)
 
 
 async def department_leave_report(
@@ -246,7 +264,7 @@ async def department_leave_report(
 ):
     return await hr_client.department_leave_report(
         department_id=str(department_id),
-    )
+     headers=headers)
 
 
 async def leave_calendar(
@@ -257,7 +275,7 @@ async def leave_calendar(
     events = await hr_client.leave_calendar(
         start_date=start_date,
         end_date=end_date,
-        )
+         headers=headers)
     
     if not isinstance(events, list):
         return events
@@ -282,7 +300,7 @@ async def create_holiday(
 ):
     return await hr_client.create_holiday(
         payload=payload.model_dump(mode="json"),
-    )
+     headers=headers)
 
 
 async def get_holidays(
@@ -297,7 +315,7 @@ async def delete_holiday(
 ):
     return await hr_client.delete_holiday(
         holiday_id=str(holiday_id),
-    )
+     headers=headers)
 
 
 # ==========================================================

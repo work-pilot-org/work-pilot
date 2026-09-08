@@ -27,7 +27,7 @@ async def create_asset(
     """
     return await it_client.create_asset(
         payload=payload,
-        )
+         headers=headers)
 
 
 async def list_assets(
@@ -43,14 +43,27 @@ async def list_assets(
     """
     List IT assets.
     """
-    return await it_client.list_assets(
-        category=category,
-        status=status,
-        assigned_to=assigned_to,
-        search=search,
-        skip=skip,
-        limit=limit,
+    try:
+        return await it_client.list_assets(
+            category=category,
+            status=status,
+            assigned_to=assigned_to,
+            search=search,
+            skip=skip,
+            limit=limit,
+            headers=headers
         )
+    except Exception as e:
+        if "403" in str(e) and assigned_to is None:
+            return await it_client.list_my_assets(
+                category=category,
+                status=status,
+                search=search,
+                skip=skip,
+                limit=limit,
+                headers=headers
+            )
+        raise e
 
 
 async def get_asset(
@@ -62,7 +75,7 @@ async def get_asset(
     """
     return await it_client.get_asset(
         asset_id=asset_id,
-        )
+         headers=headers)
 
 
 async def update_asset(
@@ -76,7 +89,7 @@ async def update_asset(
     return await it_client.update_asset(
         asset_id=asset_id,
         payload=payload,
-        )
+         headers=headers)
 
 
 async def delete_asset(
@@ -88,7 +101,7 @@ async def delete_asset(
     """
     return await it_client.delete_asset(
         asset_id=asset_id,
-        )
+         headers=headers)
 
 
 async def assign_asset(
@@ -102,7 +115,7 @@ async def assign_asset(
     return await it_client.assign_asset(
         asset_id=asset_id,
         payload=payload,
-        )
+         headers=headers)
 
 
 async def return_asset(
@@ -114,7 +127,7 @@ async def return_asset(
     """
     return await it_client.return_asset(
         asset_id=asset_id,
-        )
+         headers=headers)
 
 
 # ==========================================================

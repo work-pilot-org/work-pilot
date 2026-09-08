@@ -19,27 +19,24 @@ interface Conversation {
 }
 
 export default function AIWorkspacePage() {
-  const [conversations, setConversations] = useState<Conversation[]>([
-    {
-      id: "default",
-      title: "New Conversation",
-      date: new Date().toLocaleDateString(),
-      messages: [
-        {
-          id: "1",
-          role: "ai",
-          content: "Hello. I'm WorkPilot AI. I can help you analyze organizational data, manage requests, or answer questions about company policies. What would you like to do?"
-        }
-      ]
-    }
-  ]);
+  const [conversations, setConversations] = useState<ConversationResponse[]>([]);
   
-  const [activeId, setActiveId] = useState<string>("default");
+  const [activeId, setActiveId] = useState<string | null>(null);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const activeConversation = conversations.find(c => c.id === activeId);
+
+  useEffect(() => {
+    // Load conversations on mount
+    aiRepository.getConversations().then(data => {
+      setConversations(data);
+      if (data.length > 0) {
+        setActiveId(data[0].id);
+      }
+    }).catch(console.error);
+  }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -51,39 +48,44 @@ export default function AIWorkspacePage() {
     setInputValue("");
     setIsTyping(true);
     
-    // Add user message
+    // Optimistic user message update
     const userMsgId = Date.now().toString();
-    setConversations(prev => prev.map(c => {
-      if (c.id === activeId) {
-        return {
-          ...c,
-          title: c.messages.length === 1 ? content.slice(0, 30) + "..." : c.title,
-          messages: [...c.messages, { id: userMsgId, role: "user", content }]
-        };
-      }
-      return c;
-    }));
+    const newUserMsg: MessageResponse = { id: userMsgId, role: "user", content, created_at: new Date().toISOString() };
     
-    try {
-      const response = await aiRepository.chat({ message: content });
-      
+    if (activeId) {
       setConversations(prev => prev.map(c => {
         if (c.id === activeId) {
-          return {
-            ...c,
-            messages: [...c.messages, { id: (Date.now() + 1).toString(), role: "ai", content: response.data }]
-          };
+          return { ...c, messages: [...c.messages, newUserMsg] };
         }
         return c;
       }));
+    } else {
+      // Temporary state while backend creates it
+      const tempId = "temp-" + Date.now();
+      setActiveId(tempId);
+      setConversations(prev => [{ id: tempId, title: "New Conversation", date: "Today", messages: [newUserMsg] }, ...prev]);
+    }
+    
+    try {
+      const response = await aiRepository.chat({ 
+        message: content,
+        conversation_id: activeId && !activeId.startsWith("temp-") ? activeId : undefined
+      });
+      
+      const newAiMsg: MessageResponse = { id: (Date.now() + 1).toString(), role: "ai", content: response.data, created_at: new Date().toISOString() };
+      
+      // Refresh all conversations to get updated title/list
+      const latestConvs = await aiRepository.getConversations();
+      setConversations(latestConvs);
+      if (response.conversation_id) {
+          setActiveId(response.conversation_id);
+      }
     } catch (error: any) {
       const errorMessage = error.response?.data?.detail || "Failed to communicate with AI.";
+      const errorMsg: MessageResponse = { id: (Date.now() + 1).toString(), role: "ai", content: errorMessage, created_at: new Date().toISOString() };
       setConversations(prev => prev.map(c => {
-        if (c.id === activeId) {
-          return {
-            ...c,
-            messages: [...c.messages, { id: (Date.now() + 1).toString(), role: "ai", content: errorMessage }]
-          };
+        if (c.id === activeId || (c.id.startsWith("temp-") && activeId?.startsWith("temp-"))) {
+          return { ...c, messages: [...c.messages, errorMsg] };
         }
         return c;
       }));
@@ -100,18 +102,7 @@ export default function AIWorkspacePage() {
   };
 
   const startNewConversation = () => {
-    const newId = Date.now().toString();
-    setConversations(prev => [{
-      id: newId,
-      title: "New Conversation",
-      date: new Date().toLocaleDateString(),
-      messages: [{
-        id: "1",
-        role: "ai",
-        content: "How can I help you today?"
-      }]
-    }, ...prev]);
-    setActiveId(newId);
+    setActiveId(null);
   };
 
   return (
@@ -173,6 +164,16 @@ export default function AIWorkspacePage() {
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 scroll-smooth">
+          {!activeConversation && !isTyping && (
+            <div className="flex flex-col items-center justify-center h-full text-center space-y-4 text-muted-foreground">
+              <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-2">
+                <Sparkles className="w-8 h-8 text-primary" />
+              </div>
+              <h3 className="text-xl font-medium text-foreground">How can I help you today?</h3>
+              <p className="max-w-md text-sm">Ask me about your organization's data, request time off, or query IT issues.</p>
+            </div>
+          )}
+          
           {activeConversation?.messages.map((msg) => {
             const isAi = msg.role === "ai";
             return (

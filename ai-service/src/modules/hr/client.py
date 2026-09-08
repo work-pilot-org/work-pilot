@@ -297,6 +297,16 @@ class HRClient:
             headers=headers
         )
 
+    async def get_my_employee(
+        self,
+        headers: dict[str, str] | None = None,
+    ):
+        return await self._request(
+            "GET",
+            "/employees/me",
+            headers=headers
+        )
+
     async def get_employee_profile(
         self,
         employee_id: str,

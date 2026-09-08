@@ -34,7 +34,7 @@ async def update_maintenance_record(
         maintenance_id,
         payload,
         headers,
-    )
+     headers=headers)
 
 
 async def delete_maintenance_record(
@@ -44,7 +44,7 @@ async def delete_maintenance_record(
     return await it_client.delete_maintenance_record(
         maintenance_id,
         headers,
-    )
+     headers=headers)
 
 
 async def complete_maintenance(
@@ -56,7 +56,7 @@ async def complete_maintenance(
         maintenance_id,
         payload,
         headers,
-    )
+     headers=headers)
 
 
 async def list_device_maintenance(
@@ -66,7 +66,7 @@ async def list_device_maintenance(
     return await it_client.list_device_maintenance(
         device_id,
         headers,
-    )
+     headers=headers)
 
 
 tool_registry.register(

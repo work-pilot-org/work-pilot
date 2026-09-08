@@ -27,7 +27,7 @@ async def create_department(
 ):
     return await hr_client.create_department(
         payload=payload.model_dump(mode="json"),
-    )
+     headers=headers)
 
 
 async def get_departments(
@@ -44,7 +44,7 @@ async def update_department(
     return await hr_client.update_department(
         department_id=department_id,
         payload=payload.model_dump(exclude_unset=True),
-    )
+     headers=headers)
 
 
 async def delete_department(
@@ -53,7 +53,7 @@ async def delete_department(
 ):
     return await hr_client.delete_department(
         department_id=department_id,
-    )
+     headers=headers)
 
 
 # ==========================================================
@@ -66,7 +66,7 @@ async def create_designation(
 ):
     return await hr_client.create_designation(
         payload=payload.model_dump(mode="json"),
-    )
+     headers=headers)
 
 
 async def get_designations(
@@ -83,7 +83,7 @@ async def update_designation(
     return await hr_client.update_designation(
         designation_id=designation_id,
         payload=payload.model_dump(exclude_unset=True),
-    )
+     headers=headers)
 
 
 async def delete_designation(
@@ -92,7 +92,7 @@ async def delete_designation(
 ):
     return await hr_client.delete_designation(
         designation_id=designation_id,
-    )
+     headers=headers)
 
 
 # ==========================================================
@@ -105,7 +105,7 @@ async def create_branch(
 ):
     return await hr_client.create_branch(
         payload=payload.model_dump(mode="json"),
-    )
+     headers=headers)
 
 
 async def get_branches(
@@ -122,7 +122,7 @@ async def update_branch(
     return await hr_client.update_branch(
         branch_id=branch_id,
         payload=payload.model_dump(exclude_unset=True),
-    )
+     headers=headers)
 
 
 async def delete_branch(
@@ -131,7 +131,7 @@ async def delete_branch(
 ):
     return await hr_client.delete_branch(
         branch_id=branch_id,
-    )
+     headers=headers)
 
 
 # ==========================================================
@@ -144,7 +144,7 @@ async def create_shift(
 ):
     return await hr_client.create_shift(
         payload=payload.model_dump(mode="json"),
-    )
+     headers=headers)
 
 
 async def get_shifts(
@@ -161,7 +161,7 @@ async def update_shift(
     return await hr_client.update_shift(
         shift_id=shift_id,
         payload=payload.model_dump(exclude_unset=True),
-    )
+     headers=headers)
 
 
 async def delete_shift(
@@ -170,7 +170,7 @@ async def delete_shift(
 ):
     return await hr_client.delete_shift(
         shift_id=shift_id,
-    )
+     headers=headers)
 
 
 # ==========================================================

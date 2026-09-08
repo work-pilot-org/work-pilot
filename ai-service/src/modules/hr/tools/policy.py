@@ -29,7 +29,7 @@ async def create_leave_policy(
 ):
     return await hr_client.create_leave_policy(
         payload=payload.model_dump(mode="json"),
-    )
+     headers=headers)
 
 
 async def get_leave_policies(
@@ -53,7 +53,7 @@ async def update_leave_policy(
     return await hr_client.update_leave_policy(
         policy_id=policy_id,
         payload=payload.model_dump(exclude_unset=True),
-    )
+     headers=headers)
 
 
 async def delete_leave_policy(
@@ -73,7 +73,7 @@ async def create_attendance_policy(
 ):
     return await hr_client.create_attendance_policy(
         payload=payload.model_dump(mode="json"),
-    )
+     headers=headers)
 
 
 async def get_attendance_policies(
@@ -97,7 +97,7 @@ async def update_attendance_policy(
     return await hr_client.update_attendance_policy(
         policy_id=policy_id,
         payload=payload.model_dump(exclude_unset=True),
-    )
+     headers=headers)
 
 
 async def delete_attendance_policy(
@@ -117,7 +117,7 @@ async def create_shift_policy(
 ):
     return await hr_client.create_shift_policy(
         payload=payload.model_dump(mode="json"),
-    )
+     headers=headers)
 
 
 async def get_shift_policies(
@@ -141,7 +141,7 @@ async def update_shift_policy(
     return await hr_client.update_shift_policy(
         policy_id=policy_id,
         payload=payload.model_dump(exclude_unset=True),
-    )
+     headers=headers)
 
 
 async def delete_shift_policy(
@@ -161,7 +161,7 @@ async def create_holiday_policy(
 ):
     return await hr_client.create_holiday_policy(
         payload=payload.model_dump(mode="json"),
-    )
+     headers=headers)
 
 
 async def get_holiday_policies(
@@ -185,7 +185,7 @@ async def update_holiday_policy(
     return await hr_client.update_holiday_policy(
         policy_id=policy_id,
         payload=payload.model_dump(exclude_unset=True),
-    )
+     headers=headers)
 
 
 async def delete_holiday_policy(
@@ -205,7 +205,7 @@ async def create_probation_policy(
 ):
     return await hr_client.create_probation_policy(
         payload=payload.model_dump(mode="json"),
-    )
+     headers=headers)
 
 
 async def get_probation_policies(
@@ -229,7 +229,7 @@ async def update_probation_policy(
     return await hr_client.update_probation_policy(
         policy_id=policy_id,
         payload=payload.model_dump(exclude_unset=True),
-    )
+     headers=headers)
 
 
 async def delete_probation_policy(

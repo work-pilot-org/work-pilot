@@ -24,7 +24,7 @@ async def create_ticket(
     """
     return await it_client.create_ticket(
         payload=request,
-        )
+         headers=headers)
 
 
 async def list_tickets(
@@ -33,7 +33,12 @@ async def list_tickets(
     """
     List all help desk tickets.
     """
-    return await it_client.list_tickets(headers=headers)
+    try:
+        return await it_client.list_tickets(headers=headers)
+    except Exception as e:
+        if "403" in str(e):
+            return await it_client.list_my_tickets(headers=headers)
+        raise e
 
 
 async def get_ticket(
@@ -45,7 +50,7 @@ async def get_ticket(
     """
     return await it_client.get_ticket(
         ticket_id=ticket_id,
-        )
+         headers=headers)
 
 
 async def update_ticket(
@@ -59,7 +64,7 @@ async def update_ticket(
     return await it_client.update_ticket(
         ticket_id=ticket_id,
         payload=request,
-        )
+         headers=headers)
 
 
 async def assign_ticket(
@@ -73,7 +78,7 @@ async def assign_ticket(
     return await it_client.assign_ticket(
         ticket_id=ticket_id,
         payload=request,
-        )
+         headers=headers)
 
 
 # Register tools

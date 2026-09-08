@@ -16,6 +16,7 @@ from src.modules.employee.schemas import (
     EmployeeDocumentResponse,
     EmployeeProfileResponse,
     EmployeeProfileUpdate,
+    EmployeePersonalInfoUpdate,
     EmployeeResponse,
     EmployeeUpdate,
 )
@@ -105,7 +106,23 @@ def get_my_employee_profile(
     from uuid import UUID as UUIDType
     auth_user_id = UUIDType(current_user["sub"])
     service = EmployeeService(db)
-    return service.get_employee_by_auth_user(auth_user_id)
+    return service.get_employee_by_auth_user(UUID(current_user["sub"]))
+
+
+@router.patch(
+    "/me/personal-info",
+    response_model=EmployeeResponse,
+)
+def update_my_personal_info(
+    data: EmployeePersonalInfoUpdate,
+    current_user: dict = Depends(get_current_user_and_set_schema),
+    db: Session = Depends(get_db),
+):
+    service = EmployeeService(db)
+    employee = service.get_employee_by_auth_user(UUID(current_user["sub"]))
+    verify_employee_ownership(employee.id, current_user, db, bypass_permissions=[Permission.EMPLOYEE_MANAGE])
+    return service.update_personal_info(employee.id, data)
+
 
 
 
