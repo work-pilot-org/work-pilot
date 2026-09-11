@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { aiRepository } from "@/repositories/aiRepository";
+import { aiRepository, MessageResponse, ConversationResponse } from "@/repositories/aiRepository";
 import { Sparkles, Send, Bot, Clock, Plus, Settings2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
@@ -174,7 +174,7 @@ export default function AIWorkspacePage() {
             </div>
           )}
           
-          {activeConversation?.messages.map((msg) => {
+          {activeConversation?.messages.map((msg: MessageResponse) => {
             const isAi = msg.role === "ai";
             return (
               <div key={msg.id} className={`flex gap-4 max-w-4xl mx-auto ${isAi ? "" : "flex-row-reverse"}`}>

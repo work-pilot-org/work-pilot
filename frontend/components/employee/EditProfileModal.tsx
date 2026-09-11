@@ -38,7 +38,7 @@ export function EditProfileModal({ profile, onClose, onSuccess }: EditProfileMod
     defaultValues: {
       phone: profile.phone || "",
       work_location: profile.work_location || "",
-      gender: profile.gender || "",
+      gender: (profile.gender as "" | "MALE" | "FEMALE" | "OTHER" | undefined) || "",
       date_of_birth: profile.date_of_birth ? new Date(profile.date_of_birth).toISOString().split('T')[0] : "",
     },
   });
