@@ -51,8 +51,8 @@ async def get_employee(
 
 
 async def update_employee(
-    employee_id: UUID | None = None,
     payload: UpdateEmployeeToolInput,
+    employee_id: UUID | None = None,
     headers: dict[str, str] | None = None,
 ):
 
@@ -115,8 +115,8 @@ async def get_employee_profile(
 
 
 async def update_employee_profile(
-    employee_id: UUID | None = None,
     payload: UpdateEmployeeProfileToolInput,
+    employee_id: UUID | None = None,
     headers: dict[str, str] | None = None,
 ):
 
@@ -136,8 +136,8 @@ async def update_employee_profile(
 # ==========================================================
 
 async def upload_document(
-    employee_id: UUID | None = None,
     payload: UploadEmployeeDocumentToolInput,
+    employee_id: UUID | None = None,
     headers: dict[str, str] | None = None,
 ):
 
@@ -168,8 +168,8 @@ async def get_documents(
 
 
 async def delete_document(
-    employee_id: UUID | None = None,
     document_id: UUID,
+    employee_id: UUID | None = None,
     headers: dict[str, str] | None = None,
 ):
 
