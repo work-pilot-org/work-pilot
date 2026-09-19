@@ -8,6 +8,10 @@ from shared_infrastructure.core.dependencies import get_current_user_and_set_sch
 from shared_infrastructure.database.session import get_db
 from src.models.dimensions import DimWorkflow, DimDate, DimEmployee
 from src.models.facts import FactWorkflowExecution, FactWorkflowStep
+import os
+from src.capabilities.adx_queries.workflow import get_workflow_performance_adx
+
+USE_ADX_ANALYTICS = os.getenv("USE_ADX_ANALYTICS", "false").lower() == "true"
 
 router = APIRouter(
     prefix="/workflows",
@@ -24,6 +28,11 @@ def get_workflow_performance(
     """
     Get aggregate metrics about workflow executions.
     """
+    tenant_id = current_user.get("schema_name")
+    
+    if USE_ADX_ANALYTICS:
+        return get_workflow_performance_adx(tenant_id, workflow_id, execution_status)
+        
     query = db.query(
         DimWorkflow.name.label("workflow_name"),
         DimWorkflow.workflow_type,

@@ -6,6 +6,10 @@ from shared_infrastructure.database.session import get_db
 from shared_infrastructure.core.dependencies import get_current_user_and_set_schema
 from src.models.facts import FactITTicket, FactAssetAssignment
 from src.models.dimensions import DimAsset, DimEmployee
+import os
+from src.capabilities.adx_queries.it import get_ticket_summary_adx, get_asset_assignments_adx
+
+USE_ADX_ANALYTICS = os.getenv("USE_ADX_ANALYTICS", "false").lower() == "true"
 
 router = APIRouter(
     prefix="/analytics/it",
@@ -23,7 +27,11 @@ def get_ticket_summary(
     """
     Returns aggregated IT ticket data (e.g. counts by status, priority) scoped to the current tenant.
     """
+    tenant_id = current_user.get("schema_name")
     
+    if USE_ADX_ANALYTICS:
+        return get_ticket_summary_adx(tenant_id, category)
+        
     query = db.query(
         FactITTicket.status,
         FactITTicket.priority,
@@ -58,7 +66,11 @@ def get_asset_assignments(
     """
     Returns asset assignment analytics (current active assignments and historical assignment stats).
     """
+    tenant_id = current_user.get("schema_name")
     
+    if USE_ADX_ANALYTICS:
+        return get_asset_assignments_adx(tenant_id, status, category)
+        
     query = db.query(
         FactAssetAssignment.assignment_id,
         FactAssetAssignment.assignment_status,

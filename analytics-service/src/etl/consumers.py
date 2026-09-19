@@ -7,11 +7,45 @@ from shared_infrastructure.database.session import SessionLocal
 from src.etl.schemas import AttendancePayload, LeavePayload, EmployeePayload, TicketPayload, OrganizationPayload, WorkflowEventPayload
 from src.etl.schemas import AssetEventPayload
 from src.etl.loaders import load_attendance_event, load_leave_event, load_employee_event, load_ticket_event, load_organization_event, load_workflow_event, load_asset_event
-
-KAFKA_URL = os.getenv("KAFKA_URL", "redpanda:29092")
+from src.infrastructure.adx_client import get_ingest_client, get_ingestion_properties
+from azure.kusto.data.data_format import DataFormat
+import json
+import uuid
 
 # We instantiate the broker here, it will be started during FastAPI lifespan
 broker = KafkaBroker(KAFKA_URL)
+
+def _ingest_to_adx(event: EventEnvelope, logger: Logger):
+    """Dual-write event to ADX RawEvents table."""
+    try:
+        client = get_ingest_client()
+        props = get_ingestion_properties("RawEvents", format=DataFormat.MULTIJSON)
+        
+        # Prepare payload
+        payload_dict = event.payload.model_dump() if hasattr(event.payload, "model_dump") else event.payload
+        adx_row = {
+            "EventId": str(event.event_id),
+            "TenantId": str(event.tenant_id),
+            "EventType": event.event_type,
+            "EventTime": str(event.occurred_at),
+            "Payload": payload_dict
+        }
+        
+        # Ingest
+        import tempfile
+        with tempfile.NamedTemporaryFile("w+", delete=False, suffix=".json") as f:
+            f.write(json.dumps(adx_row) + "\n")
+            f_path = f.name
+            
+        with open(f_path, "r") as f:
+            client.ingest_from_file(f.name, ingestion_properties=props)
+            
+        os.remove(f_path)
+        logger.info(f"Successfully queued event {event.event_id} for ADX ingestion")
+    except Exception as e:
+        logger.error(f"Failed to ingest event {event.event_id} to ADX: {str(e)}")
+        # We don't raise here to avoid failing the PG transaction if ADX ingest fails temporarily
+
 
 @broker.subscriber("hr.attendance")
 async def handle_attendance_event(event: EventEnvelope[AttendancePayload], logger: Logger):
@@ -24,6 +58,7 @@ async def handle_attendance_event(event: EventEnvelope[AttendancePayload], logge
         try:
             load_attendance_event(db, event)
             db.commit()
+            _ingest_to_adx(event, logger)
             logger.info(f"Successfully processed event: {event.event_id}")
         except Exception as e:
             logger.error(f"Failed to process event {event.event_id}: {str(e)}")
@@ -45,6 +80,7 @@ async def handle_leave_event(event: EventEnvelope[LeavePayload], logger: Logger)
         try:
             load_leave_event(db, event)
             db.commit()
+            _ingest_to_adx(event, logger)
             logger.info(f"Successfully processed event: {event.event_id}")
         except Exception as e:
             logger.error(f"Failed to process event {event.event_id}: {str(e)}")
@@ -64,6 +100,7 @@ async def handle_employee_event(event: EventEnvelope[EmployeePayload], logger: L
         try:
             load_employee_event(db, event)
             db.commit()
+            _ingest_to_adx(event, logger)
             logger.info(f"Successfully processed event: {event.event_id}")
         except Exception as e:
             logger.error(f"Failed to process event {event.event_id}: {str(e)}")
@@ -83,6 +120,7 @@ async def handle_ticket_event(event: EventEnvelope[TicketPayload], logger: Logge
         try:
             load_ticket_event(db, event)
             db.commit()
+            _ingest_to_adx(event, logger)
             logger.info(f"Successfully processed event: {event.event_id}")
         except Exception as e:
             logger.error(f"Failed to process event {event.event_id}: {str(e)}")
@@ -102,6 +140,7 @@ async def handle_organization_event(event: EventEnvelope[OrganizationPayload], l
         try:
             load_organization_event(db, event)
             db.commit()
+            _ingest_to_adx(event, logger)
             logger.info(f"Successfully processed event: {event.event_id}")
         except Exception as e:
             logger.error(f"Failed to process event {event.event_id}: {str(e)}")
@@ -121,6 +160,7 @@ async def handle_workflow_event(event: EventEnvelope[WorkflowEventPayload], logg
         try:
             load_workflow_event(db, event)
             db.commit()
+            _ingest_to_adx(event, logger)
             logger.info(f"Successfully processed event: {event.event_id}")
         except Exception as e:
             logger.error(f"Failed to process event {event.event_id}: {str(e)}")
@@ -140,6 +180,7 @@ async def handle_asset_event(event: EventEnvelope[AssetEventPayload], logger: Lo
         try:
             load_asset_event(db, event)
             db.commit()
+            _ingest_to_adx(event, logger)
             logger.info(f"Successfully processed event: {event.event_id}")
         except Exception as e:
             logger.error(f"Failed to process event {event.event_id}: {str(e)}")
