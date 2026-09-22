@@ -1,0 +1,169 @@
+// 1. RawEvents Table (Staging)
+.create table RawEvents (
+    EventId: string,
+    TenantId: string,
+    EventType: string,
+    EventTime: datetime,
+    Payload: dynamic,
+    IngestedAt: datetime
+)
+
+// Add ingestion time default mapping
+.alter table RawEvents policy update 
+@'[{"Source": "RawEvents", "Query": "RawEvents | extend IngestedAt = ingestion_time()", "IsEnabled": "True", "IsTransactional": "False"}]'
+
+// 2. AttendanceEvents Table and Policy
+.create table AttendanceEvents (
+    EventId: string, 
+    TenantId: string, 
+    EmployeeId: string, 
+    Status: string, 
+    WorkedMinutes: int, 
+    OvertimeMinutes: int, 
+    EventTime: datetime
+)
+
+.create function ParseAttendanceEvents() {
+    RawEvents
+    | where EventType == "hr.attendance"
+    | project 
+        EventId,
+        TenantId,
+        EmployeeId = tostring(Payload.employee_id),
+        Status = tostring(Payload.status),
+        WorkedMinutes = toint(Payload.working_minutes),
+        OvertimeMinutes = toint(Payload.overtime_minutes),
+        EventTime
+}
+
+.alter table AttendanceEvents policy update 
+@'[{"Source": "RawEvents", "Query": "ParseAttendanceEvents()", "IsEnabled": "True", "IsTransactional": "False"}]'
+
+// 3. LeaveEvents Table and Policy
+.create table LeaveEvents (
+    EventId: string, 
+    TenantId: string, 
+    EmployeeId: string, 
+    LeaveRequestId: string,
+    Status: string, 
+    LeaveType: string,
+    RequestedDays: int,
+    EventTime: datetime
+)
+
+.create function ParseLeaveEvents() {
+    RawEvents
+    | where EventType == "hr.leave"
+    | project 
+        EventId,
+        TenantId,
+        EmployeeId = tostring(Payload.employee_id),
+        LeaveRequestId = tostring(Payload.leave_request_id),
+        Status = tostring(Payload.status),
+        LeaveType = tostring(Payload.leave_type),
+        RequestedDays = toint(Payload.total_days),
+        EventTime
+}
+
+.alter table LeaveEvents policy update 
+@'[{"Source": "RawEvents", "Query": "ParseLeaveEvents()", "IsEnabled": "True", "IsTransactional": "False"}]'
+
+// 4. TicketEvents Table and Policy
+.create table TicketEvents (
+    EventId: string, 
+    TenantId: string, 
+    RequesterId: string, 
+    TicketId: string,
+    Status: string, 
+    Priority: string,
+    Category: string,
+    EventTime: datetime
+)
+
+.create function ParseTicketEvents() {
+    RawEvents
+    | where EventType == "it.ticket"
+    | project 
+        EventId,
+        TenantId,
+        RequesterId = tostring(Payload.requester_id),
+        TicketId = tostring(Payload.ticket_id),
+        Status = tostring(Payload.status),
+        Priority = tostring(Payload.priority),
+        Category = tostring(Payload.category),
+        EventTime
+}
+
+.alter table TicketEvents policy update 
+@'[{"Source": "RawEvents", "Query": "ParseTicketEvents()", "IsEnabled": "True", "IsTransactional": "False"}]'
+
+// 5. WorkflowExecutionEvents Table and Policy
+.create table WorkflowExecutionEvents (
+    EventId: string, 
+    TenantId: string, 
+    WorkflowId: string, 
+    WorkflowName: string,
+    WorkflowType: string,
+    ExecutionId: string,
+    ExecutionStatus: string,
+    CompletionMinutes: int,
+    EventTime: datetime
+)
+
+.create function ParseWorkflowExecutionEvents() {
+    RawEvents
+    | where EventType startswith "workflow.execution."
+    | project 
+        EventId,
+        TenantId,
+        WorkflowId = tostring(Payload.workflow_id),
+        WorkflowName = tostring(Payload.workflow_name),
+        WorkflowType = tostring(Payload.entity_type),
+        ExecutionId = tostring(Payload.execution_id),
+        ExecutionStatus = tostring(Payload.status),
+        // Calculate completion minutes if it is the terminal event
+        CompletionMinutes = iff(tostring(Payload.status) in ("completed", "cancelled", "rejected"), 
+                                datetime_diff('minute', EventTime, todatetime(Payload.created_at)), 
+                                int(null)),
+        EventTime
+}
+
+.alter table WorkflowExecutionEvents policy update 
+@'[{"Source": "RawEvents", "Query": "ParseWorkflowExecutionEvents()", "IsEnabled": "True", "IsTransactional": "False"}]'
+
+// 6. AssetEvents Table and Policy
+.create table AssetEvents (
+    EventId: string, 
+    TenantId: string, 
+    AssetId: string, 
+    AssetName: string,
+    Category: string,
+    AssetStatus: string,
+    AssignmentId: string,
+    EmployeeId: string,
+    AssignmentStatus: string,
+    EventTime: datetime
+)
+
+.create function ParseAssetEvents() {
+    RawEvents
+    | where EventType startswith "it.asset."
+    | project 
+        EventId,
+        TenantId,
+        AssetId = tostring(Payload.asset_id),
+        AssetName = tostring(Payload.name),
+        Category = tostring(Payload.category),
+        AssetStatus = tostring(Payload.status),
+        AssignmentId = tostring(Payload.assignment_id),
+        EmployeeId = tostring(Payload.employee_id),
+        AssignmentStatus = case(
+            EventType == "it.asset.assigned", "ACTIVE",
+            EventType == "it.asset.returned", "RETURNED",
+            "UNKNOWN"
+        ),
+        EventTime
+}
+
+.alter table AssetEvents policy update 
+@'[{"Source": "RawEvents", "Query": "ParseAssetEvents()", "IsEnabled": "True", "IsTransactional": "False"}]'

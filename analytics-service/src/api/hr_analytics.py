@@ -6,6 +6,10 @@ from shared_infrastructure.database.session import get_db
 from shared_infrastructure.core.dependencies import get_current_user_and_set_schema
 from src.models.facts import FactAttendance, FactLeave
 from src.models.dimensions import DimEmployee
+import os
+from src.capabilities.adx_queries.hr import get_attendance_summary_adx, get_leave_utilization_adx
+
+USE_ADX_ANALYTICS = os.getenv("USE_ADX_ANALYTICS", "false").lower() == "true"
 
 router = APIRouter(
     prefix="/analytics/hr",
@@ -21,7 +25,11 @@ def get_attendance_summary(
     """
     Returns aggregated attendance data (e.g. total worked hours) scoped to the current tenant.
     """
+    tenant_id = current_user.get("schema_name")
     
+    if USE_ADX_ANALYTICS:
+        return get_attendance_summary_adx(tenant_id)
+        
     summary = db.query(
         FactAttendance.attendance_status,
         func.sum(FactAttendance.worked_minutes).label("total_worked_minutes"),
@@ -53,7 +61,11 @@ def get_leave_utilization(
     """
     Returns aggregated leave utilization (e.g. total days requested, pending, approved) scoped to the current tenant.
     """
+    tenant_id = current_user.get("schema_name")
     
+    if USE_ADX_ANALYTICS:
+        return get_leave_utilization_adx(tenant_id, department)
+        
     query = db.query(
         FactLeave.leave_status,
         func.sum(FactLeave.leave_days_requested).label("total_days"),
