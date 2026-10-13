@@ -1,0 +1,31 @@
+# =============================================================
+# WorkPilot Azure Deployment Configuration Template
+# Copy this file to terraform.tfvars and fill in your values
+# =============================================================
+
+project_name = "workpilot"
+environment  = "dev"
+location     = "eastus"
+
+# Existing Resource Group (optional)
+# If set to an existing resource group like "workpilot-rg", Terraform will deploy all resources inside it
+resource_group_name = "workpilot-rg"
+
+# Database Configuration
+db_admin_username = "workpilotadmin"
+# db_admin_password = "ReplaceWithStrongPassword123!" # If omitted, a random password is automatically generated
+
+# Compute tier: B_Standard_B1ms is lowest cost burstable (~$15/month)
+db_sku_name   = "B_Standard_B1ms"
+db_storage_mb = 32768
+
+# API Keys & Secrets
+# jwt_secret_key = "ReplaceWithStrongJWTSecret" # If omitted, a random 32-char key is generated
+gemini_api_key = "your_google_gemini_api_key_here"
+resend_api_key = "your_resend_api_key_here"
+email_from     = "notifications@yourdomain.com"
+
+# Scaling: set container_min_replicas = 0 to scale to 0 when idle (saves money on dev)
+container_min_replicas = 0
+container_max_replicas = 2
+image_tag              = "latest"
