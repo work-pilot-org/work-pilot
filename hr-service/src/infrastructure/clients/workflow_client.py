@@ -8,7 +8,7 @@ from shared_infrastructure.core.config import settings
 
 class WorkflowClient:
     def __init__(self):
-        self.base_url = settings.WORKFLOW_SERVICE_URL if hasattr(settings, "WORKFLOW_SERVICE_URL") else "http://workflow-service:8000"
+        self.base_url = getattr(settings, "WORKFLOW_SERVICE_URL", None) or "http://workflow-service:8000"
 
     def start_workflow(self, entity_id: UUID, entity_type: str, workflow_name: str, requested_by: str, token: str | None = None) -> Any:
         """

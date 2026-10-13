@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/Badge";
 import { LoadingState } from "@/components/common/LoadingState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { Button } from "@/components/ui/Button";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import {
   UserCircle2,
   Clock,
@@ -74,191 +75,212 @@ export function EmployeeDashboard() {
   const checkedOut = !!attendance?.check_out;
 
   return (
-    <div className="flex flex-col space-y-6">
+    <div className="flex flex-col space-y-8 max-w-7xl mx-auto w-full">
       {/* Welcome Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-surface border border-border-strong rounded-xl p-6 shadow-sm">
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xl border-2 border-surface shadow-sm">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 py-2">
+        <div className="flex items-center gap-5">
+          <div className="w-14 h-14 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xl border-2 border-background shadow-sm shrink-0">
             {profile?.first_name?.[0] || ""}{profile?.last_name?.[0] || ""}
           </div>
           <div>
-            <h1 className="text-xl font-bold tracking-tight text-foreground">
-              Welcome back, {profile?.first_name || user?.name || "Employee"}!
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">
+              Welcome back, {profile?.first_name || user?.name || "Employee"}
             </h1>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-sm font-medium text-muted-foreground mt-1">
               {new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
             </p>
           </div>
         </div>
-        <Button variant="outline" className="shadow-sm" onClick={() => router.push('/dashboard/employee/leave')}>
+        <Button variant="primary" onClick={() => router.push('/dashboard/employee/leave')}>
           Request Leave
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {/* Attendance Action Card */}
-        <div className="lg:col-span-1 space-y-6">
-          <div className="bg-surface border border-border-strong rounded-xl shadow-sm p-6">
-            <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-4">Today's Shift</h3>
-            
-            <div className="flex items-center gap-3 mb-6">
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
-                checkedOut ? "bg-muted text-muted-foreground" :
-                checkedIn ? "bg-success/10 text-success" :
-                "bg-warning/10 text-warning"
-              }`}>
-                {checkedOut ? <LogOut className="w-5 h-5" /> : checkedIn ? <CheckCircle2 className="w-5 h-5" /> : <Clock className="w-5 h-5" />}
-              </div>
-              <div>
-                <p className="text-sm font-medium text-foreground">
-                  {checkedOut ? "Shift Complete" : checkedIn ? "Currently Working" : "Not Checked In"}
-                </p>
-                {attendance?.status && (
-                  <Badge variant={attendance.status === "PRESENT" ? "success" : "secondary"} className="mt-1">
-                    {attendance.status}
-                  </Badge>
-                )}
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <Button 
-                className="w-full shadow-sm"
-                disabled={!profile || checkedIn}
-                onClick={async () => {
-                  if (!profile) return;
-                  try {
-                    setIsLoading(true);
-                    await hrRepository.checkIn(profile.id);
-                    const newAtt = await hrRepository.getMyTodayAttendance();
-                    setAttendance(newAtt);
-                  } catch (err: any) {
-                    alert(err.message || "Failed to check in");
-                  } finally {
-                    setIsLoading(false);
-                  }
-                }}
-              >
-                <LogIn className="w-4 h-4 mr-2" />
-                Check In Now
-              </Button>
-              <Button 
-                variant="outline"
-                className="w-full shadow-sm"
-                disabled={!profile || !checkedIn || checkedOut}
-                onClick={async () => {
-                  if (!profile) return;
-                  try {
-                    setIsLoading(true);
-                    await hrRepository.checkOut(profile.id);
-                    const newAtt = await hrRepository.getMyTodayAttendance();
-                    setAttendance(newAtt);
-                  } catch (err: any) {
-                    alert(err.message || "Failed to check out");
-                  } finally {
-                    setIsLoading(false);
-                  }
-                }}
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Check Out
-              </Button>
-            </div>
-
-            {attendanceError && (
-              <div className="mt-4 text-xs text-destructive bg-destructive/10 p-3 rounded-lg flex items-start gap-2">
-                <AlertTriangle className="w-4 h-4 shrink-0" />
-                <span>{attendanceError}</span>
-              </div>
-            )}
-          </div>
+        {/* Main Content Area */}
+        <div className="lg:col-span-2 flex flex-col gap-8">
           
-          {/* Quick Links */}
-          <div className="bg-surface-hover/30 border border-border rounded-xl p-4 flex flex-col gap-2">
-            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-2">Quick Links</h3>
-            <button onClick={() => router.push('/dashboard/employee/attendance')} className="flex items-center justify-between p-2 rounded-lg hover:bg-surface transition-colors text-sm font-medium text-foreground">
-              <div className="flex items-center gap-2"><Calendar className="w-4 h-4 text-muted-foreground" /> Timesheets</div>
-              <ArrowRight className="w-4 h-4 text-muted-foreground" />
-            </button>
-            <button onClick={() => router.push('/dashboard/it/tickets')} className="flex items-center justify-between p-2 rounded-lg hover:bg-surface transition-colors text-sm font-medium text-foreground">
-              <div className="flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-muted-foreground" /> Report IT Issue</div>
-              <ArrowRight className="w-4 h-4 text-muted-foreground" />
-            </button>
-          </div>
-        </div>
-
-        {/* Profile & Context */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="bg-surface border border-border-strong rounded-xl shadow-sm">
-            <div className="px-6 py-4 border-b border-border flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
+          <Card>
+            <CardHeader className="border-b border-border/40 pb-4">
+              <CardTitle className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                 <UserCircle2 className="w-4 h-4" /> My Profile
-              </h3>
-            </div>
-            
-            {profile ? (
-              <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-8">
-                <div>
-                  <dt className="text-xs font-medium text-muted-foreground mb-1">Employee Code</dt>
-                  <dd className="text-sm font-medium text-foreground">{profile.employee_code}</dd>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {profile ? (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-6">
+                  <div>
+                    <dt className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">Employee Code</dt>
+                    <dd className="text-sm font-semibold text-foreground">{profile.employee_code}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">Employment Type</dt>
+                    <dd className="text-sm font-semibold text-foreground">{profile.employment_type}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">Status</dt>
+                    <dd>
+                      <Badge variant={profile.employment_status === "ACTIVE" ? "success" : "secondary"}>
+                        {profile.employment_status}
+                      </Badge>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">Joining Date</dt>
+                    <dd className="text-sm font-semibold text-foreground">
+                      {new Date(profile.joining_date).toLocaleDateString()}
+                    </dd>
+                  </div>
                 </div>
-                <div>
-                  <dt className="text-xs font-medium text-muted-foreground mb-1">Employment Type</dt>
-                  <dd className="text-sm font-medium text-foreground">{profile.employment_type}</dd>
+              ) : (
+                <div className="pt-6 text-center text-sm font-medium text-muted-foreground">
+                  Profile context unavailable.
                 </div>
-                <div>
-                  <dt className="text-xs font-medium text-muted-foreground mb-1">Status</dt>
-                  <dd>
-                    <Badge variant={profile.employment_status === "ACTIVE" ? "success" : "secondary"}>
-                      {profile.employment_status}
-                    </Badge>
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-xs font-medium text-muted-foreground mb-1">Joining Date</dt>
-                  <dd className="text-sm font-medium text-foreground">
-                    {new Date(profile.joining_date).toLocaleDateString()}
-                  </dd>
-                </div>
-              </div>
-            ) : (
-              <div className="p-12 text-center text-sm text-muted-foreground">
-                Profile context unavailable.
-              </div>
-            )}
-          </div>
+              )}
+            </CardContent>
+          </Card>
           
-          <div className="bg-surface border border-border-strong rounded-xl shadow-sm">
-            <div className="px-6 py-4 border-b border-border flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
+          <Card>
+            <CardHeader className="border-b border-border/40 pb-4">
+              <CardTitle className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                 <Clock className="w-4 h-4" /> Today's Log
-              </h3>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {attendance ? (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 pt-6">
+                  <div className="bg-surface border border-border/60 shadow-[var(--shadow-subtle)] p-5 rounded-xl text-center">
+                    <span className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">Time In</span>
+                    <span className="text-2xl font-bold text-foreground tracking-tight">{formatTime(attendance.check_in)}</span>
+                  </div>
+                  <div className="bg-surface border border-border/60 shadow-[var(--shadow-subtle)] p-5 rounded-xl text-center">
+                    <span className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">Time Out</span>
+                    <span className="text-2xl font-bold text-foreground tracking-tight">{formatTime(attendance.check_out)}</span>
+                  </div>
+                  <div className="bg-primary/5 border border-primary/10 p-5 rounded-xl text-center relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-3 opacity-10">
+                      <Clock className="w-12 h-12 text-primary" />
+                    </div>
+                    <span className="relative z-10 block text-[10px] font-bold text-primary uppercase tracking-widest mb-1.5">Hours Logged</span>
+                    <span className="relative z-10 text-2xl font-bold text-primary tracking-tight">{formatMinutes(attendance.working_minutes)}</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="pt-6 text-center text-sm font-medium text-muted-foreground">
+                  No active log for today. Check in to start tracking.
+                </div>
+              )}
+            </CardContent>
+          </Card>
+          
+        </div>
+
+        {/* Action Sidebar (Right Side) */}
+        <div className="lg:col-span-1 flex flex-col gap-8">
+          
+          <Card className="overflow-hidden relative shadow-[var(--shadow-sm)] border-border/80">
+            {/* Subtle background decoration */}
+            <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary/5 rounded-full blur-2xl -z-10" />
+            
+            <CardHeader className="pb-2 pt-6 border-none">
+              <CardTitle className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Today's Shift</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-4">
+              
+              <div className="flex items-center gap-4 mb-8">
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-[var(--shadow-subtle)] border ${
+                  checkedOut ? "bg-surface-hover text-muted-foreground border-border/50" :
+                  checkedIn ? "bg-success/10 text-success border-success/20" :
+                  "bg-warning/10 text-warning border-warning/20"
+                }`}>
+                  {checkedOut ? <LogOut className="w-5 h-5" /> : checkedIn ? <CheckCircle2 className="w-5 h-5" /> : <Clock className="w-5 h-5" />}
+                </div>
+                <div>
+                  <p className="text-base font-bold text-foreground tracking-tight">
+                    {checkedOut ? "Shift Complete" : checkedIn ? "Currently Working" : "Not Checked In"}
+                  </p>
+                  {attendance?.status && (
+                    <Badge variant={attendance.status === "PRESENT" ? "success" : "secondary"} className="mt-1.5">
+                      {attendance.status}
+                    </Badge>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <Button 
+                  variant="primary"
+                  className="w-full h-11 text-sm font-semibold"
+                  disabled={!profile || checkedIn}
+                  onClick={async () => {
+                    if (!profile) return;
+                    try {
+                      setIsLoading(true);
+                      await hrRepository.checkIn(profile.id);
+                      const newAtt = await hrRepository.getMyTodayAttendance();
+                      setAttendance(newAtt);
+                    } catch (err: any) {
+                      alert(err.message || "Failed to check in");
+                    } finally {
+                      setIsLoading(false);
+                    }
+                  }}
+                >
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Check In Now
+                </Button>
+                <Button 
+                  variant="secondary"
+                  className="w-full h-11 text-sm font-semibold"
+                  disabled={!profile || !checkedIn || checkedOut}
+                  onClick={async () => {
+                    if (!profile) return;
+                    try {
+                      setIsLoading(true);
+                      await hrRepository.checkOut(profile.id);
+                      const newAtt = await hrRepository.getMyTodayAttendance();
+                      setAttendance(newAtt);
+                    } catch (err: any) {
+                      alert(err.message || "Failed to check out");
+                    } finally {
+                      setIsLoading(false);
+                    }
+                  }}
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Check Out
+                </Button>
+              </div>
+
+              {attendanceError && (
+                <div className="mt-5 text-xs text-destructive bg-destructive/5 border border-destructive/20 p-3.5 rounded-lg flex items-start gap-2.5">
+                  <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                  <span className="leading-relaxed font-medium">{attendanceError}</span>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+          
+          {/* Quick Links as a clean list */}
+          <div>
+            <h3 className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest mb-3 px-2">Quick Actions</h3>
+            <div className="flex flex-col gap-1.5">
+              <button onClick={() => router.push('/dashboard/employee/attendance')} className="flex items-center justify-between p-3.5 rounded-xl hover:bg-surface-hover/80 transition-colors text-sm font-semibold text-foreground border border-transparent hover:border-border/40">
+                <div className="flex items-center gap-3"><Calendar className="w-4 h-4 text-muted-foreground" /> View Timesheets</div>
+                <ArrowRight className="w-4 h-4 text-muted-foreground/50" />
+              </button>
+              <button onClick={() => router.push('/dashboard/it/tickets')} className="flex items-center justify-between p-3.5 rounded-xl hover:bg-surface-hover/80 transition-colors text-sm font-semibold text-foreground border border-transparent hover:border-border/40">
+                <div className="flex items-center gap-3"><AlertTriangle className="w-4 h-4 text-muted-foreground" /> Report IT Issue</div>
+                <ArrowRight className="w-4 h-4 text-muted-foreground/50" />
+              </button>
             </div>
-            {attendance ? (
-              <div className="p-6 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
-                <div className="bg-surface-hover/50 p-4 rounded-lg">
-                  <span className="block text-xs font-medium text-muted-foreground mb-1">Time In</span>
-                  <span className="text-lg font-bold text-foreground">{formatTime(attendance.check_in)}</span>
-                </div>
-                <div className="bg-surface-hover/50 p-4 rounded-lg">
-                  <span className="block text-xs font-medium text-muted-foreground mb-1">Time Out</span>
-                  <span className="text-lg font-bold text-foreground">{formatTime(attendance.check_out)}</span>
-                </div>
-                <div className="bg-surface-hover/50 p-4 rounded-lg">
-                  <span className="block text-xs font-medium text-muted-foreground mb-1">Hours Logged</span>
-                  <span className="text-lg font-bold text-foreground">{formatMinutes(attendance.working_minutes)}</span>
-                </div>
-              </div>
-            ) : (
-              <div className="p-12 text-center text-sm text-muted-foreground">
-                No active log for today. Check in to start tracking.
-              </div>
-            )}
           </div>
           
         </div>
+
       </div>
     </div>
   );
 }
+

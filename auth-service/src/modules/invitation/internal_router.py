@@ -57,5 +57,7 @@ def create_invitation_internally(
             "email_sent": getattr(invitation, "email_sent", None),
             "invite_link": getattr(invitation, "invite_link", None)
         }
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -11,11 +11,11 @@ from typing import Any
 
 from shared_infrastructure.core.config import settings
 from core.logger import get_logger
+
 from modules.coordinator.intent_detector import intent_detector
 from modules.coordinator.planner import orchestration_planner
 from modules.coordinator.tool_executor import tool_executor
 from modules.coordinator.response_builder import response_builder
-
 
 logger = get_logger(__name__)
 

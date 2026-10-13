@@ -14,6 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/Table";
 import { Badge } from "@/components/ui/Badge";
+import { Card, CardContent } from "@/components/ui/Card";
 
 export function OrganizationStructureTab({ refreshTrigger = 0 }: { refreshTrigger?: number }) {
   const [activeSubTab, setActiveSubTab] = useState<"DEPARTMENTS" | "DESIGNATIONS" | "BRANCHES" | "SHIFTS">("DEPARTMENTS");
@@ -63,152 +64,160 @@ export function OrganizationStructureTab({ refreshTrigger = 0 }: { refreshTrigge
   }
 
   const renderDepartments = () => (
-    <div className="border rounded-lg overflow-hidden bg-white">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>ID</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead>Status</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {departments.length === 0 ? (
-            <TableRow><TableCell colSpan={4} className="text-center text-gray-500 py-6">No departments found.</TableCell></TableRow>
-          ) : (
-            departments.map((dep) => (
-              <TableRow key={dep.id}>
-                <TableCell className="font-medium">{dep.id}</TableCell>
-                <TableCell>{dep.name}</TableCell>
-                <TableCell>{dep.description || "-"}</TableCell>
-                <TableCell>
-                  <Badge variant={dep.is_active ? "success" : "secondary"}>
-                    {dep.is_active ? "Active" : "Inactive"}
-                  </Badge>
-                </TableCell>
-              </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
-    </div>
+    <Card>
+      <CardContent className="p-0">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>ID</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Description</TableHead>
+              <TableHead>Status</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {departments.length === 0 ? (
+              <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-12">No departments found.</TableCell></TableRow>
+            ) : (
+              departments.map((dep) => (
+                <TableRow key={dep.id}>
+                  <TableCell className="font-medium text-foreground">{dep.id}</TableCell>
+                  <TableCell>{dep.name}</TableCell>
+                  <TableCell>{dep.description || "-"}</TableCell>
+                  <TableCell>
+                    <Badge variant={dep.is_active ? "success" : "secondary"}>
+                      {dep.is_active ? "Active" : "Inactive"}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 
   const renderDesignations = () => (
-    <div className="border rounded-lg overflow-hidden bg-white">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>ID</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Department ID</TableHead>
-            <TableHead>Status</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {designations.length === 0 ? (
-            <TableRow><TableCell colSpan={4} className="text-center text-gray-500 py-6">No designations found.</TableCell></TableRow>
-          ) : (
-            designations.map((des) => (
-              <TableRow key={des.id}>
-                <TableCell className="font-medium">{des.id}</TableCell>
-                <TableCell>{des.name}</TableCell>
-                <TableCell>{des.department_id || "-"}</TableCell>
-                <TableCell>
-                  <Badge variant={des.is_active ? "success" : "secondary"}>
-                    {des.is_active ? "Active" : "Inactive"}
-                  </Badge>
-                </TableCell>
-              </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
-    </div>
+    <Card>
+      <CardContent className="p-0">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>ID</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Department ID</TableHead>
+              <TableHead>Status</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {designations.length === 0 ? (
+              <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-12">No designations found.</TableCell></TableRow>
+            ) : (
+              designations.map((des) => (
+                <TableRow key={des.id}>
+                  <TableCell className="font-medium text-foreground">{des.id}</TableCell>
+                  <TableCell>{des.name}</TableCell>
+                  <TableCell>{des.department_id || "-"}</TableCell>
+                  <TableCell>
+                    <Badge variant={des.is_active ? "success" : "secondary"}>
+                      {des.is_active ? "Active" : "Inactive"}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 
   const renderBranches = () => (
-    <div className="border rounded-lg overflow-hidden bg-white">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>ID</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Location</TableHead>
-            <TableHead>Address</TableHead>
-            <TableHead>Status</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {branches.length === 0 ? (
-            <TableRow><TableCell colSpan={5} className="text-center text-gray-500 py-6">No branches found.</TableCell></TableRow>
-          ) : (
-            branches.map((b) => (
-              <TableRow key={b.id}>
-                <TableCell className="font-medium">{b.id}</TableCell>
-                <TableCell>{b.name}</TableCell>
-                <TableCell>{b.location || "-"}</TableCell>
-                <TableCell>{b.address || "-"}</TableCell>
-                <TableCell>
-                  <Badge variant={b.is_active ? "success" : "secondary"}>
-                    {b.is_active ? "Active" : "Inactive"}
-                  </Badge>
-                </TableCell>
-              </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
-    </div>
+    <Card>
+      <CardContent className="p-0">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>ID</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Location</TableHead>
+              <TableHead>Address</TableHead>
+              <TableHead>Status</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {branches.length === 0 ? (
+              <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-12">No branches found.</TableCell></TableRow>
+            ) : (
+              branches.map((b) => (
+                <TableRow key={b.id}>
+                  <TableCell className="font-medium text-foreground">{b.id}</TableCell>
+                  <TableCell>{b.name}</TableCell>
+                  <TableCell>{b.location || "-"}</TableCell>
+                  <TableCell>{b.address || "-"}</TableCell>
+                  <TableCell>
+                    <Badge variant={b.is_active ? "success" : "secondary"}>
+                      {b.is_active ? "Active" : "Inactive"}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 
   const renderShifts = () => (
-    <div className="border rounded-lg overflow-hidden bg-white">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>ID</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Start Time</TableHead>
-            <TableHead>End Time</TableHead>
-            <TableHead>Status</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {shifts.length === 0 ? (
-            <TableRow><TableCell colSpan={5} className="text-center text-gray-500 py-6">No shifts found.</TableCell></TableRow>
-          ) : (
-            shifts.map((s) => (
-              <TableRow key={s.id}>
-                <TableCell className="font-medium">{s.id}</TableCell>
-                <TableCell>{s.name}</TableCell>
-                <TableCell>{s.start_time}</TableCell>
-                <TableCell>{s.end_time}</TableCell>
-                <TableCell>
-                  <Badge variant={s.is_active ? "success" : "secondary"}>
-                    {s.is_active ? "Active" : "Inactive"}
-                  </Badge>
-                </TableCell>
-              </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
-    </div>
+    <Card>
+      <CardContent className="p-0">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>ID</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Start Time</TableHead>
+              <TableHead>End Time</TableHead>
+              <TableHead>Status</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {shifts.length === 0 ? (
+              <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-12">No shifts found.</TableCell></TableRow>
+            ) : (
+              shifts.map((s) => (
+                <TableRow key={s.id}>
+                  <TableCell className="font-medium text-foreground">{s.id}</TableCell>
+                  <TableCell>{s.name}</TableCell>
+                  <TableCell>{s.start_time}</TableCell>
+                  <TableCell>{s.end_time}</TableCell>
+                  <TableCell>
+                    <Badge variant={s.is_active ? "success" : "secondary"}>
+                      {s.is_active ? "Active" : "Inactive"}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 
   return (
     <div className="space-y-6 mt-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold tracking-tight text-gray-900">Organization Structure</h2>
+        <h2 className="text-xl font-semibold tracking-tight text-foreground">Organization Structure</h2>
       </div>
 
-      <div className="flex gap-2 border-b border-gray-200 pb-2 overflow-x-auto">
+      <div className="flex gap-2 border-b border-border/40 pb-2 overflow-x-auto">
         <button
           onClick={() => setActiveSubTab("DEPARTMENTS")}
           className={`flex items-center px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-            activeSubTab === "DEPARTMENTS" ? "bg-indigo-50 text-indigo-700" : "text-gray-600 hover:bg-gray-50"
+            activeSubTab === "DEPARTMENTS" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-surface-hover"
           }`}
         >
           <Building2 className="w-4 h-4 mr-2" />
@@ -217,7 +226,7 @@ export function OrganizationStructureTab({ refreshTrigger = 0 }: { refreshTrigge
         <button
           onClick={() => setActiveSubTab("DESIGNATIONS")}
           className={`flex items-center px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-            activeSubTab === "DESIGNATIONS" ? "bg-indigo-50 text-indigo-700" : "text-gray-600 hover:bg-gray-50"
+            activeSubTab === "DESIGNATIONS" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-surface-hover"
           }`}
         >
           <Briefcase className="w-4 h-4 mr-2" />
@@ -226,7 +235,7 @@ export function OrganizationStructureTab({ refreshTrigger = 0 }: { refreshTrigge
         <button
           onClick={() => setActiveSubTab("BRANCHES")}
           className={`flex items-center px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-            activeSubTab === "BRANCHES" ? "bg-indigo-50 text-indigo-700" : "text-gray-600 hover:bg-gray-50"
+            activeSubTab === "BRANCHES" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-surface-hover"
           }`}
         >
           <MapPin className="w-4 h-4 mr-2" />
@@ -235,7 +244,7 @@ export function OrganizationStructureTab({ refreshTrigger = 0 }: { refreshTrigge
         <button
           onClick={() => setActiveSubTab("SHIFTS")}
           className={`flex items-center px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-            activeSubTab === "SHIFTS" ? "bg-indigo-50 text-indigo-700" : "text-gray-600 hover:bg-gray-50"
+            activeSubTab === "SHIFTS" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-surface-hover"
           }`}
         >
           <Clock className="w-4 h-4 mr-2" />

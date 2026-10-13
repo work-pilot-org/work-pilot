@@ -143,24 +143,24 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-64 bg-surface border-r border-border hidden md:flex flex-col h-full z-20 shadow-sm transition-all duration-300">
-      <div className="h-16 px-6 border-b border-border flex items-center gap-3">
+    <aside className="w-[260px] bg-background border-r border-border/50 hidden md:flex flex-col h-full z-20 transition-all duration-300">
+      <div className="h-16 px-6 flex items-center gap-3 mt-2">
         <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-sm">
-          <Briefcase className="w-4 h-4 text-white" />
+          <Briefcase className="w-4 h-4 text-primary-foreground" />
         </div>
         <div className="flex flex-col">
-          <h2 className="font-semibold text-foreground tracking-tight leading-none text-lg">WorkPilot</h2>
-          <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-widest mt-1">
-            {user?.domain ? user.domain : "WORKSPACE"}
+          <h2 className="font-bold text-foreground tracking-tight leading-none text-lg">WorkPilot</h2>
+          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest mt-1">
+            {user?.domain || "WORKSPACE"}
           </p>
         </div>
       </div>
 
       <nav className="flex-1 overflow-y-auto py-6">
-        <div className="px-4 mb-2">
-          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Main Menu</p>
+        <div className="px-6 mb-3">
+          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">Main Menu</p>
         </div>
-        <ul className="space-y-1 px-3">
+        <ul className="space-y-0.5 px-3">
           {visibleNavItems.map((item) => {
             const isExactActive = pathname === item.href;
             const isChildActive = item.href !== "/dashboard" && pathname.startsWith(`${item.href}/`);
@@ -180,35 +180,35 @@ export default function Sidebar() {
                         toggleExpand(item.name);
                       }
                     }}
-                    className={`flex-1 flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all group ${
+                    className={`flex-1 flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all group relative ${
                       isActive && !hasChildren
-                        ? "bg-primary text-primary-foreground shadow-sm"
+                        ? "bg-primary/5 text-primary"
                         : "text-muted-foreground hover:bg-surface-hover hover:text-foreground"
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <Icon className={`w-4 h-4 transition-colors ${isActive && !hasChildren ? "text-primary-foreground" : "text-muted-foreground group-hover:text-foreground"}`} />
+                      <Icon className={`w-4 h-4 transition-colors ${isActive && !hasChildren ? "text-primary" : "text-muted-foreground group-hover:text-foreground"}`} />
                       {item.name}
                     </div>
                     {hasChildren && (
-                      isExpanded ? <ChevronDown className="w-4 h-4 opacity-50 transition-transform" /> : <ChevronRight className="w-4 h-4 opacity-50 transition-transform" />
+                      isExpanded ? <ChevronDown className="w-4 h-4 opacity-40 transition-transform" /> : <ChevronRight className="w-4 h-4 opacity-40 transition-transform" />
                     )}
                   </Link>
                 </div>
 
                 {hasChildren && (
-                  <div className={`overflow-hidden transition-all duration-200 ease-in-out ${isExpanded ? 'max-h-96 opacity-100 mt-1' : 'max-h-0 opacity-0'}`}>
-                    <ul className="mb-2 ml-4 space-y-1 border-l-2 border-border pl-3">
+                  <div className={`overflow-hidden transition-all duration-200 ease-in-out ${isExpanded ? 'max-h-96 opacity-100 mt-0.5 mb-1.5' : 'max-h-0 opacity-0'}`}>
+                    <ul className="space-y-0.5 border-l border-border/40 ml-5 pl-2">
                       {item.children!.map((child) => {
                         const isChildLinkActive = pathname === child.href;
                         const childNode = (
                           <li key={child.name}>
                             <Link
                               href={child.href}
-                              className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                              className={`flex items-center gap-3 px-3 py-1.5 rounded-md text-sm transition-all ${
                                 isChildLinkActive
-                                  ? "bg-primary/10 text-primary font-semibold"
-                                  : "text-muted-foreground hover:bg-surface-hover hover:text-foreground"
+                                  ? "text-primary font-medium"
+                                  : "text-muted-foreground hover:text-foreground hover:bg-surface-hover/50"
                               }`}
                             >
                               {child.name}

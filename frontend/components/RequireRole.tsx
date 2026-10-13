@@ -8,7 +8,11 @@ interface RequireRoleProps {
 }
 
 export function RequireRole({ allowedRoles, children, fallback = null }: RequireRoleProps) {
-  const { user } = useAuthStore();
+  const { user, isInitialized } = useAuthStore();
+  
+  if (!isInitialized) {
+    return null;
+  }
   
   if (!user || !user.roles) {
     return <>{fallback}</>;

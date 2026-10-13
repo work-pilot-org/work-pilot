@@ -13,6 +13,7 @@ import json
 import uuid
 
 # We instantiate the broker here, it will be started during FastAPI lifespan
+KAFKA_URL = os.getenv("KAFKA_URL", "redpanda:29092")
 broker = KafkaBroker(KAFKA_URL)
 
 def _ingest_to_adx(event: EventEnvelope, logger: Logger):

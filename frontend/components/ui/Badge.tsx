@@ -7,15 +7,15 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
 const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
   ({ className = "", variant = "default", ...props }, ref) => {
     
-    const baseStyles = "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2";
+    const baseStyles = "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2";
     
     const variants = {
-      default: "border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/80",
-      secondary: "border-transparent bg-muted text-muted-foreground hover:bg-muted/80",
-      destructive: "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80",
-      outline: "text-foreground",
-      success: "border-transparent bg-green-100 text-green-800 hover:bg-green-200",
-      warning: "border-transparent bg-yellow-100 text-yellow-800 hover:bg-yellow-200",
+      default: "border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/90",
+      secondary: "border-border/50 bg-surface text-foreground hover:bg-surface-hover",
+      destructive: "border-destructive/20 bg-destructive/10 text-destructive hover:bg-destructive/20",
+      outline: "border-border/60 text-foreground",
+      success: "border-success/20 bg-success/10 text-success hover:bg-success/20",
+      warning: "border-warning/20 bg-warning/10 text-warning hover:bg-warning/20",
     };
 
     const variantStyles = variants[variant] || variants.default;

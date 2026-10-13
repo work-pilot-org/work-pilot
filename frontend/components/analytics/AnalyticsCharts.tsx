@@ -25,7 +25,7 @@ interface BarChartProps {
 
 export function CustomBarChart({ data, xAxisKey, bars }: BarChartProps) {
   if (!data || data.length === 0) {
-    return <div className="flex h-64 items-center justify-center text-gray-500">No data available</div>;
+    return <div className="flex h-64 items-center justify-center text-muted-foreground">No data available</div>;
   }
 
   return (
@@ -54,7 +54,7 @@ interface PieChartProps {
 
 export function CustomPieChart({ data, dataKey, nameKey }: PieChartProps) {
   if (!data || data.length === 0) {
-    return <div className="flex h-64 items-center justify-center text-gray-500">No data available</div>;
+    return <div className="flex h-64 items-center justify-center text-muted-foreground">No data available</div>;
   }
 
   return (

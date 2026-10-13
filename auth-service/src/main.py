@@ -60,6 +60,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+
 # Include Routers
 
 app.include_router(auth_router)

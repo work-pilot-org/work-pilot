@@ -117,5 +117,11 @@ class Invitation(PublicBase):
 
     # Composite Index to prevent duplicates and fast lookups
     __table_args__ = (
-        Index("ix_invitations_tenant_email", "tenant_id", "email"),
+        Index(
+            "ix_invitations_tenant_email_pending", 
+            "tenant_id", 
+            "email", 
+            unique=True, 
+            postgresql_where="status = 'PENDING'"
+        ),
     )
