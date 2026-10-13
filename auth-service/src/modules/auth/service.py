@@ -547,7 +547,7 @@ class AuthService:
                         "X-Internal-Token": settings.SECRET_KEY,
                         "X-Tenant-Id": str(tenant.id),
                     },
-                    timeout=5.0,
+                    timeout=120.0,
                 )
 
                 if response.status_code not in (200, 201):

@@ -151,6 +151,11 @@ class EmployeeService:
                 },
                 timeout=5.0
             )
+            
+            if response.status_code == 409:
+                self.db.rollback()
+                raise HTTPException(status_code=409, detail="A pending invitation already exists for this email.")
+                
             if response.status_code not in (200, 201):
                 self.db.rollback()
                 error_detail = "Failed to create invitation in auth service."
@@ -161,6 +166,7 @@ class EmployeeService:
                 except ValueError:
                     pass
                 raise HTTPException(status_code=response.status_code, detail=error_detail)
+                
         except HTTPException:
             raise
         except Exception as e:

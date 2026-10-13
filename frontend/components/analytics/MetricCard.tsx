@@ -1,4 +1,5 @@
 import React from "react";
+import { Card, CardContent } from "@/components/ui/Card";
 
 interface MetricCardProps {
   title: string;
@@ -9,13 +10,15 @@ interface MetricCardProps {
 
 export function MetricCard({ title, value, subtitle, icon }: MetricCardProps) {
   return (
-    <div className="bg-white rounded-lg shadow p-6 flex flex-col justify-center">
-      <div className="flex justify-between items-start">
-        <div className="text-gray-500 text-sm font-medium">{title}</div>
-        {icon && <div className="text-gray-400">{icon}</div>}
-      </div>
-      <div className="mt-2 text-3xl font-semibold text-gray-900">{value}</div>
-      {subtitle && <div className="mt-1 text-sm text-gray-500">{subtitle}</div>}
-    </div>
+    <Card>
+      <CardContent className="p-6 flex flex-col justify-center h-full">
+        <div className="flex justify-between items-start">
+          <div className="text-muted-foreground text-[11px] font-bold uppercase tracking-widest">{title}</div>
+          {icon && <div className="text-muted-foreground/70">{icon}</div>}
+        </div>
+        <div className="mt-2 text-3xl font-bold tracking-tight text-foreground">{value}</div>
+        {subtitle && <div className="mt-1 text-sm text-muted-foreground">{subtitle}</div>}
+      </CardContent>
+    </Card>
   );
 }

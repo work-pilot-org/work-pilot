@@ -15,13 +15,17 @@ from src.modules.conversation.schemas import ConversationResponse
 
 from modules.coordinator.agent import CoordinatorAgent
 from shared_infrastructure.core.security import get_current_user
+from shared_infrastructure.core.dependencies import get_current_user_and_set_schema
 
 from .dependencies import get_coordinator
 
 router = APIRouter(
     prefix="/ai",
     tags=["AI"],
-    dependencies=[Depends(get_current_user)],
+    dependencies=[
+        Depends(get_current_user),
+        Depends(get_current_user_and_set_schema)
+    ],
 )
 
 

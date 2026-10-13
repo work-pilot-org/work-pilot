@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any, List, Dict
 from azure.kusto.data import ClientRequestProperties
 from azure.kusto.data.helpers import dataframe_from_result_table
 from src.infrastructure.adx_client import get_kusto_client, ADX_DATABASE_NAME

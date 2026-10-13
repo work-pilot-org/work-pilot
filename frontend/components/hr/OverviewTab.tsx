@@ -4,8 +4,9 @@ import { HeadcountResponse, TicketSummaryResponse, WorkflowPerformanceResponse }
 import { InvitationResponse } from "@/types/invitation";
 import { LoadingState } from "@/components/common/LoadingState";
 import { ErrorState } from "@/components/common/ErrorState";
-import { Users, Ticket, Activity, Clock, Mail } from "lucide-react";
+import { Users, Ticket, Activity, Mail } from "lucide-react";
 import { invitationRepository } from "@/repositories/invitationRepository";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 
 
 export function OverviewTab({ refreshTrigger = 0 }: { refreshTrigger?: number }) {
@@ -61,82 +62,77 @@ export function OverviewTab({ refreshTrigger = 0 }: { refreshTrigger?: number })
   const totalExecutions = workflows?.reduce((acc, curr) => acc + curr.total_executions, 0) || 0;
   const completedExecutions = workflows?.filter(w => w.execution_status === 'COMPLETED').reduce((acc, curr) => acc + curr.total_executions, 0) || 0;
   const avgWorkflowSuccess = totalExecutions > 0 ? completedExecutions / totalExecutions : 0;
-  const uniqueWorkflows = new Set(workflows?.map(w => w.workflow_name)).size;
 
   return (
-    <div className="space-y-8 mt-2">
+    <div className="space-y-6 mt-4 pb-12">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-gray-900">Organization Overview</h2>
-          <p className="text-sm text-gray-500 mt-1">High-level metrics and activity across your organization.</p>
+          <h2 className="text-xl font-semibold tracking-tight text-foreground">Organization Overview</h2>
+          <p className="text-sm text-muted-foreground mt-1">High-level metrics and activity across your organization.</p>
         </div>
       </div>
 
       {/* KPI Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Headcount Card */}
-        <div className="bg-white rounded-xl p-6 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100 flex flex-col justify-center transition-all hover:shadow-md">
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-2.5 bg-indigo-50 rounded-lg text-indigo-600">
-              <Users className="w-5 h-5" />
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Active Employees</span>
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                <Users className="w-4 h-4 text-primary" />
+              </div>
             </div>
-          </div>
-          <div>
-            <h3 className="text-3xl font-bold text-gray-900 tracking-tight">{activeHeadcount}</h3>
-            <p className="text-sm font-medium text-gray-500 mt-1">Active Employees</p>
-          </div>
-        </div>
+            <div className="text-3xl font-bold text-foreground tracking-tight">{activeHeadcount}</div>
+          </CardContent>
+        </Card>
 
-        {/* Invitations Card */}
-        <div className="bg-white rounded-xl p-6 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100 flex flex-col justify-center transition-all hover:shadow-md">
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-2.5 bg-purple-50 rounded-lg text-purple-600">
-              <Mail className="w-5 h-5" />
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Pending Invitations</span>
+              <div className="w-8 h-8 rounded-full bg-purple-500/10 flex items-center justify-center">
+                <Mail className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+              </div>
             </div>
-          </div>
-          <div>
-            <h3 className="text-3xl font-bold text-gray-900 tracking-tight">{pendingInvites}</h3>
-            <p className="text-sm font-medium text-gray-500 mt-1">Pending Invitations</p>
-          </div>
-        </div>
+            <div className="text-3xl font-bold text-foreground tracking-tight">{pendingInvites}</div>
+          </CardContent>
+        </Card>
 
-        {/* Tickets Card */}
-        <div className="bg-white rounded-xl p-6 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100 flex flex-col justify-center transition-all hover:shadow-md">
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-2.5 bg-amber-50 rounded-lg text-amber-600">
-              <Ticket className="w-5 h-5" />
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Active IT Tickets</span>
+              <div className="w-8 h-8 rounded-full bg-warning/10 flex items-center justify-center">
+                <Ticket className="w-4 h-4 text-warning" />
+              </div>
             </div>
-          </div>
-          <div>
-            <h3 className="text-3xl font-bold text-gray-900 tracking-tight">{openTickets}</h3>
-            <p className="text-sm font-medium text-gray-500 mt-1">Active IT Tickets</p>
-          </div>
-        </div>
+            <div className="text-3xl font-bold text-foreground tracking-tight">{openTickets}</div>
+          </CardContent>
+        </Card>
 
-        {/* Workflow Success Rate Card */}
-        <div className="bg-white rounded-xl p-6 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100 flex flex-col justify-center transition-all hover:shadow-md">
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-2.5 bg-emerald-50 rounded-lg text-emerald-600">
-              <Activity className="w-5 h-5" />
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Avg Workflow Success</span>
+              <div className="w-8 h-8 rounded-full bg-success/10 flex items-center justify-center">
+                <Activity className="w-4 h-4 text-success" />
+              </div>
             </div>
-          </div>
-          <div>
-            <h3 className="text-3xl font-bold text-gray-900 tracking-tight">{(avgWorkflowSuccess * 100).toFixed(1)}%</h3>
-            <p className="text-sm font-medium text-gray-500 mt-1">Avg Workflow Success</p>
-          </div>
-        </div>
+            <div className="text-3xl font-bold text-foreground tracking-tight">{(avgWorkflowSuccess * 100).toFixed(1)}%</div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Analytics Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
          {/* Employee Distribution */}
-         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
-            <div className="px-6 py-5 border-b border-gray-100">
-              <h3 className="text-base font-semibold text-gray-900">Employee Distribution</h3>
-            </div>
-            <div className="p-6 flex-1">
+         <Card className="flex flex-col">
+            <CardHeader className="border-b border-border/40 pb-4">
+              <CardTitle className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Employee Distribution</CardTitle>
+            </CardHeader>
+            <CardContent className="p-6 flex-1">
               {headcount?.summary.length === 0 ? (
-                <div className="h-full flex items-center justify-center text-sm text-gray-500">No data available</div>
+                <div className="h-full flex items-center justify-center text-sm text-muted-foreground">No data available</div>
               ) : (
                 <div className="space-y-5">
                   {headcount?.summary.map((item) => {
@@ -145,12 +141,12 @@ export function OverviewTab({ refreshTrigger = 0 }: { refreshTrigger?: number })
                     return (
                       <div key={item.status}>
                         <div className="flex justify-between items-center mb-2">
-                          <span className="text-sm font-medium text-gray-700 capitalize">{item.status.replace("_", " ").toLowerCase()}</span>
-                          <span className="text-sm font-semibold text-gray-900">{item.count}</span>
+                          <span className="text-sm font-medium text-foreground capitalize">{item.status.replace("_", " ").toLowerCase()}</span>
+                          <span className="text-sm font-semibold text-foreground">{item.count}</span>
                         </div>
-                        <div className="w-full bg-gray-100 rounded-full h-2">
+                        <div className="w-full bg-surface-hover rounded-full h-2 overflow-hidden">
                           <div 
-                            className="bg-indigo-500 h-2 rounded-full" 
+                            className="bg-primary h-2 rounded-full" 
                             style={{ width: `${percentage}%` }}
                           ></div>
                         </div>
@@ -159,37 +155,37 @@ export function OverviewTab({ refreshTrigger = 0 }: { refreshTrigger?: number })
                   })}
                 </div>
               )}
-            </div>
-         </div>
+            </CardContent>
+         </Card>
 
          {/* Workflow Performance */}
-         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
-            <div className="px-6 py-5 border-b border-gray-100">
-              <h3 className="text-base font-semibold text-gray-900">Workflow Performance</h3>
-            </div>
-            <div className="p-0 flex-1">
+         <Card className="flex flex-col">
+            <CardHeader className="border-b border-border/40 pb-4">
+              <CardTitle className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Workflow Performance</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0 flex-1">
               {!workflows || workflows.length === 0 ? (
-                <div className="p-6 h-full flex items-center justify-center text-sm text-gray-500">No workflow data available</div>
+                <div className="p-6 h-full flex items-center justify-center text-sm text-muted-foreground">No workflow data available</div>
               ) : (
-                <div className="divide-y divide-gray-100">
+                <div className="divide-y divide-border/40">
                   {workflows.slice(0, 5).map((item, idx) => (
-                    <div key={`${item.workflow_name}-${idx}`} className="p-5 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                    <div key={`${item.workflow_name}-${idx}`} className="p-5 flex items-center justify-between hover:bg-surface-hover/30 transition-colors">
                       <div className="flex flex-col">
-                        <span className="text-sm font-semibold text-gray-900">{item.workflow_name}</span>
-                        <span className="text-xs text-gray-500 mt-1">Avg Duration: {item.avg_completion_minutes.toFixed(1)} min</span>
+                        <span className="text-sm font-semibold text-foreground">{item.workflow_name}</span>
+                        <span className="text-xs text-muted-foreground mt-1">Avg Duration: {item.avg_completion_minutes.toFixed(1)} min</span>
                       </div>
                       <div className="flex flex-col items-end">
-                        <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider bg-success/10 text-success">
                           {item.execution_status}
                         </span>
-                        <span className="text-xs text-gray-500 mt-1.5 font-medium">{item.total_executions} executions</span>
+                        <span className="text-xs text-muted-foreground mt-1.5 font-medium">{item.total_executions} executions</span>
                       </div>
                     </div>
                   ))}
                 </div>
               )}
-            </div>
-         </div>
+            </CardContent>
+         </Card>
       </div>
     </div>
   );

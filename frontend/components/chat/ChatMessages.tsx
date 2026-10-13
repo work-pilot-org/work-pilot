@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { Message } from "./ChatPanel";
-import { Sparkles, User } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 interface ChatMessagesProps {
   messages: Message[];
@@ -17,34 +17,54 @@ export function ChatMessages({ messages, isTyping }: ChatMessagesProps) {
   }, [messages, isTyping]);
 
   return (
-    <div className="absolute inset-0 overflow-y-auto p-4 space-y-4 bg-gray-50/50">
+    <div className="absolute inset-0 overflow-y-auto p-4 space-y-6 bg-background">
       {messages.map((msg) => {
         const isAi = msg.role === "ai";
-        return (
-          <div key={msg.id} className={`flex gap-3 max-w-[85%] ${isAi ? "mr-auto" : "ml-auto flex-row-reverse"}`}>
-            <div className={`w-8 h-8 flex-shrink-0 rounded-full flex items-center justify-center ${isAi ? "bg-indigo-100" : "bg-gray-200"}`}>
-              {isAi ? <Sparkles className="w-4 h-4 text-indigo-600" /> : <User className="w-4 h-4 text-gray-600" />}
+        if (!isAi) {
+          return (
+            <div key={msg.id} className="flex justify-end ml-auto">
+              <div className="bg-surface border border-border/60 px-4 py-3 rounded-2xl max-w-[85%] text-sm text-foreground shadow-[var(--shadow-subtle)] whitespace-pre-wrap leading-relaxed">
+                {msg.content}
+              </div>
             </div>
-            <div className={`p-3 rounded-2xl text-sm ${isAi ? "bg-white border border-gray-200 text-gray-800 rounded-tl-none shadow-sm" : "bg-indigo-600 text-white rounded-tr-none shadow-sm"}`}>
-              {msg.content}
+          );
+        }
+
+        return (
+          <div key={msg.id} className="flex gap-3 max-w-[90%] mr-auto items-start">
+            <div className="w-8 h-8 rounded-xl bg-primary/5 text-primary ring-1 ring-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+              <Sparkles className="w-3.5 h-3.5" />
+            </div>
+            <div className="flex flex-col gap-1.5 min-w-0 flex-1">
+              <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-0.5">
+                WorkPilot AI
+              </div>
+              <div className="text-sm leading-relaxed text-foreground whitespace-pre-wrap">
+                {msg.content}
+              </div>
             </div>
           </div>
         );
       })}
       
       {isTyping && (
-        <div className="flex gap-3 max-w-[85%] mr-auto">
-          <div className="w-8 h-8 flex-shrink-0 rounded-full bg-indigo-100 flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-indigo-600" />
+        <div className="flex gap-3 max-w-[90%] mr-auto items-start">
+          <div className="w-8 h-8 rounded-xl bg-primary/5 text-primary ring-1 ring-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+            <Sparkles className="w-3.5 h-3.5" />
           </div>
-          <div className="p-3 bg-white border border-gray-200 rounded-2xl rounded-tl-none shadow-sm flex gap-1 items-center">
-            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-            <div className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></div>
+          <div className="flex flex-col gap-1.5 min-w-0 flex-1">
+            <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-0.5">
+              WorkPilot AI
+            </div>
+            <div className="flex gap-1.5 items-center h-5 px-1">
+              <div className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+              <div className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+              <div className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce"></div>
+            </div>
           </div>
         </div>
       )}
-      <div ref={bottomRef} className="h-px" />
+      <div ref={bottomRef} className="h-4" />
     </div>
   );
 }

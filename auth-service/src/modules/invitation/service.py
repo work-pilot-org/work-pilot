@@ -128,6 +128,19 @@ class InvitationService:
             email=inv.email
         )
 
+    def revoke_invitation(self, db: Session, invitation_id: UUID, tenant_id: int):
+        invitation = self.repository.get_by_id(db, invitation_id)
+        if not invitation or invitation.tenant_id != tenant_id:
+            raise HTTPException(status_code=404, detail="Invitation not found")
+            
+        if invitation.status != InvitationStatus.PENDING:
+            raise HTTPException(status_code=400, detail=f"Cannot revoke invitation with status {invitation.status.value}")
+            
+        invitation.status = InvitationStatus.REVOKED
+        self.repository.update_invitation(db, invitation)
+        db.commit()
+        return {"status": "ok", "message": "Invitation revoked successfully."}
+
     def accept_invitation(
         self, 
         db: Session, 
@@ -204,7 +217,7 @@ class InvitationService:
                         "schema_name": tenant.schema_name
                     },
                     headers={"X-Internal-Token": settings.SECRET_KEY, "X-Tenant-Id": str(tenant.id)},
-                    timeout=5.0
+                    timeout=120.0
                 )
                 if response.status_code != 200:
                     db.rollback()

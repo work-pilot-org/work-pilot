@@ -7,6 +7,7 @@ Tool execution and business logic are handled outside this layer.
 
 from __future__ import annotations
 
+import asyncio
 from typing import Any
 
 from google import genai
@@ -86,10 +87,13 @@ class GeminiProvider(BaseLLMProvider):
         )
 
         try:
-            response = await self._client.aio.models.generate_content(
-                model=self._model,
-                contents=prompt,
-                config=config,
+            response = await asyncio.wait_for(
+                self._client.aio.models.generate_content(
+                    model=self._model,
+                    contents=prompt,
+                    config=config,
+                ),
+                timeout=30.0
             )
 
         except errors.APIError as exc:
@@ -172,10 +176,13 @@ class GeminiProvider(BaseLLMProvider):
         )
 
         try:
-            response = await self._client.aio.models.generate_content(
-                model=self._model,
-                contents=contents,
-                config=config,
+            response = await asyncio.wait_for(
+                self._client.aio.models.generate_content(
+                    model=self._model,
+                    contents=contents,
+                    config=config,
+                ),
+                timeout=30.0
             )
 
         except errors.APIError as exc:

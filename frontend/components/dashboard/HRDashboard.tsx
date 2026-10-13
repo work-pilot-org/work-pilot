@@ -9,6 +9,7 @@ import { ErrorState } from "@/components/common/ErrorState";
 import { EmployeeResponse } from "@/types/hr";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { getAttendanceSummary, getLeaveUtilization, getHeadcount } from "@/lib/api/analytics";
 import { CustomBarChart, CustomPieChart } from "@/components/analytics/AnalyticsCharts";
 
@@ -56,20 +57,22 @@ export function HRDashboard() {
   const lateCount = attendanceSummary.find(a => a.status === "LATE")?.records || 0;
 
   return (
-    <div className="flex flex-col h-full space-y-6 max-w-7xl mx-auto pb-12">
+    <div className="flex flex-col h-full space-y-8 max-w-7xl mx-auto w-full pb-12">
       
       {/* Welcome Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-surface border border-border-strong rounded-xl p-6 shadow-sm">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
-            HR Operations, {user?.name || "Admin"}
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
-          </p>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 py-2">
+        <div className="flex items-center gap-4">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">
+              HR Operations, {user?.name || "Admin"}
+            </h1>
+            <p className="text-sm font-medium text-muted-foreground mt-1">
+              {new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+            </p>
+          </div>
         </div>
         <div className="flex items-center gap-3">
-          <Button className="shadow-sm" onClick={() => router.push('/dashboard/hr/create')}>
+          <Button variant="primary" onClick={() => router.push('/dashboard/hr/create')}>
             <UserPlus className="w-4 h-4 mr-2" />
             Add Employee
           </Button>
@@ -77,105 +80,154 @@ export function HRDashboard() {
       </div>
       
       {/* Real Metrics Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-surface border border-border-strong rounded-xl p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-semibold text-muted-foreground">Total Headcount</span>
-            <Users className="w-4 h-4 text-primary" />
-          </div>
-          <div className="text-3xl font-bold text-foreground">{totalEmployees}</div>
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Total Headcount</span>
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                <Users className="w-4 h-4 text-primary" />
+              </div>
+            </div>
+            <div className="text-3xl font-bold text-foreground tracking-tight">{totalEmployees}</div>
+          </CardContent>
+        </Card>
         
-        <div className="bg-surface border border-border-strong rounded-xl p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-semibold text-muted-foreground">Present Today</span>
-            <CheckCircle2 className="w-4 h-4 text-success" />
-          </div>
-          <div className="text-3xl font-bold text-foreground">{presentCount}</div>
-        </div>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Present Today</span>
+              <div className="w-8 h-8 rounded-full bg-success/10 flex items-center justify-center">
+                <CheckCircle2 className="w-4 h-4 text-success" />
+              </div>
+            </div>
+            <div className="text-3xl font-bold text-foreground tracking-tight">{presentCount}</div>
+          </CardContent>
+        </Card>
         
-        <div className="bg-surface border border-border-strong rounded-xl p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-semibold text-muted-foreground">Late Arrivals</span>
-            <Clock className="w-4 h-4 text-warning" />
-          </div>
-          <div className="text-3xl font-bold text-foreground">{lateCount}</div>
-        </div>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Late Arrivals</span>
+              <div className="w-8 h-8 rounded-full bg-warning/10 flex items-center justify-center">
+                <Clock className="w-4 h-4 text-warning" />
+              </div>
+            </div>
+            <div className="text-3xl font-bold text-foreground tracking-tight">{lateCount}</div>
+          </CardContent>
+        </Card>
         
-        <div className="bg-surface border border-border-strong rounded-xl p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-semibold text-muted-foreground">Absences</span>
-            <AlertTriangle className="w-4 h-4 text-destructive" />
-          </div>
-          <div className="text-3xl font-bold text-foreground">{absentCount}</div>
-        </div>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Absences</span>
+              <div className="w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center">
+                <AlertTriangle className="w-4 h-4 text-destructive" />
+              </div>
+            </div>
+            <div className="text-3xl font-bold text-foreground tracking-tight">{absentCount}</div>
+          </CardContent>
+        </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
-        <div className="bg-surface p-6 rounded-xl border border-border shadow-sm">
-          <h3 className="text-lg font-medium text-foreground mb-4">Leave Utilization</h3>
-          <CustomPieChart data={leaveSummary} dataKey="requests" nameKey="status" />
-        </div>
-        <div className="bg-surface p-6 rounded-xl border border-border shadow-sm">
-          <h3 className="text-lg font-medium text-foreground mb-4">Headcount Distribution</h3>
-          <CustomBarChart 
-            data={headcountSummary} 
-            xAxisKey="status" 
-            bars={[{ key: "count", color: "#3b82f6", name: "Employees" }]} 
-          />
-        </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <Card>
+          <CardHeader className="border-b border-border/40 pb-4">
+            <CardTitle className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+              Leave Utilization
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <CustomPieChart data={leaveSummary} dataKey="requests" nameKey="status" />
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="border-b border-border/40 pb-4">
+            <CardTitle className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+              Headcount Distribution
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <CustomBarChart 
+              data={headcountSummary} 
+              xAxisKey="status" 
+              bars={[{ key: "count", color: "var(--primary)", name: "Employees" }]} 
+            />
+          </CardContent>
+        </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Quick Links Panel */}
-        <div className="bg-surface rounded-xl border border-border-strong shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-foreground mb-4">HR Operations</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <button onClick={() => router.push('/dashboard/hr')} className="flex flex-col items-center justify-center p-6 bg-surface-hover/50 rounded-lg border border-border hover:border-primary transition-colors gap-3">
-              <Users className="w-6 h-6 text-primary" />
-              <span className="text-sm font-medium text-foreground">Employee Directory</span>
-            </button>
-            <button onClick={() => router.push('/dashboard/hr/attendance')} className="flex flex-col items-center justify-center p-6 bg-surface-hover/50 rounded-lg border border-border hover:border-primary transition-colors gap-3">
-              <Clock className="w-6 h-6 text-primary" />
-              <span className="text-sm font-medium text-foreground">Attendance Logs</span>
-            </button>
-            <button onClick={() => router.push('/dashboard/hr/leave')} className="flex flex-col items-center justify-center p-6 bg-surface-hover/50 rounded-lg border border-border hover:border-primary transition-colors gap-3">
-              <Calendar className="w-6 h-6 text-primary" />
-              <span className="text-sm font-medium text-foreground">Leave Requests</span>
-            </button>
-            <button onClick={() => router.push('/dashboard/hr/organization')} className="flex flex-col items-center justify-center p-6 bg-surface-hover/50 rounded-lg border border-border hover:border-primary transition-colors gap-3">
-              <UserPlus className="w-6 h-6 text-primary" />
-              <span className="text-sm font-medium text-foreground">Organization Config</span>
-            </button>
-          </div>
-        </div>
+        <Card>
+          <CardHeader className="border-b border-border/40 pb-4">
+            <CardTitle className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+              HR Operations
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-2 gap-4">
+              <button onClick={() => router.push('/dashboard/hr')} className="group flex flex-col items-center justify-center p-6 bg-surface-hover/30 rounded-xl border border-border/60 hover:border-border-strong hover:bg-surface-hover transition-all gap-4 shadow-[var(--shadow-subtle)]">
+                <div className="w-12 h-12 rounded-full bg-primary/5 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                  <Users className="w-5 h-5 text-primary" />
+                </div>
+                <span className="text-sm font-semibold text-foreground">Directory</span>
+              </button>
+              <button onClick={() => router.push('/dashboard/hr/attendance')} className="group flex flex-col items-center justify-center p-6 bg-surface-hover/30 rounded-xl border border-border/60 hover:border-border-strong hover:bg-surface-hover transition-all gap-4 shadow-[var(--shadow-subtle)]">
+                <div className="w-12 h-12 rounded-full bg-primary/5 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                  <Clock className="w-5 h-5 text-primary" />
+                </div>
+                <span className="text-sm font-semibold text-foreground">Attendance Logs</span>
+              </button>
+              <button onClick={() => router.push('/dashboard/hr/leave')} className="group flex flex-col items-center justify-center p-6 bg-surface-hover/30 rounded-xl border border-border/60 hover:border-border-strong hover:bg-surface-hover transition-all gap-4 shadow-[var(--shadow-subtle)]">
+                <div className="w-12 h-12 rounded-full bg-primary/5 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                  <Calendar className="w-5 h-5 text-primary" />
+                </div>
+                <span className="text-sm font-semibold text-foreground">Leave Requests</span>
+              </button>
+              <button onClick={() => router.push('/dashboard/hr/organization')} className="group flex flex-col items-center justify-center p-6 bg-surface-hover/30 rounded-xl border border-border/60 hover:border-border-strong hover:bg-surface-hover transition-all gap-4 shadow-[var(--shadow-subtle)]">
+                <div className="w-12 h-12 rounded-full bg-primary/5 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                  <UserPlus className="w-5 h-5 text-primary" />
+                </div>
+                <span className="text-sm font-semibold text-foreground">Organization Config</span>
+              </button>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Recent Additions */}
-        <div className="bg-surface rounded-xl border border-border-strong shadow-sm p-6 flex flex-col">
-          <h3 className="text-lg font-semibold text-foreground mb-4">Recently Added</h3>
-          {employees.length === 0 ? (
-            <div className="flex-1 flex items-center justify-center text-sm text-muted-foreground border-2 border-dashed border-border rounded-lg">
-              No employees found in the organization.
-            </div>
-          ) : (
-            <div className="space-y-4 flex-1 overflow-auto max-h-[300px] pr-2">
-              {employees.slice(0, 5).map(emp => (
-                <div key={emp.id} className="flex items-center gap-4 p-3 rounded-lg border border-border bg-surface-hover/30">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm shrink-0">
-                    {emp.first_name[0]}{emp.last_name[0]}
+        <Card className="flex flex-col">
+          <CardHeader className="border-b border-border/40 pb-4">
+            <CardTitle className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+              Recently Added
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-6 flex-1 flex flex-col">
+            {employees.length === 0 ? (
+              <div className="flex-1 flex items-center justify-center text-sm font-medium text-muted-foreground border-2 border-dashed border-border/60 rounded-xl bg-surface-hover/30 min-h-[200px]">
+                No employees found in the organization.
+              </div>
+            ) : (
+              <div className="space-y-3 flex-1 overflow-auto max-h-[300px] pr-2">
+                {employees.slice(0, 5).map(emp => (
+                  <div key={emp.id} className="flex items-center gap-4 p-4 rounded-xl border border-border/40 bg-surface hover:bg-surface-hover/50 transition-colors shadow-[var(--shadow-subtle)]">
+                    <div className="w-10 h-10 rounded-full bg-primary/5 text-primary flex items-center justify-center font-bold text-sm border border-primary/10 shrink-0">
+                      {emp.first_name[0]}{emp.last_name[0]}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-foreground truncate">{emp.first_name} {emp.last_name}</p>
+                      <p className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground truncate mt-0.5">{emp.employment_type} • {emp.employee_code}</p>
+                    </div>
+                    <Button variant="secondary" size="sm" onClick={() => router.push(`/dashboard/hr/employees/${emp.id}`)}>
+                      View
+                    </Button>
                   </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-foreground">{emp.first_name} {emp.last_name}</p>
-                    <p className="text-xs text-muted-foreground">{emp.employment_type} • {emp.employee_code}</p>
-                  </div>
-                  <Button variant="outline" size="sm" className="shadow-sm h-8" onClick={() => router.push(`/dashboard/hr/employees/${emp.id}`)}>
-                    View
-                  </Button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
     </div>

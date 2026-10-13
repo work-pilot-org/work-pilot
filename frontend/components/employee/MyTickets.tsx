@@ -86,6 +86,8 @@ export function MyTickets() {
               <label className="block text-sm font-medium text-foreground mb-1">Title</label>
               <input
                 required
+                minLength={5}
+                maxLength={150}
                 type="text"
                 value={newTicket.title}
                 onChange={(e) => setNewTicket({ ...newTicket, title: e.target.value })}
@@ -98,10 +100,11 @@ export function MyTickets() {
               <label className="block text-sm font-medium text-foreground mb-1">Description</label>
               <textarea
                 required
+                minLength={10}
                 value={newTicket.description}
                 onChange={(e) => setNewTicket({ ...newTicket, description: e.target.value })}
-                className="w-full p-3 rounded-md border border-border bg-background text-sm min-h-[100px]"
-                placeholder="Detailed explanation..."
+                className="w-full min-h-[100px] p-3 rounded-md border border-border bg-background text-sm resize-y"
+                placeholder="Provide detailed information about your issue..."
               />
             </div>
             
@@ -116,8 +119,12 @@ export function MyTickets() {
                   <option value="HARDWARE">Hardware</option>
                   <option value="SOFTWARE">Software</option>
                   <option value="NETWORK">Network</option>
-                  <option value="ACCESS">Access</option>
-                  <option value="ONBOARDING">Onboarding</option>
+                  <option value="VPN">VPN</option>
+                  <option value="ACCESS_CONTROL">Access Control</option>
+                  <option value="EMAIL">Email</option>
+                  <option value="SECURITY">Security</option>
+                  <option value="LICENSE">License</option>
+                  <option value="PRINTER">Printer</option>
                   <option value="OTHER">Other</option>
                 </select>
               </div>

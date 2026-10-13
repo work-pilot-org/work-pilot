@@ -57,15 +57,15 @@ export function InviteEmployeeModal({ isOpen, onClose, onSuccess }: InviteEmploy
             <div className="flex flex-col space-y-2">
               <span className="font-semibold text-sm">Invitation created, but the email could not be delivered.</span>
               {res.invitation_email_error && (
-                <span className="text-xs text-red-600 bg-red-50 p-1 rounded border border-red-100">{res.invitation_email_error}</span>
+                <span className="text-xs text-destructive bg-destructive/10 p-1 rounded border border-destructive/20">{res.invitation_email_error}</span>
               )}
-              <span className="text-xs text-gray-500">You can copy the invitation link and send it manually.</span>
+              <span className="text-xs text-muted-foreground">You can copy the invitation link and send it manually.</span>
               <button 
                 onClick={() => {
                   navigator.clipboard.writeText(res.invitation_link!);
                   toast.success("Link copied!", { id: t.id });
                 }}
-                className="mt-2 bg-indigo-600 text-white text-xs px-2 py-1 rounded w-fit hover:bg-indigo-700"
+                className="mt-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded w-fit hover:bg-primary/90"
               >
                 Copy Link
               </button>
@@ -100,12 +100,12 @@ export function InviteEmployeeModal({ isOpen, onClose, onSuccess }: InviteEmploy
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden bg-black/50 p-4">
-      <div className="relative w-full max-w-2xl rounded-lg bg-white shadow-lg max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-white p-4">
-          <h3 className="text-lg font-medium text-gray-900">Onboard & Invite Employee</h3>
+      <div className="relative w-full max-w-2xl rounded-lg bg-surface shadow-lg border border-border/40 max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border/40 bg-surface p-4">
+          <h3 className="text-lg font-medium text-foreground">Onboard & Invite Employee</h3>
           <button
             onClick={onClose}
-            className="ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900"
+            className="ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-muted-foreground hover:bg-surface-hover hover:text-foreground"
           >
             <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
               <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"></path>
@@ -175,7 +175,7 @@ export function InviteEmployeeModal({ isOpen, onClose, onSuccess }: InviteEmploy
               <Label htmlFor="employmentType">Employment Type</Label>
               <select
                 id="employmentType"
-                className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-10 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
                 value={employmentType}
                 onChange={(e) => setEmploymentType(e.target.value)}
                 required
@@ -191,7 +191,7 @@ export function InviteEmployeeModal({ isOpen, onClose, onSuccess }: InviteEmploy
               <Label htmlFor="role">Role Authorization</Label>
               <select
                 id="role"
-                className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-10 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
                 required
@@ -204,7 +204,7 @@ export function InviteEmployeeModal({ isOpen, onClose, onSuccess }: InviteEmploy
             </div>
           </div>
           
-          <div className="flex justify-end space-x-2 pt-4 border-t mt-4">
+          <div className="flex justify-end space-x-2 pt-4 border-t border-border/40 mt-4">
             <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
               Cancel
             </Button>

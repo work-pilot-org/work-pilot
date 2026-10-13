@@ -38,7 +38,9 @@ def create_request(
     from shared_infrastructure.core.rbac import Permission, get_permissions_for_roles
     roles = current_user.get("roles", [])
     user_perms = get_permissions_for_roles(roles)
-    if Permission.ADMIN_ALL not in user_perms and Permission.IT_MANAGE not in user_perms:
+    
+    is_self_submission = payload.requested_by == uuid.UUID('00000000-0000-0000-0000-000000000000')
+    if is_self_submission or (Permission.ADMIN_ALL not in user_perms and Permission.IT_MANAGE not in user_perms):
         payload.requested_by = uuid.UUID(current_user.get("sub"))
     return service.create_request(db, payload)
 

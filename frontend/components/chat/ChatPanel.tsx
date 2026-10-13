@@ -59,7 +59,7 @@ export function ChatPanel({ onClose }: ChatPanelProps) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-50">
+    <div className="flex flex-col h-full bg-background">
       <ChatHeader onClose={onClose} />
       <div className="flex-1 overflow-hidden relative">
         <ChatMessages messages={messages} isTyping={isTyping} />

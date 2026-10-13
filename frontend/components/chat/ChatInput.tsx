@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { SendHorizontal } from "lucide-react";
+import { Send } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 
 interface ChatInputProps {
   onSend: (message: string) => void;
@@ -20,23 +21,25 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
   };
 
   return (
-    <div className="p-4 bg-white border-t border-gray-200 z-10">
-      <form onSubmit={handleSubmit} className="relative flex items-center">
+    <div className="p-4 bg-background border-t border-border/40 z-10">
+      <form onSubmit={handleSubmit} className="relative flex items-center bg-surface border border-border-strong rounded-xl shadow-[var(--shadow-subtle)] focus-within:ring-1 focus-within:ring-primary/20 focus-within:border-primary/40 transition-all">
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask WorkPilot..."
           disabled={disabled}
-          className="w-full bg-gray-50 border border-gray-200 rounded-full py-3 pl-4 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all disabled:opacity-50"
+          className="w-full bg-transparent py-3 pl-4 pr-12 text-sm focus:outline-none placeholder:text-muted-foreground/60 text-foreground disabled:opacity-50"
         />
-        <button
+        <Button
           type="submit"
           disabled={!input.trim() || disabled}
-          className="absolute right-2 p-2 text-indigo-600 hover:bg-indigo-50 rounded-full disabled:opacity-50 disabled:hover:bg-transparent transition-colors"
+          size="sm"
+          variant="primary"
+          className="absolute right-1.5 p-0 w-8 h-8 rounded-lg shadow-none"
         >
-          <SendHorizontal className="w-5 h-5" />
-        </button>
+          <Send className="w-4 h-4 ml-0.5" />
+        </Button>
       </form>
     </div>
   );

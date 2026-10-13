@@ -4,13 +4,14 @@ import { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { hrRepository } from "@/repositories/hrRepository";
 import { workflowRepository } from "@/repositories/workflowRepository";
-import { Users, ClipboardList, Clock, ArrowRight, Check, X, Activity } from "lucide-react";
+import { Users, ClipboardList, Clock, ArrowRight, Check, X, Activity, UserCircle2 } from "lucide-react";
 import { LoadingState } from "@/components/common/LoadingState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { EmployeeResponse } from "@/types/hr";
 import { WorkflowExecutionResponse } from "@/types/workflow";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { getWorkflowPerformance } from "@/lib/api/analytics";
 import { CustomBarChart } from "@/components/analytics/AnalyticsCharts";
 
@@ -53,135 +54,173 @@ export function ManagerDashboard() {
   const pendingApprovals = executions.filter(e => e.status === "pending");
 
   return (
-    <div className="flex flex-col h-full space-y-6 max-w-7xl mx-auto pb-12">
+    <div className="flex flex-col h-full space-y-8 max-w-7xl mx-auto w-full pb-12">
       
       {/* Welcome Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-surface border border-border-strong rounded-xl p-6 shadow-sm">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 py-2">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">
-            Manager Overview, {user?.name || "Manager"}
+            Manager Overview
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+          <p className="text-sm font-medium text-muted-foreground mt-1">
+            Welcome back, {user?.name || "Manager"} • {new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Button className="shadow-sm" onClick={() => router.push('/dashboard/workflows')}>
+          <Button variant="primary" onClick={() => router.push('/dashboard/workflows')}>
             View Approvals
           </Button>
         </div>
       </div>
       
       {/* Real Metrics Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-surface border border-border-strong rounded-xl p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-semibold text-muted-foreground">Team Size</span>
-            <Users className="w-4 h-4 text-primary" />
-          </div>
-          <div className="text-3xl font-bold text-foreground">{team.length}</div>
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Team Size</span>
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                <Users className="w-4 h-4 text-primary" />
+              </div>
+            </div>
+            <div className="text-3xl font-bold text-foreground tracking-tight">{team.length}</div>
+          </CardContent>
+        </Card>
         
-        <div className={`bg-surface border border-border-strong rounded-xl p-5 shadow-sm ${pendingApprovals.length > 0 ? 'border-l-4 border-l-warning' : ''}`}>
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-semibold text-muted-foreground">Pending Approvals</span>
-            <ClipboardList className="w-4 h-4 text-warning" />
-          </div>
-          <div className="text-3xl font-bold text-foreground">{pendingApprovals.length}</div>
-        </div>
+        <Card className={pendingApprovals.length > 0 ? "border-warning/30 bg-warning/5 relative overflow-hidden" : ""}>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <span className={`text-[11px] font-bold uppercase tracking-widest ${pendingApprovals.length > 0 ? 'text-warning' : 'text-muted-foreground'}`}>
+                Pending Approvals
+              </span>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${pendingApprovals.length > 0 ? 'bg-warning/10' : 'bg-muted'}`}>
+                <ClipboardList className={`w-4 h-4 ${pendingApprovals.length > 0 ? 'text-warning' : 'text-muted-foreground'}`} />
+              </div>
+            </div>
+            <div className={`text-3xl font-bold tracking-tight ${pendingApprovals.length > 0 ? 'text-warning' : 'text-foreground'}`}>
+              {pendingApprovals.length}
+            </div>
+          </CardContent>
+        </Card>
         
-        <div className="bg-surface border border-border-strong rounded-xl p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-semibold text-muted-foreground">Workflow Executions</span>
-            <Activity className="w-4 h-4 text-primary" />
-          </div>
-          <div className="text-3xl font-bold text-foreground">{workflowPerformance.reduce((a, b) => a + (b.total_executions || 0), 0)}</div>
-        </div>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Workflow Executions</span>
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                <Activity className="w-4 h-4 text-primary" />
+              </div>
+            </div>
+            <div className="text-3xl font-bold text-foreground tracking-tight">{workflowPerformance.reduce((a, b) => a + (b.total_executions || 0), 0)}</div>
+          </CardContent>
+        </Card>
 
-        <div className="bg-surface border border-border-strong rounded-xl p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-semibold text-muted-foreground">Team Absences</span>
-            <Clock className="w-4 h-4 text-muted-foreground" />
-          </div>
-          <div className="text-3xl font-bold text-foreground">0</div>
-        </div>
+        <Card className="opacity-70 bg-surface/50">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Team Absences</span>
+              <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                <Clock className="w-4 h-4 text-muted-foreground" />
+              </div>
+            </div>
+            <div className="text-3xl font-bold text-muted-foreground tracking-tight">0</div>
+          </CardContent>
+        </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-4">
         
         {/* Approvals Action Required */}
-        <div className="bg-surface rounded-xl border border-border-strong shadow-sm p-6 flex flex-col">
-          <h3 className="text-lg font-semibold text-foreground mb-4">Requires Action</h3>
-          {pendingApprovals.length === 0 ? (
-            <div className="flex-1 flex items-center justify-center text-sm text-muted-foreground border-2 border-dashed border-border rounded-lg p-6">
-              You're all caught up. No pending approvals.
-            </div>
-          ) : (
-            <div className="space-y-4 flex-1 overflow-auto max-h-[300px] pr-2">
-              {pendingApprovals.slice(0, 5).map(exec => (
-                <div key={exec.id} className="flex flex-col gap-3 p-4 rounded-lg border border-warning/30 bg-warning/5">
-                  <div className="flex items-start justify-between">
+        <Card className="flex flex-col overflow-hidden">
+          <CardHeader className="border-b border-border/40 pb-4">
+            <CardTitle className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+              Requires Action
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex-1 p-0 flex flex-col">
+            {pendingApprovals.length === 0 ? (
+              <div className="flex-1 flex flex-col items-center justify-center p-12 text-center bg-surface-hover/20">
+                <ClipboardList className="w-8 h-8 text-muted-foreground/40 mb-4" />
+                <p className="text-sm font-semibold text-foreground">You're all caught up</p>
+                <p className="text-[13px] text-muted-foreground mt-1">No pending approvals require your attention.</p>
+              </div>
+            ) : (
+              <div className="flex-1 overflow-auto max-h-[350px]">
+                {pendingApprovals.slice(0, 5).map(exec => (
+                  <div key={exec.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-5 border-b border-border/40 hover:bg-surface-hover/30 transition-colors last:border-0 gap-4">
                     <div>
                       <p className="text-sm font-semibold text-foreground">Workflow Request #{exec.id.split('-')[0]}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">Submitted: {new Date(exec.created_at).toLocaleDateString()}</p>
+                      <p className="text-xs text-muted-foreground mt-1">Submitted: {new Date(exec.created_at).toLocaleDateString()}</p>
+                    </div>
+                    <div className="flex items-center gap-2 w-full sm:w-auto">
+                      <Button variant="outline" size="sm" className="flex-1 sm:flex-none text-[11px] px-3 border-border hover:bg-success/10 hover:text-success hover:border-success/30" onClick={() => router.push('/dashboard/workflows')}>
+                        <Check className="w-3.5 h-3.5 mr-1.5" /> Approve
+                      </Button>
+                      <Button variant="outline" size="sm" className="flex-1 sm:flex-none text-[11px] px-3 border-border hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30" onClick={() => router.push('/dashboard/workflows')}>
+                        <X className="w-3.5 h-3.5 mr-1.5" /> Reject
+                      </Button>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" className="flex-1 text-success border-success/30 hover:bg-success/10" onClick={() => router.push('/dashboard/workflows')}>
-                      <Check className="w-4 h-4 mr-1.5" /> Approve
-                    </Button>
-                    <Button variant="outline" size="sm" className="flex-1 text-destructive border-destructive/30 hover:bg-destructive/10" onClick={() => router.push('/dashboard/workflows')}>
-                      <X className="w-4 h-4 mr-1.5" /> Reject
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Team Analytics */}
-        <div className="bg-surface rounded-xl border border-border-strong shadow-sm p-6 flex flex-col">
-          <h3 className="text-lg font-semibold text-foreground mb-4">Team Workflow Performance</h3>
-          <CustomBarChart 
-            data={workflowPerformance} 
-            xAxisKey="workflow_name" 
-            bars={[{ key: "avg_completion_minutes", color: "#6366f1", name: "Avg Time (Min)" }]} 
-          />
-        </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Team Members */}
-        <div className="bg-surface rounded-xl border border-border-strong shadow-sm p-6 flex flex-col">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-foreground">Direct Reports</h3>
-            <button onClick={() => router.push('/dashboard/hr')} className="text-sm text-primary hover:underline">
+        <Card className="flex flex-col">
+          <CardHeader className="border-b border-border/40 pb-4 flex flex-row items-center justify-between">
+            <CardTitle className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+              Direct Reports
+            </CardTitle>
+            <Button variant="outline" size="sm" className="h-8 text-[11px] px-3 shadow-none border-transparent hover:bg-surface-hover/80" onClick={() => router.push('/dashboard/hr')}>
               View Directory
-            </button>
-          </div>
-          
-          {team.length === 0 ? (
-            <div className="flex-1 flex items-center justify-center text-sm text-muted-foreground border-2 border-dashed border-border rounded-lg">
-              No team members found.
-            </div>
-          ) : (
-            <div className="space-y-3 flex-1 overflow-auto max-h-[300px] pr-2">
-              {team.map(emp => (
-                <div key={emp.id} className="flex items-center justify-between p-3 rounded-lg border border-border hover:border-primary/50 transition-colors cursor-pointer" onClick={() => router.push(`/dashboard/hr/${emp.id}`)}>
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shrink-0">
-                      {emp.first_name[0]}{emp.last_name[0]}
+            </Button>
+          </CardHeader>
+          <CardContent className="flex-1 p-0 flex flex-col">
+            {team.length === 0 ? (
+              <div className="flex-1 flex flex-col items-center justify-center p-12 text-center bg-surface-hover/20">
+                <UserCircle2 className="w-8 h-8 text-muted-foreground/40 mb-4" />
+                <p className="text-sm font-semibold text-foreground">No team members</p>
+              </div>
+            ) : (
+              <div className="flex-1 overflow-auto max-h-[350px]">
+                {team.map(emp => (
+                  <div key={emp.id} className="flex items-center justify-between p-4 border-b border-border/40 hover:bg-surface-hover/40 transition-colors cursor-pointer last:border-0 group" onClick={() => router.push(`/dashboard/hr/${emp.id}`)}>
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-primary/5 text-primary flex items-center justify-center font-bold text-xs shrink-0 group-hover:bg-primary/10 transition-colors">
+                        {emp.first_name[0]}{emp.last_name[0]}
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-foreground">{emp.first_name} {emp.last_name}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{emp.employment_type}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-medium text-foreground">{emp.first_name} {emp.last_name}</p>
-                      <p className="text-xs text-muted-foreground">{emp.employment_type}</p>
-                    </div>
+                    <ArrowRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-foreground transition-colors" />
                   </div>
-                  <ArrowRight className="w-4 h-4 text-muted-foreground" />
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+      
+      {/* Team Analytics */}
+      <div className="grid grid-cols-1 gap-8">
+        <Card className="flex flex-col overflow-hidden">
+          <CardHeader className="border-b border-border/40 pb-4">
+            <CardTitle className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+              Team Workflow Performance
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="flex-1 p-6">
+            <CustomBarChart 
+              data={workflowPerformance} 
+              xAxisKey="workflow_name" 
+              bars={[{ key: "avg_completion_minutes", color: "#6366f1", name: "Avg Time (Min)" }]} 
+            />
+          </CardContent>
+        </Card>
       </div>
 
     </div>
