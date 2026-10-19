@@ -80,3 +80,6 @@ async def root():
     return {
         "message": "Welcome to WorkPilot AI Service"
     }
+
+from shared_infrastructure.core.metrics import setup_prometheus_metrics
+setup_prometheus_metrics(app)

@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: 'workpilot-dashboards'
+    orgId: 1
+    folder: 'WorkPilot'
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /var/lib/grafana/dashboards

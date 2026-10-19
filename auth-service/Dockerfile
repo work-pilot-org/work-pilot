@@ -1,3 +1,4 @@
+
 # ---------------------------------------
 # Base Stage
 # ---------------------------------------
@@ -21,6 +22,10 @@ COPY packages/shared-infrastructure /app/packages/shared-infrastructure
 COPY auth-service/pyproject.toml auth-service/README.md* /app/auth-service/
 
 WORKDIR /app/auth-service
+
+# Ensure uv creates the environment where production expects it
+ENV UV_PROJECT_ENVIRONMENT=/app/auth-service/.venv
+
 RUN uv sync --frozen --no-dev
 
 # ---------------------------------------
@@ -34,12 +39,17 @@ COPY packages/shared-infrastructure /app/packages/shared-infrastructure
 COPY auth-service/pyproject.toml auth-service/README.md* /app/auth-service/
 
 WORKDIR /app/auth-service
+
+ENV UV_PROJECT_ENVIRONMENT=/app/auth-service/.venv
+
 RUN uv sync --frozen
 
 COPY auth-service /app/auth-service
 
 ENV PYTHONPATH=/app/auth-service/src
+
 EXPOSE 8000
+
 CMD ["uv", "run", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
 # ---------------------------------------
@@ -57,4 +67,5 @@ ENV PATH="/app/auth-service/.venv/bin:$PATH"
 ENV PYTHONPATH=/app/auth-service/src
 
 EXPOSE 8000
+
 CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]

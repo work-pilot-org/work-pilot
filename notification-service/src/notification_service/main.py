@@ -50,3 +50,6 @@ def health_check():
         "status": "healthy",
         "service": "WorkPilot Notification Service",
     }
+
+from shared_infrastructure.core.metrics import setup_prometheus_metrics
+setup_prometheus_metrics(app)

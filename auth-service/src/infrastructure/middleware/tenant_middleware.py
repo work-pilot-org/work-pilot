@@ -6,6 +6,9 @@ from shared_infrastructure.database.tenant_session import set_tenant_schema, set
 
 class TenantMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
+        if request.url.path in ("/metrics", "/health", "/favicon.ico"):
+            return await call_next(request)
+
         # 1. Create a single database session for the lifetime of this request
         db = SessionLocal()
         

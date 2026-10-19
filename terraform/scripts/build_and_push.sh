@@ -24,13 +24,19 @@ SERVICES=(
   "analytics-service:analytics-service/Dockerfile:.:prod"
   "ai-service:ai-service/Dockerfile:.:prod"
   "frontend:frontend/Dockerfile:./frontend:prod"
+  "prometheus:monitoring/prometheus/Dockerfile:.:"
+  "grafana:monitoring/grafana/Dockerfile:.:"
 )
 
 for entry in "${SERVICES[@]}"; do
   IFS=":" read -r NAME DOCKERFILE CONTEXT TARGET <<< "${entry}"
   IMAGE_NAME="${LOGIN_SERVER}/workpilot/${NAME}:${TAG}"
   echo "--> Building ${NAME}..."
-  docker build -f "${DOCKERFILE}" -t "${IMAGE_NAME}" --target "${TARGET}" "${CONTEXT}"
+  if [ -n "${TARGET}" ]; then
+    docker build -f "${DOCKERFILE}" -t "${IMAGE_NAME}" --target "${TARGET}" "${CONTEXT}"
+  else
+    docker build -f "${DOCKERFILE}" -t "${IMAGE_NAME}" "${CONTEXT}"
+  fi
   echo "--> Pushing ${NAME} to ACR..."
   docker push "${IMAGE_NAME}"
 done

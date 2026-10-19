@@ -75,3 +75,7 @@ def home():
         "app": settings.APP_NAME,
         "debug": settings.DEBUG,
     }
+
+from shared_infrastructure.core.metrics import setup_prometheus_metrics
+setup_prometheus_metrics(app)
+

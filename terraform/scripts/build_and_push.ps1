@@ -27,14 +27,20 @@ $Services = @(
     @{ Name = "notification-service"; Dockerfile = "notification-service/Dockerfile"; Context = "."; Target = "prod" },
     @{ Name = "analytics-service"; Dockerfile = "analytics-service/Dockerfile"; Context = "."; Target = "prod" },
     @{ Name = "ai-service"; Dockerfile = "ai-service/Dockerfile"; Context = "."; Target = "prod" },
-    @{ Name = "frontend"; Dockerfile = "frontend/Dockerfile"; Context = "./frontend"; Target = "prod" }
+    @{ Name = "frontend"; Dockerfile = "frontend/Dockerfile"; Context = "./frontend"; Target = "prod" },
+    @{ Name = "prometheus"; Dockerfile = "monitoring/prometheus/Dockerfile"; Context = "."; Target = "" },
+    @{ Name = "grafana"; Dockerfile = "monitoring/grafana/Dockerfile"; Context = "."; Target = "" }
 )
 
 foreach ($svc in $Services) {
     $ImageName = "$LoginServer/workpilot/$($svc.Name):$Tag"
-    Write-Host "`n--> Building $($svc.Name) (target: $($svc.Target))..." -ForegroundColor Green
+    Write-Host "`n--> Building $($svc.Name)..." -ForegroundColor Green
     
-    docker build -f $svc.Dockerfile -t $ImageName --target $svc.Target $svc.Context
+    if ($svc.Target) {
+        docker build -f $svc.Dockerfile -t $ImageName --target $svc.Target $svc.Context
+    } else {
+        docker build -f $svc.Dockerfile -t $ImageName $svc.Context
+    }
     if ($LASTEXITCODE -ne 0) {
         Write-Error "Docker build failed for $($svc.Name)"
     }

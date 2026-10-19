@@ -103,3 +103,20 @@ variable "container_max_replicas" {
   description = "Maximum replicas for Container Apps during traffic"
   default     = 2
 }
+
+# -------------------------------------------------------------
+# Monitoring configuration
+# -------------------------------------------------------------
+variable "grafana_admin_user" {
+  type        = string
+  description = "Grafana admin username"
+  default     = "admin"
+}
+
+variable "grafana_admin_password" {
+  type        = string
+  description = "Grafana admin password"
+  default     = "AdminSecure123!"
+  sensitive   = true
+}
+

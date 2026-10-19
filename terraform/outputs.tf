@@ -63,3 +63,15 @@ output "ai_service_url" {
   description = "Public URL for AI Service"
   value       = "https://${azurerm_container_app.ai_service.latest_revision_fqdn}"
 }
+
+# --- Monitoring URLs ---
+output "grafana_url" {
+  description = "Public URL for Grafana Monitoring Dashboards"
+  value       = "https://${azurerm_container_app.grafana.latest_revision_fqdn}"
+}
+
+output "prometheus_internal_url" {
+  description = "Internal URL for Prometheus"
+  value       = "http://prometheus.${azurerm_container_app_environment.env.default_domain}"
+}
+

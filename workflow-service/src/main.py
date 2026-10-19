@@ -46,3 +46,6 @@ async def health():
     return {
         "status": "healthy",
     }
+
+from shared_infrastructure.core.metrics import setup_prometheus_metrics
+setup_prometheus_metrics(app)

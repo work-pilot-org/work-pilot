@@ -1,0 +1,43 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: "workpilot-auth-service"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["auth-service:8000"]
+
+  - job_name: "workpilot-hr-service"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["hr-service:8000"]
+
+  - job_name: "workpilot-it-service"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["it-service:8000"]
+
+  - job_name: "workpilot-workflow-service"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["workflow-service:8000"]
+
+  - job_name: "workpilot-notification-service"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["notification-service:8000"]
+
+  - job_name: "workpilot-analytics-service"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["analytics-service:8000"]
+
+  - job_name: "workpilot-ai-service"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["ai-service:8000"]
