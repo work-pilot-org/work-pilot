@@ -1,0 +1,60 @@
+version: 2
+updates:
+  # GitHub Actions workflows
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: "develop"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "ci"
+
+  # Frontend (Next.js / npm)
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    target-branch: "develop"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "frontend"
+
+  # Python Services (uv / pyproject.toml)
+  - package-ecosystem: "pip"
+    directories:
+      - "/"
+      - "/ai-service"
+      - "/analytics-service"
+      - "/auth-service"
+      - "/hr-service"
+      - "/it-service"
+      - "/notification-service"
+      - "/workflow-service"
+      - "/packages/shared-infrastructure"
+    target-branch: "develop"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "backend"
+
+  # Dockerfiles across services
+  - package-ecosystem: "docker"
+    directories:
+      - "/ai-service"
+      - "/analytics-service"
+      - "/auth-service"
+      - "/frontend"
+      - "/hr-service"
+      - "/it-service"
+      - "/notification-service"
+      - "/workflow-service"
+    target-branch: "develop"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "docker"
