@@ -1,0 +1,18 @@
+from typing import Any
+
+from shared_infrastructure.core.config import settings
+from src.infrastructure.clients.base_client import BaseClient
+
+
+class NotificationClient(BaseClient):
+    def __init__(self):
+        super().__init__(base_url=settings.NOTIFICATION_SERVICE_URL if hasattr(settings, "NOTIFICATION_SERVICE_URL") else "http://notification-service:8000")
+
+    async def send_notification(self, user_id: str, message: str, token: str | None = None) -> Any:
+        """
+        Send a notification to a user.
+        """
+        print(f"[STUB] Notification to {user_id}: {message}")
+        return {"status": "success", "stubbed": True}
+
+notification_client = NotificationClient()

@@ -1,0 +1,82 @@
+export interface RegisterRequest {
+  company_name: string;
+  full_name: string;
+  email: string;
+  password: string;
+  confirm_password: string;
+}
+
+export interface RegisterResponse {
+  message: string;
+  tenant_id: number;
+  company_name: string;
+  domain: string;
+}
+
+export interface ApiError {
+  detail: string | { loc: string[]; msg: string; type: string }[];
+}
+
+export interface User {
+  id: string;
+  email: string;
+  name?: string;
+  schemaName?: string;
+  domain?: string;
+  isMfaEnabled?: boolean;
+  roles?: string[];
+}
+
+export interface LoginCredentials {
+  email: string;
+  password?: string;
+}
+
+export interface LoginResponse {
+  user: User;
+  token: string;
+  ssoToken?: string;
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ForgotPasswordResponse {
+  message: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  new_password: string;
+}
+
+export interface ResetPasswordResponse {
+  message: string;
+  ssoToken?: string;
+}
+
+export interface PreAuthResponse {
+  preauth_token: string;
+  mfa_required: boolean;
+  message: string;
+}
+
+export interface MFASetupResponse {
+  secret: string;
+  provisioning_uri: string;
+}
+
+export interface MFALoginRequest {
+  preauth_token: string;
+  code: string;
+}
+
+export interface MFAEnableRequest {
+  code: string;
+}
+
+export interface MFADisableRequest {
+  password: string;
+  code: string;
+}

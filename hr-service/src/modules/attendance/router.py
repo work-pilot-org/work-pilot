@@ -1,0 +1,364 @@
+from datetime import date
+from uuid import UUID
+
+from fastapi import APIRouter, Depends, Query, status, BackgroundTasks
+from sqlalchemy.orm import Session
+
+from shared_infrastructure.core.dependencies import (
+    get_current_user_and_set_schema,
+    require_permissions,
+    verify_employee_ownership,
+)
+from shared_infrastructure.core.rbac import Permission
+from shared_infrastructure.database.session import get_db
+from src.modules.attendance.schemas import (
+    AttendanceCheckIn,
+    AttendanceCheckOut,
+    AttendanceCreate,
+    AttendanceExportResponse,
+    AttendanceResponse,
+    AttendanceStatusUpdate,
+    AttendanceSummaryResponse,
+    AttendanceUpdate,
+    MonthlyAttendanceReportResponse,
+)
+from src.modules.attendance.use_cases import AttendanceUseCases
+from shared_infrastructure.publisher import publish_event
+from shared_infrastructure.events import EventEnvelope
+router = APIRouter(
+    prefix="/attendance",
+    tags=["Attendance"],
+    dependencies=[Depends(get_current_user_and_set_schema)],
+)
+
+
+def get_service(db: Session = Depends(get_db)) -> AttendanceUseCases:
+    return AttendanceUseCases(db)
+
+
+# ----------------------------------------------------
+# Check In
+# ----------------------------------------------------
+
+@router.post(
+    "/check-in",
+    response_model=AttendanceResponse,
+    status_code=status.HTTP_200_OK,
+)
+def check_in(
+    request: AttendanceCheckIn,
+    background_tasks: BackgroundTasks,
+    current_user: dict = Depends(get_current_user_and_set_schema),
+    db: Session = Depends(get_db),
+    service: AttendanceUseCases = Depends(get_service),
+):
+    verify_employee_ownership(request.employee_id, current_user, db, bypass_permissions=[Permission.ATTENDANCE_MANAGE])
+    attendance = service.check_in(request)
+    
+    event = EventEnvelope[dict](
+        event_type="attendance.created",
+        source="hr-service",
+        tenant_id=current_user.get("schema_name", "public"),
+        payload={
+            "attendance_id": attendance.id,
+            "employee_id": str(attendance.employee_id),
+            "check_in": str(attendance.check_in) if attendance.check_in else None,
+            "check_out": str(attendance.check_out) if attendance.check_out else None,
+            "attendance_date": str(attendance.attendance_date),
+            "status": attendance.status.value,
+            "working_minutes": attendance.working_minutes,
+            "overtime_minutes": attendance.overtime_minutes,
+        }
+    )
+    background_tasks.add_task(publish_event, "hr.attendance", event)
+    
+    return attendance
+
+
+# ----------------------------------------------------
+# Check Out
+# ----------------------------------------------------
+
+@router.post(
+    "/check-out",
+    response_model=AttendanceResponse,
+    status_code=status.HTTP_200_OK,
+)
+def check_out(
+    request: AttendanceCheckOut,
+    background_tasks: BackgroundTasks,
+    current_user: dict = Depends(get_current_user_and_set_schema),
+    db: Session = Depends(get_db),
+    service: AttendanceUseCases = Depends(get_service),
+):
+    verify_employee_ownership(request.employee_id, current_user, db, bypass_permissions=[Permission.ATTENDANCE_MANAGE])
+    attendance = service.check_out(request)
+    
+    event = EventEnvelope[dict](
+        event_type="attendance.updated",
+        source="hr-service",
+        tenant_id=current_user.get("schema_name", "public"),
+        payload={
+            "attendance_id": attendance.id,
+            "employee_id": str(attendance.employee_id),
+            "check_in": str(attendance.check_in) if attendance.check_in else None,
+            "check_out": str(attendance.check_out) if attendance.check_out else None,
+            "attendance_date": str(attendance.attendance_date),
+            "status": attendance.status.value,
+            "working_minutes": attendance.working_minutes,
+            "overtime_minutes": attendance.overtime_minutes,
+        }
+    )
+    background_tasks.add_task(publish_event, "hr.attendance", event)
+    
+    return attendance
+
+
+# ----------------------------------------------------
+# Create Attendance
+# ----------------------------------------------------
+
+@router.post(
+    "",
+    response_model=AttendanceResponse,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_permissions([Permission.ATTENDANCE_MANAGE]))],
+)
+def create_attendance(
+    request: AttendanceCreate,
+    service: AttendanceUseCases = Depends(get_service),
+):
+    return service.create_attendance(request)
+
+
+# ----------------------------------------------------
+# Get All Attendance
+# ----------------------------------------------------
+
+@router.get(
+    "",
+    response_model=list[AttendanceResponse],
+    dependencies=[Depends(require_permissions([Permission.ATTENDANCE_MANAGE]))],
+)
+def get_all_attendance(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1),
+    service: AttendanceUseCases = Depends(get_service),
+):
+    return service.get_all_attendance(skip, limit)
+
+
+# ----------------------------------------------------
+# Today's Attendance
+# ----------------------------------------------------
+
+@router.get(
+    "/today",
+    response_model=list[AttendanceResponse],
+    dependencies=[Depends(require_permissions([Permission.ATTENDANCE_MANAGE]))],
+)
+def get_today_attendance(
+    service: AttendanceUseCases = Depends(get_service),
+):
+    return service.get_today_attendance()
+
+
+# ----------------------------------------------------
+# My Today's Attendance (self-service for EMPLOYEE role)
+# ----------------------------------------------------
+
+@router.get(
+    "/me/today",
+    response_model=AttendanceResponse | None,
+    dependencies=[Depends(require_permissions([Permission.ATTENDANCE_READ]))],
+)
+def get_my_today_attendance(
+    current_user: dict = Depends(get_current_user_and_set_schema),
+    db: Session = Depends(get_db),
+    service: AttendanceUseCases = Depends(get_service),
+):
+    """
+    Returns the authenticated employee's attendance record for today.
+    Accessible by the EMPLOYEE role via ATTENDANCE_READ permission.
+    """
+    from uuid import UUID as UUIDType
+    from datetime import date as date_type
+    from src.modules.employee.repository import EmployeeRepository
+
+    auth_user_id = UUIDType(current_user["sub"])
+    emp_repo = EmployeeRepository(db)
+    employee = emp_repo.get_employee_by_auth_user_id(auth_user_id)
+    if not employee:
+        return None
+    return service.get_employee_attendance_by_date(employee.id, date_type.today())
+
+
+
+# ----------------------------------------------------
+# Active Attendance
+# ----------------------------------------------------
+
+@router.get(
+    "/active",
+    response_model=list[AttendanceResponse],
+    dependencies=[Depends(require_permissions([Permission.ATTENDANCE_MANAGE]))],
+)
+def get_active_attendance(
+    service: AttendanceUseCases = Depends(get_service),
+):
+    return service.get_active_attendance()
+
+
+# ----------------------------------------------------
+# Get Attendance By ID
+# ----------------------------------------------------
+
+@router.get(
+    "/{attendance_id}",
+    response_model=AttendanceResponse,
+    dependencies=[Depends(require_permissions([Permission.ATTENDANCE_MANAGE]))],
+)
+def get_attendance(
+    attendance_id: int,
+    service: AttendanceUseCases = Depends(get_service),
+):
+    return service.get_attendance(attendance_id)
+
+
+# ----------------------------------------------------
+# Update Attendance
+# ----------------------------------------------------
+
+@router.put(
+    "/{attendance_id}",
+    response_model=AttendanceResponse,
+    dependencies=[Depends(require_permissions([Permission.ATTENDANCE_MANAGE]))],
+)
+def update_attendance(
+    attendance_id: int,
+    request: AttendanceUpdate,
+    service: AttendanceUseCases = Depends(get_service),
+):
+    return service.update_attendance(attendance_id, request)
+
+
+# ----------------------------------------------------
+# Delete Attendance
+# ----------------------------------------------------
+
+@router.delete(
+    "/{attendance_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(require_permissions([Permission.ATTENDANCE_MANAGE]))],
+)
+def delete_attendance(
+    attendance_id: int,
+    service: AttendanceUseCases = Depends(get_service),
+):
+    service.delete_attendance(attendance_id)
+
+
+# ----------------------------------------------------
+# Employee Attendance
+# ----------------------------------------------------
+
+@router.get(
+    "/employee/{employee_id}",
+    response_model=list[AttendanceResponse],
+)
+def get_employee_attendance(
+    employee_id: UUID,
+    current_user: dict = Depends(get_current_user_and_set_schema),
+    db: Session = Depends(get_db),
+    service: AttendanceUseCases = Depends(get_service),
+):
+    verify_employee_ownership(employee_id, current_user, db, bypass_permissions=[Permission.ATTENDANCE_READ, Permission.ATTENDANCE_MANAGE])
+    return service.get_employee_attendance(employee_id)
+
+
+# ----------------------------------------------------
+# Employee Summary
+# ----------------------------------------------------
+
+@router.get(
+    "/employee/{employee_id}/summary",
+    response_model=AttendanceSummaryResponse,
+)
+def get_employee_summary(
+    employee_id: UUID,
+    current_user: dict = Depends(get_current_user_and_set_schema),
+    db: Session = Depends(get_db),
+    service: AttendanceUseCases = Depends(get_service),
+):
+    verify_employee_ownership(employee_id, current_user, db, bypass_permissions=[Permission.ATTENDANCE_READ, Permission.ATTENDANCE_MANAGE])
+    return service.get_employee_summary(employee_id)
+
+
+# ----------------------------------------------------
+# Attendance By Date
+# ----------------------------------------------------
+
+@router.get(
+    "/date/{attendance_date}",
+    response_model=list[AttendanceResponse],
+    dependencies=[Depends(require_permissions([Permission.ATTENDANCE_MANAGE]))],
+)
+def get_attendance_by_date(
+    attendance_date: date,
+    service: AttendanceUseCases = Depends(get_service),
+):
+    return service.get_attendance_by_date(attendance_date)
+
+
+
+
+
+# ----------------------------------------------------
+# Update Status
+# ----------------------------------------------------
+
+@router.patch(
+    "/{attendance_id}/status",
+    response_model=AttendanceResponse,
+    dependencies=[Depends(require_permissions([Permission.ATTENDANCE_MANAGE]))],
+)
+def update_status(
+    attendance_id: int,
+    request: AttendanceStatusUpdate,
+    service: AttendanceUseCases = Depends(get_service),
+):
+    return service.update_status(attendance_id, request)
+
+
+# ----------------------------------------------------
+# Monthly Report
+# ----------------------------------------------------
+
+@router.get(
+    "/report/monthly",
+    response_model=MonthlyAttendanceReportResponse,
+    dependencies=[Depends(require_permissions([Permission.ATTENDANCE_READ]))],
+)
+def get_monthly_report(
+    month: int,
+    year: int,
+    service: AttendanceUseCases = Depends(get_service),
+):
+    return service.get_monthly_report(month, year)
+
+
+# ----------------------------------------------------
+# Export Attendance
+# ----------------------------------------------------
+
+@router.get(
+    "/export",
+    response_model=AttendanceExportResponse,
+    dependencies=[Depends(require_permissions([Permission.ATTENDANCE_MANAGE]))],
+)
+def export_attendance(
+    month: int = Query(..., ge=1, le=12),
+    year: int = Query(..., ge=1900, le=2100),
+    service: AttendanceUseCases = Depends(get_service),
+):
+    return service.export_attendance(month, year)

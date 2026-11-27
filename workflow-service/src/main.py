@@ -1,0 +1,48 @@
+from fastapi import FastAPI
+
+from shared_infrastructure.core.config import settings
+from src.core.logging import logger
+from src.modules.workflow.router import router as workflow_router
+
+app = FastAPI(
+    title=settings.APP_NAME,
+    debug=settings.DEBUG,
+)
+
+from fastapi.middleware.cors import CORSMiddleware
+
+origins = [
+    "http://localhost:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_origin_regex=r"http://.*\.localhost:\d+",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(workflow_router)
+@app.on_event("startup")
+async def startup():
+
+    logger.info("Workflow Service Started")
+
+
+@app.get("/")
+async def root():
+
+    return {
+        "service": settings.APP_NAME,
+        "status": "running",
+    }
+
+
+@app.get("/health")
+async def health():
+
+    return {
+        "status": "healthy",
+    }

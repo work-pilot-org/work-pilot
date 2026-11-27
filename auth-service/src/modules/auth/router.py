@@ -1,0 +1,339 @@
+from fastapi import APIRouter, Depends, Response, Request, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
+from shared_infrastructure.core.dependencies import get_current_user_and_set_schema
+from sqlalchemy.orm import Session
+
+from shared_infrastructure.database.session import get_db
+from src.modules.auth.schemas import (
+    RegisterRequest,
+    RegisterResponse,
+    LoginRequest,
+    LoginResponse,
+    SSOExchangeRequest,
+    MFASetupResponse,
+    MFAEnableRequest,
+    MFADisableRequest,
+    MFALoginRequest,
+    PreAuthResponse,
+)
+from typing import Union
+from src.modules.auth.service import AuthService
+
+from src.modules.password_reset.schemas import (
+    ForgotPasswordRequest,
+    ResetPasswordRequest,
+)
+
+router = APIRouter(
+    prefix="/auth",
+    tags=["Authentication"],
+)
+
+auth_service = AuthService()
+
+
+def _cookie_params() -> dict:
+    """
+    Returns the unified cookie security parameters.
+
+    Development (DEBUG=True):
+        SameSite=Lax, Secure=False — works on plain HTTP localhost subdomains.
+    Production (DEBUG=False):
+        SameSite=None, Secure=True — required for cross-site cookie delivery.
+
+    Using the SAME helper for every Set-Cookie operation (login, sso-exchange,
+    refresh, logout) guarantees that the deletion attributes always match the
+    creation attributes — which is required for cookie deletion to work.
+    """
+    from shared_infrastructure.core.config import settings
+    is_production = not settings.DEBUG
+    return {
+        "httponly": True,
+        "secure": is_production,
+        "samesite": "none" if is_production else "lax",
+        "path": "/",
+    }
+
+
+@router.post(
+    "/register",
+    response_model=RegisterResponse,
+    status_code=201,
+)
+def register(
+    request: RegisterRequest,
+    db: Session = Depends(get_db),
+) -> RegisterResponse:
+    """
+    Register a new company along with its first organization admin.
+    """
+    return auth_service.register(
+        db=db,
+        request=request,
+    )
+
+
+@router.post(
+    "/login",
+    response_model=Union[LoginResponse, PreAuthResponse],
+    status_code=200,
+)
+def login(
+    request: LoginRequest,
+    response: Response,
+    db: Session = Depends(get_db),
+) -> LoginResponse:
+    """
+    Authenticate a user and return a JWT access token. Sets refresh token as HttpOnly cookie.
+    """
+    login_response, refresh_token = auth_service.login(
+        db=db,
+        request=request,
+    )
+    
+    if isinstance(login_response, PreAuthResponse):
+        return login_response
+    
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        max_age=7 * 24 * 60 * 60,  # 7 days
+        **_cookie_params(),
+    )
+    
+    return login_response
+
+@router.post("/sso-exchange")
+def sso_exchange(
+    request: SSOExchangeRequest,
+    response: Response,
+    db: Session = Depends(get_db),
+) -> dict:
+    """
+    Exchange a short-lived single-use SSO token for an HttpOnly refresh token cookie
+    on the current domain. The SSO token is permanently revoked after this call.
+    """
+    refresh_token = auth_service.exchange_sso_token(db=db, sso_token=request.sso_token)
+    
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        max_age=7 * 24 * 60 * 60,
+        **_cookie_params(),
+    )
+    
+    return {"message": "SSO exchange successful"}
+
+@router.post("/swagger-login", include_in_schema=False)
+def swagger_login(
+    response: Response,
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db),
+) -> LoginResponse:
+    """
+    Hidden endpoint just for Swagger UI's Authorize button to work.
+    """
+    request = LoginRequest(email=form_data.username, password=form_data.password)
+    login_response, refresh_token = auth_service.login(db=db, request=request)
+    return login_response
+
+@router.post("/refresh", response_model=LoginResponse)
+def refresh_token_endpoint(
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db),
+) -> LoginResponse:
+    """
+    Refresh the access token using the HttpOnly refresh token cookie.
+    Implements token rotation: the old refresh token is permanently revoked and
+    a new one is issued and set as a cookie. Replayed tokens are rejected.
+    """
+    refresh_token = request.cookies.get("refresh_token")
+    if not refresh_token:
+        raise HTTPException(status_code=401, detail="Refresh token missing.")
+        
+    try:
+        login_response, new_refresh_token = auth_service.refresh_access_token(
+            db=db,
+            refresh_token=refresh_token,
+        )
+
+        # Set the rotated refresh token cookie with identical attributes to the original.
+        response.set_cookie(
+            key="refresh_token",
+            value=new_refresh_token,
+            max_age=7 * 24 * 60 * 60,
+            **_cookie_params(),
+        )
+
+        return login_response
+    except Exception as e:
+        raise HTTPException(status_code=401, detail=str(e))
+
+@router.post("/logout")
+def logout(
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db),
+):
+    """
+    Revoke the refresh token server-side and delete the cookie.
+    Cookie deletion uses the EXACT same attributes as creation (via _cookie_params())
+    to guarantee the browser removes it.
+    """
+    refresh_token = request.cookies.get("refresh_token")
+    if refresh_token:
+        from src.modules.user.models import RevokedToken
+        # Idempotent: ignore if already revoked
+        existing = db.query(RevokedToken).filter(RevokedToken.token == refresh_token).first()
+        if not existing:
+            revoked = RevokedToken(token=refresh_token)
+            db.add(revoked)
+            try:
+                db.commit()
+            except Exception:
+                db.rollback()
+
+    # Delete with identical attributes to creation — this is required for the browser
+    # to match and remove the cookie.
+    response.set_cookie(
+        key="refresh_token",
+        value="",
+        max_age=0,
+        **_cookie_params(),
+    )
+    return {"message": "Logged out successfully"}
+
+@router.get(
+    "/me",
+    status_code=200,
+)
+def get_current_user_info(
+    current_user_payload: dict = Depends(get_current_user_and_set_schema),
+):
+    """
+    Test endpoint to verify the JWT and schema switching dependency!
+    """
+    return {
+        "message": "Successfully authenticated and switched schema!",
+        "your_jwt_data": current_user_payload,
+    }
+    
+
+
+@router.post(
+    "/forgot-password",
+    status_code=200,
+)
+def forgot_password(
+    request: ForgotPasswordRequest,
+    db: Session = Depends(get_db),
+):
+    """
+    Send password reset email.
+    """
+    from src.modules.password_reset.service import PasswordResetService
+    password_reset_service = PasswordResetService()
+    return password_reset_service.forgot_password(
+        db=db,
+        email=request.email,
+    )
+    
+@router.post(
+    "/reset-password",
+    status_code=200,
+)
+def reset_password(
+    request: ResetPasswordRequest,
+    db: Session = Depends(get_db),
+):
+    """
+    Reset user password.
+    """
+    from src.modules.password_reset.service import PasswordResetService
+    password_reset_service = PasswordResetService()
+    return password_reset_service.reset_password(
+        db=db,
+        token=request.token,
+        new_password=request.new_password,
+    )
+
+@router.post(
+    "/mfa/setup",
+    response_model=MFASetupResponse,
+    status_code=200,
+)
+def setup_mfa(
+    current_user_payload: dict = Depends(get_current_user_and_set_schema),
+    db: Session = Depends(get_db),
+):
+    """
+    Generate an MFA secret and return a provisioning URI for TOTP apps.
+    """
+    user_id = current_user_payload.get("sub")
+    try:
+        return auth_service.setup_mfa(db, user_id)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.post(
+    "/mfa/enable",
+    status_code=200,
+)
+def enable_mfa(
+    request: MFAEnableRequest,
+    current_user_payload: dict = Depends(get_current_user_and_set_schema),
+    db: Session = Depends(get_db),
+):
+    """
+    Verify the TOTP code and enable MFA for the user.
+    """
+    user_id = current_user_payload.get("sub")
+    try:
+        return auth_service.enable_mfa(db, user_id, request)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.post(
+    "/mfa/disable",
+    status_code=200,
+)
+def disable_mfa(
+    request: MFADisableRequest,
+    current_user_payload: dict = Depends(get_current_user_and_set_schema),
+    db: Session = Depends(get_db),
+):
+    """
+    Disable MFA requiring password and current TOTP code.
+    """
+    user_id = current_user_payload.get("sub")
+    try:
+        return auth_service.disable_mfa(db, user_id, request)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.post(
+    "/login/mfa",
+    response_model=LoginResponse,
+    status_code=200,
+)
+def login_mfa(
+    request: MFALoginRequest,
+    response: Response,
+    db: Session = Depends(get_db),
+):
+    """
+    Exchange a preauth token + TOTP code for standard auth tokens.
+    """
+    try:
+        login_response, refresh_token = auth_service.login_mfa(db, request)
+        
+        response.set_cookie(
+            key="refresh_token",
+            value=refresh_token,
+            max_age=7 * 24 * 60 * 60,
+            **_cookie_params(),
+        )
+        return login_response
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
